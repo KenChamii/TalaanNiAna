@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="TalaanNiAna.API/TalaanNiAna.API.csproj" />
+  <Project Path="TalaanNiAna.Application/TalaanNiAna.Application.csproj" />
+  <Project Path="TalaanNiAna.Domain/TalaanNiAna.Domain.csproj" />
+  <Project Path="TalaanNiAna.Infrastructure/TalaanNiAna.Infrastructure.csproj" />
+</Solution>
