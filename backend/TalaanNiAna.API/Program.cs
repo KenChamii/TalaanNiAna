@@ -44,8 +44,12 @@ builder.Services.AddCors(options =>
 
 //Dependency Injection
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<CustomerService>();
+
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
