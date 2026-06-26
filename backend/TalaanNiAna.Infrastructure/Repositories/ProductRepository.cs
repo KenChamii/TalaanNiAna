@@ -84,12 +84,8 @@ public class ProductRepository : IProductRepository
     }
 
     public async Task<IEnumerable<Product>> GetQuickItemsAsync()
-        // "Quick items" = the tiles shown on the POS screen (Page 5).
-        // Simplest useful rule: the 8 most recently sold / most stocked active items.
-        // Swap this for a `IsQuickItem` flag on Product later if Nanay Ana wants to pick them manually.
-        => await _context.Products
-            .Where(p => p.IsActive)
-            .OrderByDescending(p => p.StockQuantity)
-            .Take(8)
-            .ToListAsync();
+     => await _context.Products
+         .Where(p => p.IsActive)
+         .OrderByDescending(p => p.StockQuantity)
+         .ToListAsync();
 }

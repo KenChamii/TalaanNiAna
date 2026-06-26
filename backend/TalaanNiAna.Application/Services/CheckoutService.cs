@@ -53,11 +53,14 @@
 
             await _unitOfWork.Transactions.CreateAsync(transaction);
 
-            var customerExists = await _unitOfWork.Customers.GetByIdAsync(dto.CustomerId!.Value) is not null;
-            if (!customerExists)
-                throw new InvalidOperationException("Customer not found.");
+            if (paymentType == PaymentType.Credit)
+            {
+                var customerExists = await _unitOfWork.Customers.GetByIdAsync(dto.CustomerId!.Value) is not null;
+                if (!customerExists)
+                    throw new InvalidOperationException("Customer not found.");
 
-            await _unitOfWork.Customers.UpdateCreditAsync(dto.CustomerId!.Value, transaction.TotalAmount);
+                await _unitOfWork.Customers.UpdateCreditAsync(dto.CustomerId!.Value, transaction.TotalAmount);
+            }
 
             await _unitOfWork.CommitAsync();
 
