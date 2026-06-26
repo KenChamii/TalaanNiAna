@@ -45,10 +45,11 @@ builder.Services.AddCors(options =>
 //Dependency Injection
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CustomerService>();
-
+builder.Services.AddScoped<TransactionService>();
 
 
 builder.Services.AddControllers();
