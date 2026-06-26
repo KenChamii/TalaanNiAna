@@ -32,15 +32,15 @@ export class InventoryListComponent implements OnInit {
     this.load();
   }
 
-  load() {
-    this.inventoryService
-      .getAll(this.searchTerm(), this.selectedCategory(), this.currentPage())
-      .subscribe(result => {
-        this.products.set(result.items);
-        this.totalPages.set(result.totalPages);
-        this.totalCount.set(result.totalCount);
-      });
-  }
+load() {
+  this.inventoryService
+    .getAll(this.searchTerm(), this.selectedCategory(), this.currentPage())
+    .subscribe(result => {
+      this.products.set(result.items);
+      this.totalCount.set(result.totalCount);
+      this.totalPages.set(Math.ceil(result.totalCount / 10)); // 10 = pageSize
+    });
+}
 
   onSearchChange() {
     this.currentPage.set(1);

@@ -1,0 +1,108 @@
+.pos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+
+  .pos-title { font-weight: 700; color: var(--sun-yellow); font-size: 1.1rem; }
+  .pos-total { font-weight: 700; color: var(--crimson-red); font-size: 1.1rem; }
+}
+
+.pos-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.quick-tiles {
+  h4 { margin: 0 0 0.75rem; color: var(--text-muted); font-size: 0.85rem; }
+  input { width: 100%; margin-bottom: 1rem; }
+}
+
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.tile {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 1.25rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  min-height: 90px;
+  transition: transform 0.1s ease, border-color 0.15s ease;
+
+  &:hover { border-color: var(--flag-blue); }
+  &:active { transform: scale(0.96); background: var(--flag-blue); }
+
+  .tile-name { font-size: 0.85rem; text-align: center; font-weight: 600; }
+  .tile-price { color: var(--sun-yellow); font-weight: 700; }
+}
+
+.receipt {
+  h4 { margin: 0 0 0.75rem; color: var(--text-muted); font-size: 0.85rem; }
+}
+
+.receipt-lines {
+  min-height: 120px;
+  border-bottom: 1px dashed var(--border-subtle);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.receipt-line {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.9rem;
+  padding: 0.35rem 0;
+
+  .remove-btn { background: none; border: none; color: var(--crimson-red); cursor: pointer; }
+}
+
+.empty { color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+
+.subtotal-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.payment-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+
+  label { display: flex; align-items: center; gap: 0.5rem; }
+}
+
+.checkout-btn {
+  width: 100%;
+  background: var(--crimson-red);
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { opacity: 0.9; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+@media (max-width: 900px) {
+  .pos-grid { grid-template-columns: 1fr; }
+  .tile-grid { grid-template-columns: repeat(2, 1fr); }
+}

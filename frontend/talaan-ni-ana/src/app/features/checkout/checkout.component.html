@@ -1,0 +1,67 @@
+<div class="pos-header">
+  <span class="pos-title">☀ Talaan ni Ana POS</span>
+  <span class="pos-total">KABUUANG HALAGA: {{ subtotal() | peso }}</span>
+</div>
+
+<div class="pos-grid">
+  <section class="quick-tiles">
+    <h4>MABILISANG PINDUTAN (ISANG TAP LANG)</h4>
+    <input
+      type="text"
+      placeholder="Itype o i-search ang paninda..."
+      [(ngModel)]="searchTerm" />
+
+    <div class="tile-grid">
+      <button
+        *ngFor="let item of filteredItems()"
+        class="tile"
+        (click)="addToCart(item)">
+        <span class="tile-name">{{ item.name }}</span>
+        <span class="tile-price">{{ item.price | peso }}</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="receipt card">
+    <h4>ANG RESIBO (KASALUKUYANG KARETA)</h4>
+
+    <div class="receipt-lines">
+      <div class="receipt-line" *ngFor="let line of cart()">
+        <span>{{ line.qty }}x {{ line.name }}</span>
+        <span>{{ (line.price * line.qty) | peso }}</span>
+        <button class="remove-btn" (click)="removeLine(line.productId)">✕</button>
+      </div>
+      <p class="empty" *ngIf="cart().length === 0">Walang item sa kart pa.</p>
+    </div>
+
+    <div class="subtotal-row">
+      <span>Subtotal:</span>
+      <span>{{ subtotal() | peso }}</span>
+    </div>
+
+    <div class="payment-toggle">
+      <span>Paraan ng Pagbayad:</span>
+      <label>
+        <input type="radio" name="payment" value="Cash" [(ngModel)]="paymentType" />
+        CASH (Abot-Kamay)
+      </label>
+      <label>
+        <input type="radio" name="payment" value="Credit" [(ngModel)]="paymentType" />
+        UTANG (Listahan)
+      </label>
+    </div>
+
+    <div class="customer-select" *ngIf="paymentType() === 'Credit'">
+  <label>Piliin ang Suki:</label>
+  <select [(ngModel)]="selectedCustomerId">
+    <option [ngValue]="null">-- Pumili ng Suki --</option>
+    <option *ngFor="let c of customers()" [ngValue]="c.id">
+      {{ c.fullName }}
+    </option>
+  </select>
+</div>
+    <button class="checkout-btn" (click)="checkout()" [disabled]="isProcessing() || cart().length === 0">
+      ☀ {{ isProcessing() ? 'Pinoproseso...' : 'TAP TO CHECKOUT — IREHISTRO ANG BENTA' }}
+    </button>
+  </section>
+</div>

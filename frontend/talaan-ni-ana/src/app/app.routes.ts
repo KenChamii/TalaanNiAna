@@ -21,6 +21,9 @@ export const routes: Routes = [
           import('./features/customers/customer-list/customer-list.component').then(m => m.CustomerListComponent) },
       { path: 'customers/:id', loadComponent: () =>
           import('./features/customers/customer-detail/customer-detail.component').then(m => m.CustomerDetailComponent) },
+
+       { path: 'checkout', loadComponent: () =>
+          import('./features/checkout/checkout.component').then(m => m.CheckoutComponent) },
     ]
   },
   { path: '**', redirectTo: '' }
