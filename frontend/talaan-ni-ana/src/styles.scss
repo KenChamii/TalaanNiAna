@@ -1,0 +1,66 @@
+/* You can add global styles to this file, and also import other style files */
+:root {
+  --flag-blue: #0038A8;
+  --crimson-red: #CE1126;
+  --sun-yellow: #FCD116;
+  --bg-dark: #0B1330;
+  --bg-card: #121B40;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --text-primary: #F1F3F9;
+  --text-muted: #9AA3C2;
+  --success: #2ECC71;
+  --danger: #FF6B6B;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+}
+
+.btn-primary {
+  background: var(--sun-yellow);
+  color: #1A1A1A;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  padding: 0.6rem 1.1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+input, select {
+  background: #0B1330;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--flag-blue);
+}
