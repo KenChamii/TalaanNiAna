@@ -1,6 +1,6 @@
 <div class="pos-header">
-  <span class="pos-title">☀ Talaan ni Ana POS</span>
-  <span class="pos-total">KABUUANG HALAGA: {{ subtotal() | peso }}</span>
+  <span class="pos-title">Talaan ni Ana POS</span>
+  <span class="pos-total">Total: <span class="total-amount">{{ subtotal() | peso }}</span></span>
 </div>
 
 <div class="pos-grid">
@@ -61,7 +61,7 @@
   </select>
 </div>
     <button class="checkout-btn" (click)="checkout()" [disabled]="isProcessing() || cart().length === 0">
-      ☀ {{ isProcessing() ? 'Pinoproseso...' : 'TAP TO CHECKOUT — IREHISTRO ANG BENTA' }}
+      {{ isProcessing() ? 'Pinoproseso...' : 'Checkout — Irehistro ang Benta' }}
     </button>
   </section>
 </div>

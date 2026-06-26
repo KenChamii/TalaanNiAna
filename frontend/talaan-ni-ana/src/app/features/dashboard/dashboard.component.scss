@@ -1,5 +1,35 @@
-h2 { margin-bottom: 1rem; }
+/* ── Header ── */
+.dash-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
 
+.eyebrow {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0 0 0.2rem;
+}
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.header-date {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* ── KPI Grid ── */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -8,21 +38,185 @@ h2 { margin-bottom: 1rem; }
 }
 
 .stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.35rem;
+  transition: border-color 0.15s ease;
 
-  .value { font-size: 1.5rem; font-weight: 700; }
-  .label { color: var(--text-muted); font-size: 0.85rem; }
+  &:hover { border-color: var(--border-light); }
+}
 
-  &.warn .value { color: var(--crimson-red); }
-  &.alert .value { color: var(--sun-yellow); }
+.stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.stat-icon-wrap {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  &.sales   { background: rgba(59,111,232,0.15); color: var(--accent); }
+  &.success { background: rgba(46,204,113,0.15); color: var(--success); }
+  &.danger  { background: rgba(229,83,75,0.15);  color: var(--danger); }
+  &.warning { background: rgba(232,161,32,0.15); color: var(--warning); }
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+
+  &.danger  { color: var(--danger); }
+  &.warning { color: var(--warning); }
+
+  small {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: 0;
+  }
+}
+
+.stat-footer {
+  margin-top: 0.1rem;
+}
+
+.delta {
+  font-size: 0.72rem;
+  font-weight: 500;
+
+  &.up      { color: var(--success); }
+  &.down    { color: var(--danger); }
+  &.neutral { color: var(--text-muted); }
+}
+
+/* ── Charts Row ── */
+.charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
 }
 
 .chart-card {
-  height: 320px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
 
-  h3 { margin-top: 0; font-size: 0.95rem; color: var(--text-muted); }
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.chart-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin: 0 0 0.15rem;
+}
+
+.chart-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.chart-wrap {
+  flex: 1;
+  min-height: 220px;
+
+  ngx-charts-line-chart,
+  ngx-charts-pie-chart {
+    display: block;
+    width: 100% !important;
+    height: 220px !important;
+  }
+}
+
+/* Legend for line chart */
+.chart-legend {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.legend-pip {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 4px;
+
+  &.cash   { background: #3B6FE8; }
+  &.credit { background: #E5534B; }
+}
+
+/* Donut legend */
+.pie-legend {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.pie-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+}
+
+.pie-pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.pie-label {
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.pie-val {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .charts-row { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 900px) {

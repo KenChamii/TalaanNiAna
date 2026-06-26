@@ -1,0 +1,18 @@
+h2 { margin-bottom: 1rem; }
+
+.settings-card {
+  max-width: 600px;
+
+  h3 { margin-top: 0; font-size: 0.95rem; color: var(--text-muted); }
+}
+
+.field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+
+  label { font-size: 0.85rem; color: var(--text-muted); }
+}
+
+.success { color: var(--success); font-size: 0.85rem; }

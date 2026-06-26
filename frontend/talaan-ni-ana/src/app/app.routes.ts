@@ -24,6 +24,11 @@ export const routes: Routes = [
 
        { path: 'checkout', loadComponent: () =>
           import('./features/checkout/checkout.component').then(m => m.CheckoutComponent) },
+      { path: 'transactions', loadComponent: () =>
+          import('./features/transactions/transaction-list/transaction-list.component').then(m => m.TransactionListComponent) },
+
+       { path: 'settings', loadComponent: () =>
+          import('./features/settings/settings.component').then(m => m.SettingsComponent) },
     ]
   },
   { path: '**', redirectTo: '' }

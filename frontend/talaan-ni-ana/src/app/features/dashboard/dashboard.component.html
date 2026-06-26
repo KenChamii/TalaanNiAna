@@ -1,32 +1,120 @@
-<h2>Dashboard / Overbyu ng Tindahan</h2>
-
-<div class="stat-grid">
-  <div class="card stat-card">
-    <span class="value">{{ todaySales() | peso }}</span>
-    <span class="label">Benta Ngayon</span>
+<!-- Page Header -->
+<div class="dash-header">
+  <div>
+    <p class="eyebrow">Pangkalahatang-tanaw</p>
+    <h2 class="page-title">Dashboard</h2>
   </div>
-  <div class="card stat-card">
-    <span class="value">{{ collections() | peso }}</span>
-    <span class="label">Koleksyon</span>
-  </div>
-  <div class="card stat-card warn">
-    <span class="value">{{ totalCredit() | peso }}</span>
-    <span class="label">Kabuuang Utang</span>
-  </div>
-  <div class="card stat-card alert">
-    <span class="value">{{ lowStockCount() }} Items</span>
-    <span class="label">Paubos Stock</span>
-  </div>
+  <div class="header-date">{{ today }}</div>
 </div>
 
-<div class="card chart-card">
-  <h3>Tsart ng Kasaysayan: Cash Sales kumpara sa mga Nag-Utang ngayong Buwan</h3>
-  <ngx-charts-line-chart
-    [results]="chartData()"
-    [scheme]="colorScheme"
-    [xAxis]="true"
-    [yAxis]="true"
-    [legend]="true"
-    [autoScale]="true">
-  </ngx-charts-line-chart>
+<!-- KPI Cards -->
+<div class="stat-grid">
+
+  <div class="stat-card">
+    <div class="stat-top">
+      <span class="stat-label">Benta Ngayon</span>
+      <span class="stat-icon-wrap sales">₱</span>
+    </div>
+    <span class="stat-value">{{ todaySales() | peso }}</span>
+    <div class="stat-footer">
+      <span class="delta up">↑ 12% vs kahapon</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      <span class="stat-label">Koleksyon</span>
+      <span class="stat-icon-wrap success">✓</span>
+    </div>
+    <span class="stat-value">{{ collections() | peso }}</span>
+    <div class="stat-footer">
+      <span class="delta neutral">{{ collectionRate() }}% ng benta</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      <span class="stat-label">Kabuuang Utang</span>
+      <span class="stat-icon-wrap danger">!</span>
+    </div>
+    <span class="stat-value danger">{{ totalCredit() | peso }}</span>
+    <div class="stat-footer">
+      <span class="delta down">{{ creditorCount() }} customers may utang</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      <span class="stat-label">Paubos na Stock</span>
+      <span class="stat-icon-wrap" [class.warning]="lowStockCount() > 0" [class.success]="lowStockCount() === 0">↓</span>
+    </div>
+    <span class="stat-value" [class.warning]="lowStockCount() > 0">{{ lowStockCount() }} <small>items</small></span>
+    <div class="stat-footer">
+      <span class="delta" [class.up]="lowStockCount() === 0" [class.down]="lowStockCount() > 0">
+        {{ lowStockCount() === 0 ? '✓ Lahat OK' : 'Kailangan ng restok' }}
+      </span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Charts Row -->
+<div class="charts-row">
+
+  <!-- Line Chart -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <p class="chart-eyebrow">Ngayong Buwan</p>
+        <h3 class="chart-title">Cash Sales vs Utang</h3>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-pip cash"></span><span>Cash</span>
+        <span class="legend-pip credit"></span><span>Utang</span>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <ngx-charts-line-chart
+        [results]="chartData()"
+        [scheme]="lineScheme"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="false"
+        [autoScale]="true"
+        [curve]="curve"
+        [showXAxisLabel]="false"
+        [showYAxisLabel]="false"
+        [tooltipDisabled]="false"
+        [roundDomains]="true">
+      </ngx-charts-line-chart>
+    </div>
+  </div>
+
+  <!-- Donut / Bar Summary -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <p class="chart-eyebrow">Breakdown</p>
+        <h3 class="chart-title">Sales Summary</h3>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <ngx-charts-pie-chart
+        [results]="pieData()"
+        [scheme]="pieScheme"
+        [legend]="false"
+        [doughnut]="true"
+        [arcWidth]="0.35"
+        [tooltipDisabled]="false">
+      </ngx-charts-pie-chart>
+    </div>
+    <div class="pie-legend">
+      <div class="pie-legend-item" *ngFor="let d of pieData()">
+        <span class="pie-pip" [ngStyle]="{'background': getPieColor(d.name)}"></span>
+        <span class="pie-label">{{ d.name }}</span>
+        <span class="pie-val">{{ d.value | peso }}</span>
+      </div>
+    </div>
+  </div>
+
 </div>
