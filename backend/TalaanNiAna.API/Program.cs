@@ -46,13 +46,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IStoreSettingsRepository, StoreSettingsRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<TransactionService>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<CheckoutService>();
-
+builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<SettingsService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
