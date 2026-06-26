@@ -1,0 +1,41 @@
+.login-wrap {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+}
+
+.login-card {
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border-top: 4px solid var(--flag-blue);
+
+  h1 { margin: 0; color: var(--sun-yellow); font-size: 1.4rem; }
+  .subtitle { margin: 0 0 0.75rem; color: var(--text-muted); font-size: 0.85rem; }
+
+  label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem; }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-direction: row;
+    margin: 0.5rem 0;
+  }
+
+  .error { color: var(--danger); font-size: 0.85rem; }
+  .full-width { width: 100%; margin-top: 0.5rem; }
+
+  .switch-link {
+    margin: 0.75rem 0 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+
+    a { color: var(--flag-blue); text-decoration: none; font-weight: 600; }
+    a:hover { text-decoration: underline; }
+  }
+}

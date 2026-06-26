@@ -1,0 +1,31 @@
+<div class="login-wrap">
+  <form class="login-card card" [formGroup]="form" (ngSubmit)="submit()">
+    <h1>Talaan ni Ana</h1>
+    <p class="subtitle">☀ Gumawa ng Bagong Account</p>
+
+    <label>Pangalan ng Tindahan</label>
+    <input type="text" formControlName="storeName" placeholder="Tindahan ni Ana" />
+
+    <label>Pangalan Mo</label>
+    <input type="text" formControlName="displayName" placeholder="Ana Reyes" />
+
+    <label>Username</label>
+    <input type="text" formControlName="username" placeholder="ana_tindahan" />
+
+    <label>Password</label>
+    <input type="password" formControlName="password" placeholder="••••••••••" />
+
+    <label>Ulitin ang Password</label>
+    <input type="password" formControlName="confirmPassword" placeholder="••••••••••" />
+
+    <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+    <button type="submit" class="btn-primary full-width" [disabled]="isLoading()">
+      {{ isLoading() ? 'Naglo-load...' : 'GUMAWA NG ACCOUNT' }}
+    </button>
+
+    <p class="switch-link">
+      May account ka na? <a routerLink="/login">Mag-login dito</a>
+    </p>
+  </form>
+</div>
