@@ -1,0 +1,59 @@
+h2 { margin-bottom: 1rem; }
+
+.toolbar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+
+  input { flex: 1; max-width: 320px; }
+}
+
+.table-card { padding: 0; overflow: hidden; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    text-align: left;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 0.9rem;
+  }
+
+  th { color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+
+  .low-stock { color: var(--crimson-red); font-weight: 600; }
+
+  .actions { display: flex; gap: 0.75rem; }
+  .link-btn {
+    background: none;
+    border: none;
+    color: var(--flag-blue);
+    cursor: pointer;
+    font-size: 0.85rem;
+    &.danger { color: var(--crimson-red); }
+  }
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+
+  button {
+    background: none;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    &.active { background: var(--sun-yellow); color: #1A1A1A; border-color: var(--sun-yellow); }
+  }
+
+  .total { margin-left: auto; }
+}
