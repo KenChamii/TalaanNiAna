@@ -1,0 +1,32 @@
+<h2>Dashboard / Overbyu ng Tindahan</h2>
+
+<div class="stat-grid">
+  <div class="card stat-card">
+    <span class="value">{{ todaySales() | peso }}</span>
+    <span class="label">Benta Ngayon</span>
+  </div>
+  <div class="card stat-card">
+    <span class="value">{{ collections() | peso }}</span>
+    <span class="label">Koleksyon</span>
+  </div>
+  <div class="card stat-card warn">
+    <span class="value">{{ totalCredit() | peso }}</span>
+    <span class="label">Kabuuang Utang</span>
+  </div>
+  <div class="card stat-card alert">
+    <span class="value">{{ lowStockCount() }} Items</span>
+    <span class="label">Paubos Stock</span>
+  </div>
+</div>
+
+<div class="card chart-card">
+  <h3>Tsart ng Kasaysayan: Cash Sales kumpara sa mga Nag-Utang ngayong Buwan</h3>
+  <ngx-charts-line-chart
+    [results]="chartData()"
+    [scheme]="colorScheme"
+    [xAxis]="true"
+    [yAxis]="true"
+    [legend]="true"
+    [autoScale]="true">
+  </ngx-charts-line-chart>
+</div>
