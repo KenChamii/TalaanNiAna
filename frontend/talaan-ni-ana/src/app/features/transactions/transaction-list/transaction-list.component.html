@@ -1,0 +1,69 @@
+<h2>Kasaysayan ng mga Transaksyon</h2>
+
+<div class="toolbar">
+  <div class="date-field">
+    <label>Mula</label>
+    <input type="date" [(ngModel)]="dateFrom" (ngModelChange)="onFilterChange()" />
+  </div>
+  <div class="date-field">
+    <label>Hanggang</label>
+    <input type="date" [(ngModel)]="dateTo" (ngModelChange)="onFilterChange()" />
+  </div>
+
+  <select [(ngModel)]="paymentType" (ngModelChange)="onFilterChange()">
+    <option value="">Lahat ng Paraan ng Bayad</option>
+    <option value="Cash">Cash</option>
+    <option value="Credit">Utang</option>
+  </select>
+</div>
+
+<div class="card table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Petsa</th>
+        <th>Customer</th>
+        <th>Paraan ng Bayad</th>
+        <th>Kabuuan</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let txn of transactions()">
+        <tr class="row" (click)="toggleExpand(txn.id)">
+          <td>{{ txn.transactionDate | date:'MMM d, y · h:mm a' }}</td>
+          <td>{{ txn.customerName || 'Walk-in' }}</td>
+          <td>
+            <span class="badge" [class.credit]="txn.paymentType === 'Credit'">
+              {{ txn.paymentType === 'Credit' ? 'Utang' : 'Cash' }}
+            </span>
+          </td>
+          <td>{{ txn.totalAmount | peso }}</td>
+          <td class="chevron">{{ expandedId() === txn.id ? '▲' : '▼' }}</td>
+        </tr>
+        <tr class="detail-row" *ngIf="expandedId() === txn.id">
+          <td colspan="5">
+            <div class="line-item" *ngFor="let item of txn.items">
+              <span>{{ item.quantity }}x {{ item.productName }}</span>
+              <span>{{ item.subtotal | peso }}</span>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+      <tr *ngIf="transactions().length === 0">
+        <td colspan="5" class="empty">Walang transaksyon na natagpuan.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pager">
+    <span>Pahina:</span>
+    <button
+      *ngFor="let p of [].constructor(totalPages()); let i = index"
+      [class.active]="currentPage() === i + 1"
+      (click)="goToPage(i + 1)">
+      {{ i + 1 }}
+    </button>
+    <span class="total">Total: {{ totalCount() }} Transaksyon</span>
+  </div>
+</div>
