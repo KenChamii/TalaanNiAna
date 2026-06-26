@@ -13,6 +13,8 @@ export const routes: Routes = [
       import('./shared/components/layout/layout.component').then(m => m.LayoutComponent),
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', loadComponent: () =>
+          import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
     
     ]
   },
