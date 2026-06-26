@@ -1,0 +1,60 @@
+.back-link {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--flag-blue);
+    text-decoration: none;
+}
+
+.contact {
+    color: var(--text-muted);
+    margin-top: -0.5rem;
+}
+
+.debt-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    .value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    &.has-debt .value {
+        color: var(--crimson-red);
+    }
+}
+
+.tx-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    font-size: 0.9rem;
+
+    .tag {
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        background: var(--flag-blue);
+        font-size: 0.75rem;
+    }
+
+    .tag.credit {
+        background: var(--crimson-red);
+    }
+
+    .amount {
+        margin-left: auto;
+        font-weight: 700;
+    }
+}
+
+.items {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0.5rem 0 0;
+}
+
+.empty {
+    color: var(--text-muted);
+}

@@ -1,0 +1,18 @@
+<div class="modal-overlay" (click)="closed.emit()">
+  <form class="modal-card card" [formGroup]="form" (ngSubmit)="submit()" (click)="$event.stopPropagation()">
+    <h3>Bagong Customer (Suki)</h3>
+
+    <label>Pangalan ng Suki</label>
+    <input type="text" formControlName="fullName" placeholder="e.g. Mang Tomas" />
+
+    <label>Contact No.</label>
+    <input type="text" formControlName="contactNumber" placeholder="09171234567" />
+
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" (click)="closed.emit()">Kanselahin</button>
+      <button type="submit" class="btn-primary" [disabled]="isSaving">
+        {{ isSaving ? 'Sine-save...' : 'I-save' }}
+      </button>
+    </div>
+  </form>
+</div>

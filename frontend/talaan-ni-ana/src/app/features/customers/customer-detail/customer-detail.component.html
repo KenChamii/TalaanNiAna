@@ -1,0 +1,24 @@
+<a routerLink="/customers" class="back-link">← Bumalik sa Listahan</a>
+
+<div *ngIf="isLoading()">Loading...</div>
+
+<ng-container *ngIf="!isLoading() && customer() as c">
+  <h2>{{ c.fullName }}</h2>
+  <p class="contact">{{ c.contactNumber }}</p>
+
+  <div class="card debt-card" [class.has-debt]="c.totalCredit > 0">
+    <span class="label">Kasalukuyang Utang</span>
+    <span class="value">{{ c.totalCredit | peso }}</span>
+  </div>
+
+  <h3>Kasaysayan ng Transaksyon</h3>
+  <div class="card" *ngFor="let t of c.transactions">
+    <div class="tx-row">
+      <span>{{ t.transactionDate | date:'MMM d, y · h:mm a' }}</span>
+      <span class="tag" [class.credit]="t.paymentType === 'Credit'">{{ t.paymentType }}</span>
+      <span class="amount">{{ t.totalAmount | peso }}</span>
+    </div>
+    <p class="items">{{ t.itemSummaries.join(', ') }}</p>
+  </div>
+  <p *ngIf="c.transactions.length === 0" class="empty">Walang transaksyon pa.</p>
+</ng-container>

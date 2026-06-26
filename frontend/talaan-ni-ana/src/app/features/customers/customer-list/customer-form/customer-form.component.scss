@@ -1,0 +1,29 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-card {
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 4px solid var(--sun-yellow);
+
+  h3 { margin: 0 0 0.5rem; }
+  label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem; }
+
+  .row { display: flex; gap: 1rem; > div { flex: 1; } }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+}
