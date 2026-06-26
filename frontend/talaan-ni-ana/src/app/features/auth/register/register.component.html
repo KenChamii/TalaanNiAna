@@ -1,7 +1,9 @@
+<app-particles />
 <div class="login-wrap">
-  <form class="login-card card" [formGroup]="form" (ngSubmit)="submit()">
-    <h1>Talaan ni Ana</h1>
-    <p class="subtitle">☀ Gumawa ng Bagong Account</p>
+  <form class="login-card" [formGroup]="form" (ngSubmit)="submit()">
+    <p class="eyebrow">POS System</p>
+    <h1>Gumawa ng Account<span>.</span></h1>
+    <p class="subtitle">Para makapag-manage ng iyong tindahan</p>
 
     <label>Pangalan ng Tindahan</label>
     <input type="text" formControlName="storeName" placeholder="Tindahan ni Ana" />
@@ -21,7 +23,7 @@
     <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
 
     <button type="submit" class="btn-primary full-width" [disabled]="isLoading()">
-      {{ isLoading() ? 'Naglo-load...' : 'GUMAWA NG ACCOUNT' }}
+      {{ isLoading() ? 'Naglo-load...' : 'Gumawa ng Account' }}
     </button>
 
     <p class="switch-link">

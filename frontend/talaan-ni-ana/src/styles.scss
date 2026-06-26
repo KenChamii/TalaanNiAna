@@ -1,66 +1,114 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --flag-blue: #0038A8;
-  --crimson-red: #CE1126;
-  --sun-yellow: #FCD116;
-  --bg-dark: #0B1330;
-  --bg-card: #121B40;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --text-primary: #F1F3F9;
-  --text-muted: #9AA3C2;
+  /* Brand */
+  --accent: #3B6FE8;
+  --accent-soft: rgba(59, 111, 232, 0.12);
+  --danger: #E5534B;
+  --danger-soft: rgba(229, 83, 75, 0.1);
+  --warning: #E8A120;
+  --warning-soft: rgba(232, 161, 32, 0.12);
   --success: #2ECC71;
-  --danger: #FF6B6B;
+
+  /* Surfaces */
+  --bg: #080C14;
+  --bg-card: rgba(22, 28, 42, 0.7);
+  --bg-card-solid: #161C2A;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.13);
+  --border-focus: rgba(59, 111, 232, 0.55);
+
+  /* Glass */
+  --glass-bg: rgba(16, 22, 36, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.09);
+
+  /* Text */
+  --text: #E8EEF8;
+  --text-muted: #6E7A94;
+  --text-dim: #3D4558;
 }
 
-* {
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Roboto, sans-serif;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--bg-dark);
-  color: var(--text-primary);
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+
+  /* Subtle grid background */
+  background-image:
+    radial-gradient(ellipse at 15% 30%, rgba(59, 111, 232, 0.13) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 70%, rgba(59, 111, 232, 0.07) 0%, transparent 50%),
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  background-attachment: fixed;
 }
 
+/* Buttons */
 .btn-primary {
-  background: var(--sun-yellow);
-  color: #1A1A1A;
+  background: var(--accent);
+  color: #fff;
   border: none;
-  padding: 0.65rem 1.25rem;
+  padding: 0.55rem 1.1rem;
   border-radius: 6px;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.15s ease;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
 }
-.btn-primary:hover { opacity: 0.9; }
-.btn-primary:active { transform: scale(0.98); }
+.btn-primary:hover { background: #4a7bf0; box-shadow: 0 0 16px rgba(59,111,232,0.3); }
+.btn-primary:active { background: #2f5ed4; }
 
 .btn-secondary {
-  background: transparent;
-  color: var(--text-primary);
-  border: 1px solid var(--border-subtle);
-  padding: 0.6rem 1.1rem;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
   border-radius: 6px;
+  font-size: 0.875rem;
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
+.btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: var(--border-light); }
 
+/* Card — glass by default */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: 10px;
   padding: 1.25rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
+/* Inputs */
 input, select {
-  background: #0B1330;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text);
   border-radius: 6px;
-  padding: 0.6rem 0.8rem;
-  font-size: 0.95rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 input:focus, select:focus {
   outline: none;
-  border-color: var(--flag-blue);
+  border-color: var(--border-focus);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(59, 111, 232, 0.1);
+}
+input::placeholder { color: var(--text-dim); }
+
+/* Page title */
+.page-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 1.25rem;
+  letter-spacing: -0.01em;
 }

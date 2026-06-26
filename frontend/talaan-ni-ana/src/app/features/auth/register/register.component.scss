@@ -3,39 +3,80 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-dark);
+  position: relative;
+  z-index: 1;
+  /* no background here — body already has the dark bg + grid */
 }
 
 .login-card {
-  width: 340px;
+  width: 360px;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  border-top: 4px solid var(--flag-blue);
+  background: rgba(22, 27, 39, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 2rem 2rem 1.75rem;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4);
 
-  h1 { margin: 0; color: var(--sun-yellow); font-size: 1.4rem; }
-  .subtitle { margin: 0 0 0.75rem; color: var(--text-muted); font-size: 0.85rem; }
-
-  label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem; }
-
-  .checkbox-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-direction: row;
-    margin: 0.5rem 0;
+  .eyebrow {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.25rem;
   }
 
-  .error { color: var(--danger); font-size: 0.85rem; }
-  .full-width { width: 100%; margin-top: 0.5rem; }
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+
+    span { color: var(--accent); }
+  }
+
+  .subtitle {
+    margin: 0 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+    letter-spacing: 0.02em;
+  }
+
+  input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    &:focus { border-color: var(--border-focus); background: rgba(255,255,255,0.07); }
+  }
+
+  .error {
+    color: var(--danger);
+    font-size: 0.8rem;
+    margin: 0;
+  }
+
+  .full-width { width: 100%; margin-top: 0.5rem; padding: 0.65rem; font-size: 0.875rem; }
 
   .switch-link {
-    margin: 0.75rem 0 0;
-    font-size: 0.8rem;
+    margin: 0.5rem 0 0;
+    font-size: 0.78rem;
     color: var(--text-muted);
     text-align: center;
 
-    a { color: var(--flag-blue); text-decoration: none; font-weight: 600; }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
     a:hover { text-decoration: underline; }
   }
 }

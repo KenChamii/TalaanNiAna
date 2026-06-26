@@ -1,0 +1,28 @@
+<h2>Settings / Impormasyon at Configuration</h2>
+
+<div class="card settings-card">
+  <h3>Pangunahing Setup ng Tindahan</h3>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="field-row">
+      <label>Pangalan ng Tindahan (Store Name)</label>
+      <input type="text" formControlName="storeName" />
+    </div>
+
+    <div class="field-row">
+      <label>Low-Stock Alert System Notification Limit</label>
+      <input type="number" formControlName="lowStockAlertLimit" />
+    </div>
+
+    <div class="field-row">
+      <label>Auto-Format SMS Alert Greeting Template</label>
+      <input type="text" formControlName="smsAlertTemplate" />
+    </div>
+
+    <p class="success" *ngIf="savedMessage()">{{ savedMessage() }}</p>
+
+    <button type="submit" class="btn-primary" [disabled]="isSaving()">
+      {{ isSaving() ? 'Sine-save...' : 'I-SAVE ANG SETTINGS' }}
+    </button>
+  </form>
+</div>
