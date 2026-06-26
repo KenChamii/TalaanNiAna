@@ -1,0 +1,26 @@
+<div class="shell">
+  <header class="topbar">
+    <span class="brand">☀ Talaan ni Ana</span>
+    <span class="store-name">{{ storeName }}</span>
+  </header>
+
+  <div class="body">
+    <nav class="sidebar">
+      <a *ngFor="let item of navItems"
+         [routerLink]="item.path"
+         routerLinkActive="active"
+         class="nav-link">
+        <span class="icon">{{ item.icon }}</span>
+        <span>{{ item.label }}</span>
+      </a>
+      <button class="nav-link logout" (click)="logout()">
+        <span class="icon">↩</span>
+        <span>Logout</span>
+      </button>
+    </nav>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

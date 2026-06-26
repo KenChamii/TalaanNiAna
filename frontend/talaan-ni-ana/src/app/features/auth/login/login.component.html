@@ -1,0 +1,27 @@
+<div class="login-wrap">
+  <form class="login-card card" [formGroup]="form" (ngSubmit)="submit()">
+    <h1>Talaan ni Ana</h1>
+    <p class="subtitle">☀ Nanay Ana Edition</p>
+
+    <label>Pangalan / Email</label>
+    <input type="text" formControlName="username" placeholder="ana_tindahan" />
+
+    <label>Password / Access</label>
+    <input type="password" formControlName="password" placeholder="••••••••••" />
+
+    <label class="checkbox-row">
+      <input type="checkbox" formControlName="rememberMe" />
+      Tandaan Ako
+    </label>
+
+    <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+    <button type="submit" class="btn-primary full-width" [disabled]="isLoading()">
+      {{ isLoading() ? 'Naglo-load...' : 'PUMASOK SA POS' }}
+    </button>
+
+    <p class="switch-link">
+      Wala ka pang account? <a routerLink="/register">Mag-register dito</a>
+    </p>
+  </form>
+</div>
