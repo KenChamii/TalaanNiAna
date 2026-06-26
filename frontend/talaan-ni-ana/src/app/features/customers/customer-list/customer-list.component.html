@@ -1,0 +1,54 @@
+<h2>CMS / Talaan ng mga Suki at Utang</h2>
+
+<div class="toolbar">
+  <input
+    type="text"
+    placeholder="Maghanap ng Suki..."
+    [(ngModel)]="searchTerm"
+    (ngModelChange)="onSearchChange()" />
+
+  <button class="btn-primary" (click)="isModalOpen.set(true)">+ Bagong Customer</button>
+</div>
+
+<div class="card table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Pangalan ng Suki</th>
+        <th>Contact No.</th>
+        <th>Total Utang</th>
+        <th>Last Active</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of customers()">
+        <td>{{ c.fullName }}</td>
+        <td>{{ c.contactNumber }}</td>
+        <td [class.has-debt]="c.totalCredit > 0">{{ c.totalCredit | peso }}</td>
+        <td>{{ c.lastActiveAt | date:'MMM d' }}</td>
+        <td class="actions">
+          <button class="link-btn" [routerLink]="['/customers', c.id]">View</button>
+          <button class="link-btn" (click)="copyReminder(c)" title="Copy reminder message">✍</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pager">
+    <span>Pahina:</span>
+    <button
+      *ngFor="let p of [].constructor(totalPages()); let i = index"
+      [class.active]="currentPage() === i + 1"
+      (click)="currentPage.set(i + 1); load()">
+      {{ i + 1 }}
+    </button>
+    <span class="total">Total: {{ totalCount() }} Sukis</span>
+  </div>
+</div>
+
+<app-customer-form
+  *ngIf="isModalOpen()"
+  (saved)="onModalSaved()"
+  (closed)="isModalOpen.set(false)">
+</app-customer-form>
