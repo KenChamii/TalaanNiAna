@@ -1,10 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../inventory.service';
 import { InventoryFormComponent } from '../inventory-form/inventory-form.component';
 import { Product } from '../../../shared/models/product.model';
 import { PesoPipe } from '../../../shared/pipes/peso.pipes';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-inventory-list',
@@ -27,6 +28,7 @@ export class InventoryListComponent implements OnInit {
   categories = ['Noodles', 'Coffee', 'Beverages', 'Canned Goods', 'Snacks', 'Household'];
 
   constructor(private inventoryService: InventoryService) {}
+  private toast = inject(ToastService);
 
   ngOnInit() {
     this.load();
@@ -69,6 +71,12 @@ load() {
 
   deleteProduct(product: Product) {
     if (!confirm(`Tanggalin ang "${product.name}"?`)) return;
-    this.inventoryService.delete(product.id).subscribe(() => this.load());
+    this.inventoryService.delete(product.id).subscribe({
+      next: () => {
+        this.toast.success(`"${product.name}" na-tanggal.`);
+        this.load();
+      },
+      error: () => this.toast.error('Hindi na-tanggal ang produkto. Subukan muli.')
+    });
   }
 }
