@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -6,6 +6,7 @@ import { CustomerService } from '../customer.service';
 import { CustomerFormComponent } from './customer-form/customer-form.component';
 import { Customer } from '../../../shared/models/customer.model';
 import { PesoPipe } from '../../../shared/pipes/peso.pipes';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-customer-list',
@@ -23,6 +24,7 @@ export class CustomerListComponent implements OnInit {
   isModalOpen = signal(false);
 
   constructor(private customerService: CustomerService) {}
+  private toast = inject(ToastService);
 
   ngOnInit() {
     this.load();
@@ -43,8 +45,9 @@ export class CustomerListComponent implements OnInit {
 
   copyReminder(customer: Customer) {
     const message = `Hi ${customer.fullName}, paalala lang na may natitirang utang kang ₱${customer.totalCredit.toFixed(2)} sa tindahan. Salamat po!`;
-    navigator.clipboard.writeText(message);
-    alert('Na-copy sa clipboard! I-paste sa Messenger o SMS.');
+    navigator.clipboard.writeText(message).then(() => {
+      this.toast.success('Na-copy sa clipboard! I-paste sa Messenger o SMS.');
+    });
   }
 
   onModalSaved() {

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { InventoryService } from '../inventory.service';
 import { Product } from '../../../shared/models/product.model';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-inventory-form',
@@ -13,6 +14,7 @@ import { Product } from '../../../shared/models/product.model';
 export class InventoryFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private inventoryService = inject(InventoryService);
+  private toast = inject(ToastService);
 
   @Input() product: Product | null = null;
   @Output() saved = new EventEmitter<void>();
@@ -55,8 +57,14 @@ submit() {
     : this.inventoryService.create(payload);
 
   request.subscribe({
-    next: () => this.saved.emit(),
-    error: () => (this.isSaving = false)
+    next: () => {
+      this.toast.success(this.product ? `"${this.product.name}" na-update!` : 'Nadagdag na ang produkto!');
+      this.saved.emit();
+    },
+    error: () => {
+      this.isSaving = false;
+      this.toast.error('Hindi na-save ang produkto. Subukan muli.');
+    }
   });
 }
 }

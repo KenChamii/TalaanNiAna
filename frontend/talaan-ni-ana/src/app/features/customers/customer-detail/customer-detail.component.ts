@@ -1,9 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CustomerService } from '../customer.service';
 import { CustomerDetail } from '../../../shared/models/customer.model';
 import { PesoPipe } from '../../../shared/pipes/peso.pipes';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-customer-detail',
@@ -15,6 +16,7 @@ import { PesoPipe } from '../../../shared/pipes/peso.pipes';
 export class CustomerDetailComponent implements OnInit {
   customer = signal<CustomerDetail | null>(null);
   isLoading = signal(true);
+  private toast = inject(ToastService);
 
   constructor(private route: ActivatedRoute, private customerService: CustomerService) {}
 
@@ -25,7 +27,10 @@ export class CustomerDetailComponent implements OnInit {
         this.customer.set(data);
         this.isLoading.set(false);
       },
-      error: () => this.isLoading.set(false)
+      error: () => {
+        this.isLoading.set(false);
+        this.toast.error('Hindi ma-load ang impormasyon ng suki.');
+      }
     });
   }
 }

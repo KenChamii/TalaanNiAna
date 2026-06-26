@@ -19,8 +19,6 @@
       <input type="text" formControlName="smsAlertTemplate" />
     </div>
 
-    <p class="success" *ngIf="savedMessage()">{{ savedMessage() }}</p>
-
     <button type="submit" class="btn-primary" [disabled]="isSaving()">
       {{ isSaving() ? 'Sine-save...' : 'I-SAVE ANG SETTINGS' }}
     </button>

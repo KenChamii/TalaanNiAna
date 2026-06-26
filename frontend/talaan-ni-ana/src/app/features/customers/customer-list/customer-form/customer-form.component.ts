@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { CustomerService } from '../../customer.service';
 import { Customer } from '../../../../shared/models/customer.model';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-customer-form',
@@ -13,6 +14,7 @@ import { Customer } from '../../../../shared/models/customer.model';
 export class CustomerFormComponent {
   private fb = inject(FormBuilder);
   private customerService = inject(CustomerService);
+  private toast = inject(ToastService);
 
   @Output() saved = new EventEmitter<void>();
   @Output() closed = new EventEmitter<void>();
@@ -34,8 +36,14 @@ export class CustomerFormComponent {
   };
 
   this.customerService.create(payload).subscribe({
-    next: () => this.saved.emit(),
-    error: () => (this.isSaving = false)
+    next: () => {
+      this.toast.success('Panibagong suki ang nadagdag!');
+      this.saved.emit();
+    },
+    error: () => {
+      this.isSaving = false;
+      this.toast.error('Hindi na-dagdag ang suki. Subukan muli.');
+    }
   });
 }
 }

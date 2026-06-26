@@ -1,8 +1,9 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CheckoutService } from './checkout.service';
 import { PesoPipe } from '../../shared/pipes/peso.pipes';
+import { ToastService } from '../../shared/services/toast.service';
 
 interface QuickItem { id: number; name: string; price: number; }
 interface CartLine { productId: number; name: string; price: number; qty: number; }
@@ -22,6 +23,7 @@ export class CheckoutComponent implements OnInit {
     selectedCustomerId: number | null = null; // plain property, not signal
     isProcessing = signal(false);
     customers = signal<{ id: number; fullName: string }[]>([]);
+    private toast = inject(ToastService);
 
 
     subtotal = computed(() =>
@@ -59,7 +61,7 @@ export class CheckoutComponent implements OnInit {
     checkout() {
         if (this.cart().length === 0) return;
         if (this.paymentType() === 'Credit' && !this.selectedCustomerId) {
-            alert('Pumili ng suki para sa Utang.');
+            this.toast.warning('Pumili ng suki para sa Utang.');
             return;
         }
         this.isProcessing.set(true);
@@ -69,8 +71,16 @@ export class CheckoutComponent implements OnInit {
             items: this.cart().map(l => ({ productId: l.productId, quantity: l.qty, unitPrice: l.price }))
         };
         this.checkoutService.processSale(payload).subscribe({
-            next: () => { this.cart.set([]); this.selectedCustomerId = null; this.isProcessing.set(false); },
-            error: () => this.isProcessing.set(false)
+            next: () => {
+                this.cart.set([]);
+                this.selectedCustomerId = null;
+                this.isProcessing.set(false);
+                this.toast.success('Nasave na ang benta!');
+            },
+            error: () => {
+                this.isProcessing.set(false);
+                this.toast.error('May error sa pag-checkout. Subukan muli.');
+            }
         });
     }
 }
