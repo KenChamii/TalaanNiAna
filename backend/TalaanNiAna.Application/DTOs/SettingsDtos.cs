@@ -1,0 +1,1 @@
+﻿public record StoreSettingsDto(string StoreName, int LowStockAlertLimit, string SmsAlertTemplate);
