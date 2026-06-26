@@ -1,0 +1,29 @@
+<div class="modal-overlay" (click)="closed.emit()">
+  <form class="modal-card card" [formGroup]="form" (ngSubmit)="submit()" (click)="$event.stopPropagation()">
+    <h3>{{ product ? 'I-edit ang Item' : 'Magdagdag ng Item' }}</h3>
+
+    <label>Item Name</label>
+    <input type="text" formControlName="name" placeholder="e.g. Lucky Me! Pancit Canton" />
+
+    <label>Category</label>
+    <input type="text" formControlName="category" placeholder="e.g. Noodles" />
+
+    <div class="row">
+      <div>
+        <label>Price (₱)</label>
+        <input type="number" formControlName="price" step="0.50" />
+      </div>
+      <div>
+        <label>Stocks</label>
+        <input type="number" formControlName="stockQuantity" />
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" (click)="closed.emit()">Kanselahin</button>
+      <button type="submit" class="btn-primary" [disabled]="isSaving">
+        {{ isSaving ? 'Sine-save...' : 'I-save' }}
+      </button>
+    </div>
+  </form>
+</div>

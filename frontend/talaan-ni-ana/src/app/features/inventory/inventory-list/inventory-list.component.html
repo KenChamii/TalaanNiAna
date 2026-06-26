@@ -1,0 +1,62 @@
+<h2>CMS / Listahan ng Imbentaryo</h2>
+
+<div class="toolbar">
+  <input
+    type="text"
+    placeholder="Maghanap ng paninda..."
+    [(ngModel)]="searchTerm"
+    (ngModelChange)="onSearchChange()" />
+
+  <select [(ngModel)]="selectedCategory" (ngModelChange)="onSearchChange()">
+    <option value="">Lahat ng Kategorya</option>
+    <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+  </select>
+
+  <button class="btn-primary" (click)="openAddModal()">+ Magdagdag ng Item</button>
+</div>
+
+<div class="card table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Item Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Stocks Left</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of products()">
+        <td>{{ item.name }}</td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.price | peso }}</td>
+        <td [class.low-stock]="item.isLowStock">
+          {{ item.stockQuantity }} pcs <span *ngIf="item.isLowStock">(!)</span>
+        </td>
+        <td class="actions">
+          <button class="link-btn" (click)="openEditModal(item)">Edit</button>
+          <button class="link-btn danger" (click)="deleteProduct(item)">✕</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pager">
+    <span>Pahina:</span>
+    <button
+      *ngFor="let p of [].constructor(totalPages()); let i = index"
+      [class.active]="currentPage() === i + 1"
+      (click)="goToPage(i + 1)">
+      {{ i + 1 }}
+    </button>
+    <span class="total">Total: {{ totalCount() }} Items</span>
+  </div>
+</div>
+
+<app-inventory-form
+  *ngIf="isModalOpen()"
+  [product]="editingProduct()"
+  (saved)="onModalSaved()"
+  (closed)="isModalOpen.set(false)">
+</app-inventory-form>
