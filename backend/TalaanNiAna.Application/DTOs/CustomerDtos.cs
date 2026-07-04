@@ -11,3 +11,7 @@ public record CustomerDetailDto(
 public record CustomerTransactionDto(
     int Id, DateTime TransactionDate, decimal TotalAmount,
     string PaymentType, IEnumerable<string> ItemSummaries);
+
+public record RecordPaymentDto(decimal Amount, string? Note);
+
+public record CreditPaymentDto(int Id, decimal Amount, DateTime PaidAt, string? Note, decimal RemainingCredit);

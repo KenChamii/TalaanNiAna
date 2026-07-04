@@ -1,0 +1,59 @@
+<div class="receipt-backdrop" *ngIf="receipt" (click)="onBackdropClick($event)">
+  <div class="receipt-modal">
+
+    <div class="receipt-modal-actions no-print">
+      <button class="icon-btn" (click)="print()" title="I-print ang resibo" aria-label="Print">🖨️</button>
+      <button class="icon-btn" (click)="close()" title="Isara" aria-label="Isara">✕</button>
+    </div>
+
+    <div class="receipt-print-area">
+      <div class="receipt-shop-header">
+        <h3>Talaan ni Ana</h3>
+        <p class="receipt-subtitle">Opisyal na Resibo</p>
+      </div>
+
+      <div class="receipt-meta">
+        <div class="meta-row">
+          <span>Transaction ID:</span>
+          <span class="meta-value">#{{ receipt.transactionId }}</span>
+        </div>
+        <div class="meta-row">
+          <span>Petsa:</span>
+          <span class="meta-value">{{ receipt.transactionDate | date:'MMM d, y, h:mm a' }}</span>
+        </div>
+        <div class="meta-row">
+          <span>Paraan ng Bayad:</span>
+          <span class="meta-value payment-pill" [class.payment-pill--credit]="receipt.paymentType === 'Credit'">
+            {{ receipt.paymentType === 'Credit' ? 'Utang' : 'Cash' }}
+          </span>
+        </div>
+        <div class="meta-row" *ngIf="receipt.paymentType === 'Credit' && receipt.customerName">
+          <span>Suki:</span>
+          <span class="meta-value">{{ receipt.customerName }}</span>
+        </div>
+      </div>
+
+      <div class="receipt-items">
+        <div class="receipt-items-header">
+          <span>Item</span>
+          <span>Qty</span>
+          <span>Subtotal</span>
+        </div>
+        <div class="receipt-item-row" *ngFor="let line of receipt.items">
+          <span class="item-name">{{ line.productName }}</span>
+          <span class="item-qty">{{ line.quantity }}</span>
+          <span class="item-subtotal">{{ line.subtotal | peso }}</span>
+        </div>
+      </div>
+
+      <div class="receipt-total-row">
+        <span>Kabuuan (Total):</span>
+        <span class="total-value">{{ receipt.totalAmount | peso }}</span>
+      </div>
+
+      <p class="receipt-footer">Salamat sa inyong pagbili!</p>
+    </div>
+
+    <button class="checkout-btn close-btn no-print" (click)="close()">Isara</button>
+  </div>
+</div>

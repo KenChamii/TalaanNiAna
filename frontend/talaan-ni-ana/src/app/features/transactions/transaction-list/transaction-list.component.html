@@ -39,7 +39,10 @@
             </span>
           </td>
           <td>{{ txn.totalAmount | peso }}</td>
-          <td class="chevron">{{ expandedId() === txn.id ? '▲' : '▼' }}</td>
+          <td class="row-actions">
+            <button class="receipt-link-btn" (click)="viewReceipt(txn, $event)" title="Tingnan ang resibo">🧾</button>
+            <span class="chevron">{{ expandedId() === txn.id ? '▲' : '▼' }}</span>
+          </td>
         </tr>
         <tr class="detail-row" *ngIf="expandedId() === txn.id">
           <td colspan="5">
@@ -67,3 +70,5 @@
     <span class="total">Total: {{ totalCount() }} Transaksyon</span>
   </div>
 </div>
+
+<app-receipt-modal [receipt]="currentReceipt()" (closed)="closeReceipt()"></app-receipt-modal>

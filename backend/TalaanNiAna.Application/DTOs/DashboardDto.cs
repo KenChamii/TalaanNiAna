@@ -3,4 +3,11 @@
     decimal TotalCollections,
     decimal TotalCredit,
     int LowStockCount,
-    IEnumerable<DailySalesPoint> SalesHistory);
+    int CreditorCount,
+    decimal AverageTransactionValue,
+    int MonthlyTransactionCount,
+    IEnumerable<DailySalesPoint> SalesHistory,
+    IEnumerable<TopProductResult> TopProducts,
+    IEnumerable<TopDebtorDto> TopDebtors);
+
+public record TopDebtorDto(int CustomerId, string FullName, decimal TotalCredit);

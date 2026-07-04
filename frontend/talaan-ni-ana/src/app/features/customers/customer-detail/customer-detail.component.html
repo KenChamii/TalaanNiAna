@@ -9,6 +9,36 @@
   <div class="card debt-card" [class.has-debt]="c.totalCredit > 0">
     <span class="label">Kasalukuyang Utang</span>
     <span class="value">{{ c.totalCredit | peso }}</span>
+    <button
+      class="pay-btn"
+      *ngIf="c.totalCredit > 0 && !showPaymentForm()"
+      (click)="openPaymentForm()">
+      Magbayad ng Utang
+    </button>
+  </div>
+
+  <div class="card payment-form" *ngIf="showPaymentForm()">
+    <h4>Itala ang Bayad</h4>
+    <div class="form-row">
+      <label>Halaga</label>
+      <input
+        type="number"
+        min="0"
+        [max]="c.totalCredit"
+        step="0.01"
+        placeholder="0.00"
+        [(ngModel)]="paymentAmount" />
+    </div>
+    <div class="form-row">
+      <label>Tala (opsyonal)</label>
+      <input type="text" placeholder="hal. bayad sa Lunes" [(ngModel)]="paymentNote" />
+    </div>
+    <div class="form-actions">
+      <button class="btn-secondary" (click)="cancelPayment()" [disabled]="isSubmittingPayment()">Kanselahin</button>
+      <button class="btn-primary" (click)="submitPayment()" [disabled]="isSubmittingPayment()">
+        {{ isSubmittingPayment() ? 'Isinusave...' : 'I-save ang Bayad' }}
+      </button>
+    </div>
   </div>
 
   <h3>Kasaysayan ng Transaksyon</h3>

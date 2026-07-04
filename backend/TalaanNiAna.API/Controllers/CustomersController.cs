@@ -34,4 +34,11 @@ public class CustomersController : ControllerBase
         var customer = await _service.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer);
     }
+
+    [HttpPost("{id:int}/payments")]
+    public async Task<IActionResult> RecordPayment(int id, [FromBody] RecordPaymentDto dto)
+    {
+        var result = await _service.RecordPaymentAsync(id, dto);
+        return Ok(result);
+    }
 }

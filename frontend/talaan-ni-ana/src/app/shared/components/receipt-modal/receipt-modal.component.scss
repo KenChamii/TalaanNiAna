@@ -1,0 +1,229 @@
+.receipt-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 4, 10, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  animation: fade-in 0.15s ease;
+}
+
+.receipt-modal {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--bg-card-solid);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: pop-in 0.18s ease;
+}
+
+.receipt-modal-actions {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    border-color: var(--border-light);
+  }
+}
+
+.receipt-shop-header {
+  text-align: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--glass-border);
+
+  h3 {
+    margin: 0 0 0.2rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .receipt-subtitle {
+    margin: 0;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+}
+
+.receipt-meta {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+
+  .meta-value {
+    color: var(--text);
+    font-weight: 600;
+  }
+}
+
+.payment-pill {
+  background: var(--success);
+  color: #062b16;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  &--credit {
+    background: var(--warning);
+    color: #2b1d04;
+  }
+}
+
+.receipt-items {
+  border-top: 1px dashed var(--glass-border);
+  border-bottom: 1px dashed var(--glass-border);
+  padding: 0.75rem 0;
+  margin-bottom: 1rem;
+}
+
+.receipt-items-header {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.75rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+
+  span:nth-child(2) { text-align: center; min-width: 28px; }
+  span:nth-child(3) { text-align: right; min-width: 70px; }
+}
+
+.receipt-item-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text);
+  padding: 0.3rem 0;
+
+  .item-name { overflow-wrap: anywhere; }
+  .item-qty { text-align: center; min-width: 28px; color: var(--text-muted); }
+  .item-subtotal { text-align: right; min-width: 70px; font-weight: 600; }
+}
+
+.receipt-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1.25rem;
+
+  .total-value { color: var(--accent); font-size: 1.1rem; }
+}
+
+.receipt-footer {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 1.25rem;
+}
+
+.close-btn {
+  margin-top: 0;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ---- Print-friendly ----
+   Positioning (making this the only visible thing on the page) is
+   handled globally in styles.scss — this block only cleans up the
+   visual styling for paper output. */
+@media print {
+  .receipt-backdrop {
+    background: none;
+    backdrop-filter: none;
+    padding: 0;
+    display: block;
+  }
+
+  .receipt-modal {
+    max-width: 100%;
+    max-height: none;
+    overflow: visible;
+    box-shadow: none;
+    border: none;
+    background: #fff;
+    color: #000;
+    padding: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .receipt-shop-header h3,
+  .meta-value,
+  .item-subtotal,
+  .total-value {
+    color: #000 !important;
+  }
+
+  .receipt-subtitle,
+  .meta-row,
+  .item-qty,
+  .receipt-footer {
+    color: #333 !important;
+  }
+
+  .payment-pill {
+    background: none !important;
+    color: #000 !important;
+    border: 1px solid #000;
+  }
+}

@@ -32,7 +32,7 @@
 /* ── KPI Grid ── */
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -214,9 +214,73 @@
   font-size: 0.8rem;
 }
 
+/* ── Insights Row (Top Products / Top Debtors) ── */
+.insights-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.list-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.list-row {
+  display: grid;
+  grid-template-columns: 20px 1fr auto auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+
+  &:last-child { border-bottom: none; }
+
+  &.list-row--debtor {
+    grid-template-columns: 20px 1fr auto;
+  }
+}
+
+.list-rank {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.list-name {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-qty {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.list-value {
+  color: var(--text);
+  font-weight: 600;
+
+  &.danger { color: var(--danger); }
+}
+
+.empty {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 1.25rem 0;
+  margin: 0;
+}
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .charts-row { grid-template-columns: 1fr; }
+  .insights-row { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 900px) {

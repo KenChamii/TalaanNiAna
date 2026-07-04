@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CheckoutService } from './checkout.service';
 import { PesoPipe } from '../../shared/pipes/peso.pipes';
 import { ToastService } from '../../shared/services/toast.service';
+import { ReceiptModalComponent, ReceiptData } from '../../shared/components/receipt-modal/receipt-modal.component';
 
 interface QuickItem { id: number; name: string; price: number; }
 interface CartLine { productId: number; name: string; price: number; qty: number; }
@@ -11,7 +12,7 @@ interface CartLine { productId: number; name: string; price: number; qty: number
 @Component({
     selector: 'app-checkout',
     standalone: true,
-    imports: [CommonModule, FormsModule, PesoPipe],
+    imports: [CommonModule, FormsModule, PesoPipe, ReceiptModalComponent],
     templateUrl: './checkout.component.html',
     styleUrl: './checkout.component.scss'
 })
@@ -23,6 +24,7 @@ export class CheckoutComponent implements OnInit {
     selectedCustomerId: number | null = null; // plain property, not signal
     isProcessing = signal(false);
     customers = signal<{ id: number; fullName: string }[]>([]);
+    currentReceipt = signal<ReceiptData | null>(null);
     private toast = inject(ToastService);
 
 
@@ -65,13 +67,34 @@ export class CheckoutComponent implements OnInit {
             return;
         }
         this.isProcessing.set(true);
+
+        // snapshot the cart/payment state now — checkout() resets it on success
+        const lineItemsSnapshot = this.cart();
+        const paymentTypeSnapshot = this.paymentType();
+        const customerNameSnapshot = paymentTypeSnapshot === 'Credit'
+            ? this.customers().find(c => c.id === this.selectedCustomerId)?.fullName ?? null
+            : null;
+
         const payload = {
-            paymentType: this.paymentType(),
+            paymentType: paymentTypeSnapshot,
             customerId: this.selectedCustomerId,
-            items: this.cart().map(l => ({ productId: l.productId, quantity: l.qty, unitPrice: l.price }))
+            items: lineItemsSnapshot.map(l => ({ productId: l.productId, quantity: l.qty, unitPrice: l.price }))
         };
         this.checkoutService.processSale(payload).subscribe({
-            next: () => {
+            next: (result: any) => {
+                this.currentReceipt.set({
+                    transactionId: result.transactionId,
+                    transactionDate: result.transactionDate,
+                    items: lineItemsSnapshot.map(l => ({
+                        productName: l.name,
+                        quantity: l.qty,
+                        unitPrice: l.price,
+                        subtotal: l.price * l.qty
+                    })),
+                    totalAmount: result.totalAmount,
+                    paymentType: paymentTypeSnapshot,
+                    customerName: customerNameSnapshot
+                });
                 this.cart.set([]);
                 this.selectedCustomerId = null;
                 this.isProcessing.set(false);
@@ -82,5 +105,9 @@ export class CheckoutComponent implements OnInit {
                 this.toast.error('May error sa pag-checkout. Subukan muli.');
             }
         });
+    }
+
+    closeReceipt() {
+        this.currentReceipt.set(null);
     }
 }

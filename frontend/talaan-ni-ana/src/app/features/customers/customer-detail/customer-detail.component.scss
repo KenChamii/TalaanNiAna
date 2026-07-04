@@ -15,6 +15,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    gap: 1rem;
 
     .value {
         font-size: 1.5rem;
@@ -24,6 +25,49 @@
     &.has-debt .value {
         color: var(--crimson-red);
     }
+}
+
+.pay-btn {
+    background: var(--flag-blue);
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s ease;
+
+    &:hover { opacity: 0.85; }
+}
+
+.payment-form {
+    margin-bottom: 1.5rem;
+
+    h4 {
+        margin: 0 0 1rem;
+        font-size: 0.95rem;
+    }
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 0.85rem;
+
+    label {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
 }
 
 .tx-row {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Customer, CustomerDetail } from '../../shared/models/customer.model';
+import { Customer, CustomerDetail, CreditPaymentResult } from '../../shared/models/customer.model';
 import { PagedResult } from '../../shared/models/product.model';
 
 @Injectable({ providedIn: 'root' })
@@ -21,5 +21,9 @@ export class CustomerService {
 
   getById(id: number) {
     return this.http.get<CustomerDetail>(`${this.url}/${id}`);
+  }
+
+  recordPayment(customerId: number, amount: number, note?: string) {
+    return this.http.post<CreditPaymentResult>(`${this.url}/${customerId}/payments`, { amount, note });
   }
 }

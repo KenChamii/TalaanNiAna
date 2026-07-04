@@ -17,3 +17,11 @@ export interface CustomerTransaction {
 export interface CustomerDetail extends Customer {
   transactions: CustomerTransaction[];
 }
+
+export interface CreditPaymentResult {
+  id: number;
+  amount: number;
+  paidAt: string;
+  note: string | null;
+  remainingCredit: number;
+}

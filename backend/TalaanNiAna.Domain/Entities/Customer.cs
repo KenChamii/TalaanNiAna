@@ -9,4 +9,5 @@ public class Customer
     public DateTime LastActiveAt { get; set; } = DateTime.UtcNow;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+    public ICollection<CreditPayment> CreditPayments { get; set; } = new List<CreditPayment>();
 }

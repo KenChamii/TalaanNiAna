@@ -10,6 +10,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<TransactionItem> TransactionItems => Set<TransactionItem>();
     public DbSet<StoreSettings> StoreSettings => Set<StoreSettings>();
+    public DbSet<CreditPayment> CreditPayments => Set<CreditPayment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -33,6 +34,16 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<Transaction>()
             .Property(t => t.TotalAmount)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Entity<CreditPayment>()
+            .HasOne(p => p.Customer)
+            .WithMany(c => c.CreditPayments)
+            .HasForeignKey(p => p.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<CreditPayment>()
+            .Property(p => p.Amount)
             .HasColumnType("decimal(18,2)");
 
         // Seed default settings
