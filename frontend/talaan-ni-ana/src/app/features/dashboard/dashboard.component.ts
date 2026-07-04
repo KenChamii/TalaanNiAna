@@ -1,9 +1,12 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { NgFor, NgStyle } from '@angular/common';
 import { curveMonotoneX } from 'd3-shape';
 import { DashboardService } from './dashboard.service';
 import { PesoPipe } from '../../shared/pipes/peso.pipes';
+
+interface TopProduct { productId: number; productName: string; totalQuantitySold: number; totalRevenue: number; }
+interface TopDebtor { customerId: number; fullName: string; totalCredit: number; }
 
 @Component({
   selector: 'app-dashboard',
@@ -18,15 +21,14 @@ export class DashboardComponent implements OnInit {
   totalCredit = signal(0);
   lowStockCount = signal(0);
   creditorCount = signal(0);
+  averageTransactionValue = signal(0);
+  monthlyTransactionCount = signal(0);
+  topProducts = signal<TopProduct[]>([]);
+  topDebtors = signal<TopDebtor[]>([]);
   chartData = signal<any[]>([]);
   pieData = signal<any[]>([]);
 
   today = new Date().toLocaleDateString('fil-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-  collectionRate = computed(() => {
-    const sales = this.todaySales();
-    return sales > 0 ? Math.round((this.collections() / sales) * 100) : 0;
-  });
 
   curve = curveMonotoneX;
 
@@ -52,6 +54,10 @@ export class DashboardComponent implements OnInit {
       this.totalCredit.set(data.totalCredit);
       this.lowStockCount.set(data.lowStockCount);
       this.creditorCount.set(data.creditorCount ?? 0);
+      this.averageTransactionValue.set(data.averageTransactionValue ?? 0);
+      this.monthlyTransactionCount.set(data.monthlyTransactionCount ?? 0);
+      this.topProducts.set(data.topProducts ?? []);
+      this.topDebtors.set(data.topDebtors ?? []);
 
       this.chartData.set([
         {

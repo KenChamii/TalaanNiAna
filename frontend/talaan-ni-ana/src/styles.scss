@@ -112,3 +112,26 @@ input::placeholder { color: var(--text-dim); }
   margin: 0 0 1.25rem;
   letter-spacing: -0.01em;
 }
+
+/* ---- Print isolation ----
+   When printing, hide the entire app (sidebar, header, page content)
+   and reveal only the receipt modal, no matter how deep it's nested.
+   The .receipt-backdrop itself is repositioned in
+   receipt-modal.component.scss to take over the page. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .receipt-backdrop,
+  .receipt-backdrop * {
+    visibility: visible;
+  }
+
+  .receipt-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+}

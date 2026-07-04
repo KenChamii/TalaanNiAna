@@ -23,12 +23,12 @@
 
   <div class="stat-card">
     <div class="stat-top">
-      <span class="stat-label">Koleksyon</span>
+      <span class="stat-label">Koleksyon (Bayad sa Utang)</span>
       <span class="stat-icon-wrap success">✓</span>
     </div>
     <span class="stat-value">{{ collections() | peso }}</span>
     <div class="stat-footer">
-      <span class="delta neutral">{{ collectionRate() }}% ng benta</span>
+      <span class="delta neutral">Binayaran ngayong araw</span>
     </div>
   </div>
 
@@ -53,6 +53,17 @@
       <span class="delta" [class.up]="lowStockCount() === 0" [class.down]="lowStockCount() > 0">
         {{ lowStockCount() === 0 ? '✓ Lahat OK' : 'Kailangan ng restok' }}
       </span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      <span class="stat-label">Average na Benta</span>
+      <span class="stat-icon-wrap sales">⌀</span>
+    </div>
+    <span class="stat-value">{{ averageTransactionValue() | peso }}</span>
+    <div class="stat-footer">
+      <span class="delta neutral">{{ monthlyTransactionCount() }} transaksyon ngayong buwan</span>
     </div>
   </div>
 
@@ -114,6 +125,46 @@
         <span class="pie-label">{{ d.name }}</span>
         <span class="pie-val">{{ d.value | peso }}</span>
       </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Top Products / Top Debtors Row -->
+<div class="insights-row">
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <p class="chart-eyebrow">Ngayong Buwan</p>
+        <h3 class="chart-title">Top Selling Products</h3>
+      </div>
+    </div>
+    <div class="list-wrap">
+      <div class="list-row" *ngFor="let p of topProducts(); let i = index">
+        <span class="list-rank">{{ i + 1 }}</span>
+        <span class="list-name">{{ p.productName }}</span>
+        <span class="list-qty">{{ p.totalQuantitySold }}x</span>
+        <span class="list-value">{{ p.totalRevenue | peso }}</span>
+      </div>
+      <p class="empty" *ngIf="topProducts().length === 0">Walang benta ngayong buwan pa.</p>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <p class="chart-eyebrow">Pagbabantay</p>
+        <h3 class="chart-title">Pinakamalaking Utang</h3>
+      </div>
+    </div>
+    <div class="list-wrap">
+      <div class="list-row list-row--debtor" *ngFor="let d of topDebtors(); let i = index">
+        <span class="list-rank">{{ i + 1 }}</span>
+        <span class="list-name">{{ d.fullName }}</span>
+        <span class="list-value danger">{{ d.totalCredit | peso }}</span>
+      </div>
+      <p class="empty" *ngIf="topDebtors().length === 0">Walang may utang sa ngayon. ✓</p>
     </div>
   </div>
 

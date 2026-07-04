@@ -94,6 +94,33 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("CreditPayment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("CreditPayments");
+                });
+
             modelBuilder.Entity("Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -384,6 +411,17 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.ToTable("TransactionItems");
                 });
 
+            modelBuilder.Entity("CreditPayment", b =>
+                {
+                    b.HasOne("Customer", "Customer")
+                        .WithMany("CreditPayments")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -466,6 +504,8 @@ namespace TalaanNiAna.Infrastructure.Migrations
 
             modelBuilder.Entity("Customer", b =>
                 {
+                    b.Navigation("CreditPayments");
+
                     b.Navigation("Transactions");
                 });
 

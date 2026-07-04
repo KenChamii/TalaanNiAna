@@ -65,6 +65,54 @@ public class TransactionRepository : ITransactionRepository
         return grouped.Select(g => new DailySalesPoint(g.Date, g.CashSales, g.CreditSales));
     }
 
+    public async Task<(decimal averageValue, int count)> GetMonthlyAverageTransactionAsync()
+    {
+        var monthStart = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+
+        var monthly = await _context.Transactions
+            .Where(t => t.TransactionDate >= monthStart)
+            .ToListAsync();
+
+        if (monthly.Count == 0) return (0m, 0);
+
+        return (monthly.Average(t => t.TotalAmount), monthly.Count);
+    }
+
+    public async Task<IEnumerable<TopProductResult>> GetTopProductsThisMonthAsync(int count)
+    {
+        var monthStart = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+
+        // Project to a flat, navigation-free shape first so the GroupBy key/aggregates
+        // are plain scalars — mixing navigation properties (i.Product.Name) into a
+        // GroupBy key alongside aggregates over a filtered join can fail to translate
+        // to SQL (see: InvalidOperationException on GroupBy + Join + EF.Property<int?>).
+        var flatItems = _context.TransactionItems
+            .Where(i => i.Transaction.TransactionDate >= monthStart)
+            .Select(i => new
+            {
+                i.ProductId,
+                ProductName = i.Product.Name,
+                i.Quantity,
+                i.UnitPrice
+            });
+
+        var grouped = await flatItems
+            .GroupBy(i => i.ProductId)
+            .Select(g => new
+            {
+                ProductId = g.Key,
+                ProductName = g.Select(i => i.ProductName).FirstOrDefault(),
+                TotalQuantitySold = g.Sum(i => i.Quantity),
+                TotalRevenue = g.Sum(i => i.Quantity * i.UnitPrice)
+            })
+            .OrderByDescending(r => r.TotalQuantitySold)
+            .Take(count)
+            .ToListAsync();
+
+        return grouped.Select(g => new TopProductResult(
+            g.ProductId, g.ProductName ?? "(walang pangalan)", g.TotalQuantitySold, g.TotalRevenue));
+    }
+
     private IQueryable<Transaction> Filter(
         DateTime? dateFrom, DateTime? dateTo, PaymentType? paymentType)
     {

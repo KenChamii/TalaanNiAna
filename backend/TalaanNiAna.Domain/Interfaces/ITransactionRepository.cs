@@ -6,4 +6,6 @@
     Task<Transaction> CreateAsync(Transaction transaction);
     Task<(decimal cashTotal, decimal creditTotal)> GetTodayTotalsAsync();
     Task<IEnumerable<DailySalesPoint>> GetMonthlySalesHistoryAsync();
+    Task<(decimal averageValue, int count)> GetMonthlyAverageTransactionAsync();
+    Task<IEnumerable<TopProductResult>> GetTopProductsThisMonthAsync(int count);
 }

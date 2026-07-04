@@ -31,7 +31,27 @@ table {
 
   .row { cursor: pointer; }
   .row:hover { background: rgba(255,255,255,0.03); }
-  .chevron { color: var(--text-muted); text-align: right; }
+  .chevron { color: var(--text-muted); }
+
+  .row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.6rem;
+  }
+
+  .receipt-link-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 0.15rem 0.3rem;
+    border-radius: 4px;
+    line-height: 1;
+    transition: background 0.15s ease;
+
+    &:hover { background: rgba(255,255,255,0.06); }
+  }
 
   .badge {
     background: rgba(46, 204, 113, 0.15);
