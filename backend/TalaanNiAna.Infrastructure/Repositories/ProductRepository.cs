@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 public class ProductRepository : IProductRepository
 {
@@ -11,24 +11,24 @@ public class ProductRepository : IProductRepository
 
     public async Task<IEnumerable<Product>> GetAllAsync(
         string? search, string? category, int page, int pageSize)
-    {
-        var query = _context.Products.Where(p => p.IsActive);
-
-        if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(p => p.Name.Contains(search));
-
-        if (!string.IsNullOrWhiteSpace(category))
-            query = query.Where(p => p.Category == category);
-
-        return await query
+        => await Filter(search, category)
             .OrderBy(p => p.Name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
-    }
 
     public async Task<Product?> GetByIdAsync(int id)
         => await _context.Products.FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
+
+    public async Task<IReadOnlyDictionary<int, Product>> GetByIdsAsync(IEnumerable<int> ids)
+    {
+        var distinct = ids.Distinct().ToArray();
+
+        // Tracked on purpose: checkout mutates these and relies on the concurrency token.
+        return await _context.Products
+            .Where(p => p.IsActive && distinct.Contains(p.Id))
+            .ToDictionaryAsync(p => p.Id);
+    }
 
     public async Task<Product> CreateAsync(Product product)
     {
@@ -58,7 +58,7 @@ public class ProductRepository : IProductRepository
         var existing = await _context.Products.FindAsync(id);
         if (existing is null) return false;
 
-        // Soft delete — keeps historical TransactionItem rows valid
+        // Soft delete keeps historical TransactionItem rows valid.
         existing.IsActive = false;
         existing.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
@@ -67,10 +67,22 @@ public class ProductRepository : IProductRepository
 
     public async Task<IEnumerable<Product>> GetLowStockAsync(int threshold)
         => await _context.Products
+            .AsNoTracking()
             .Where(p => p.IsActive && p.StockQuantity <= threshold)
             .ToListAsync();
 
     public async Task<int> GetTotalCountAsync(string? search, string? category)
+        => await Filter(search, category).CountAsync();
+
+    public async Task<IEnumerable<Product>> GetQuickItemsAsync(int count = 24)
+        => await _context.Products
+            .AsNoTracking()
+            .Where(p => p.IsActive)
+            .OrderByDescending(p => p.StockQuantity)
+            .Take(count)
+            .ToListAsync();
+
+    private IQueryable<Product> Filter(string? search, string? category)
     {
         var query = _context.Products.Where(p => p.IsActive);
 
@@ -80,12 +92,6 @@ public class ProductRepository : IProductRepository
         if (!string.IsNullOrWhiteSpace(category))
             query = query.Where(p => p.Category == category);
 
-        return await query.CountAsync();
+        return query;
     }
-
-    public async Task<IEnumerable<Product>> GetQuickItemsAsync()
-     => await _context.Products
-         .Where(p => p.IsActive)
-         .OrderByDescending(p => p.StockQuantity)
-         .ToListAsync();
 }

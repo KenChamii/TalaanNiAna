@@ -1,8 +1,13 @@
-﻿public record CheckoutItemDto(int ProductId, int Quantity, decimal UnitPrice);
+public record CheckoutItemDto(int ProductId, int Quantity, decimal UnitPrice);
 
 public record CheckoutDto(
-    string PaymentType,        // "Cash" or "Credit" — matches the Angular payload in 5.14
+    string PaymentType,        // "Cash" or "Credit"
     int? CustomerId,
-    IEnumerable<CheckoutItemDto> Items);
+    IEnumerable<CheckoutItemDto> Items,
+    string IdempotencyKey);
 
-public record CheckoutResultDto(int TransactionId, decimal TotalAmount, DateTime TransactionDate);
+public record CheckoutResultDto(
+    int TransactionId,
+    decimal TotalAmount,
+    DateTime TransactionDate,
+    bool WasReplay = false);

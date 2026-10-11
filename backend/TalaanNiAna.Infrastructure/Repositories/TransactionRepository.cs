@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 public class TransactionRepository : ITransactionRepository
 {
@@ -11,17 +11,13 @@ public class TransactionRepository : ITransactionRepository
 
     public async Task<IEnumerable<Transaction>> GetAllAsync(
         DateTime? dateFrom, DateTime? dateTo, PaymentType? paymentType, int page, int pageSize)
-    {
-        var query = Filter(dateFrom, dateTo, paymentType);
-
-        return await query
+        => await Filter(dateFrom, dateTo, paymentType)
             .Include(t => t.Customer)
             .Include(t => t.Items).ThenInclude(i => i.Product)
             .OrderByDescending(t => t.TransactionDate)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
-    }
 
     public async Task<int> GetTotalCountAsync(
         DateTime? dateFrom, DateTime? dateTo, PaymentType? paymentType)
@@ -33,6 +29,11 @@ public class TransactionRepository : ITransactionRepository
         await _context.SaveChangesAsync();
         return transaction;
     }
+
+    public async Task<Transaction?> GetByIdempotencyKeyAsync(string idempotencyKey)
+        => await _context.Transactions
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.IdempotencyKey == idempotencyKey);
 
     public async Task<(decimal cashTotal, decimal creditTotal)> GetTodayTotalsAsync()
     {
