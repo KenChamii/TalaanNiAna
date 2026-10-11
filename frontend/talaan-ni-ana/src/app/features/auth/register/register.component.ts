@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
-import { ParticlesComponent } from '../../../shared/components/particles/particles.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, ParticlesComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
@@ -19,6 +18,9 @@ export class RegisterComponent {
 
   errorMessage = signal<string | null>(null);
   isLoading = signal(false);
+
+  /** Banderitas pennants. Colour cycles in CSS. */
+  readonly flags = Array.from({ length: 44 });
 
   form = this.fb.group({
     storeName: ['', Validators.required],

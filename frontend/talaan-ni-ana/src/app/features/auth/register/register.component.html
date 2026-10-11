@@ -1,33 +1,86 @@
-<app-particles />
-<div class="login-wrap">
-  <form class="login-card" [formGroup]="form" (ngSubmit)="submit()">
-    <p class="eyebrow">POS System</p>
-    <h1>Gumawa ng Account<span>.</span></h1>
-    <p class="subtitle">Para makapag-manage ng iyong tindahan</p>
+<div class="auth-page">
 
-    <label>Pangalan ng Tindahan</label>
-    <input type="text" formControlName="storeName" placeholder="Tindahan ni Ana" />
+  <header class="auth-top">
+    <span class="brand">Talaan ni Ana</span>
+    <a routerLink="/login" class="badge">May account na</a>
+  </header>
 
-    <label>Pangalan Mo</label>
-    <input type="text" formControlName="displayName" placeholder="Ana Reyes" />
+  <div class="banderitas" aria-hidden="true">
+    <div class="flags">
+      <i *ngFor="let f of flags"></i>
+    </div>
+  </div>
 
-    <label>Username</label>
-    <input type="text" formControlName="username" placeholder="ana_tindahan" />
+  <div class="auth-body">
 
-    <label>Password</label>
-    <input type="password" formControlName="password" placeholder="••••••••••" />
+    <section class="pitch">
+      <span class="badge">Libre, walang bayad</span>
 
-    <label>Ulitin ang Password</label>
-    <input type="password" formControlName="confirmPassword" placeholder="••••••••••" />
+      <h1 class="signwriting">Buksan<br />ang talaan</h1>
 
-    <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+      <div class="pitch-stripe jeep-stripe" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
 
-    <button type="submit" class="btn-primary full-width" [disabled]="isLoading()">
-      {{ isLoading() ? 'Naglo-load...' : 'Gumawa ng Account' }}
-    </button>
+      <ol class="steps">
+        <li>
+          <span class="step-n">1</span>
+          <span><strong>Pangalanan ang tindahan.</strong> Ito ang lalabas sa resibo at sa dashboard.</span>
+        </li>
+        <li>
+          <span class="step-n">2</span>
+          <span><strong>Ilagay ang paninda.</strong> Pumili sa handang listahan o mag-import ng CSV.</span>
+        </li>
+        <li>
+          <span class="step-n">3</span>
+          <span><strong>Simulan ang benta.</strong> Hindi kailangan ng signal habang nagtitinda.</span>
+        </li>
+      </ol>
+    </section>
 
-    <p class="switch-link">
-      May account ka na? <a routerLink="/login">Mag-login dito</a>
-    </p>
-  </form>
+    <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()">
+      <p class="eyebrow">Bagong tindahan</p>
+      <h2 class="auth-title">Gumawa ng account</h2>
+
+      <label class="field-label" for="storeName">Pangalan ng tindahan</label>
+      <input id="storeName" type="text" formControlName="storeName" placeholder="Tindahan ni Ana" />
+
+      <div class="field-grid">
+        <div>
+          <label class="field-label" for="displayName">Pangalan mo</label>
+          <input id="displayName" type="text" formControlName="displayName" placeholder="Ana Reyes" />
+        </div>
+        <div>
+          <label class="field-label" for="username">Username</label>
+          <input id="username" type="text" formControlName="username" placeholder="ana_tindahan" />
+        </div>
+      </div>
+
+      <div class="field-grid">
+        <div>
+          <label class="field-label" for="password">Password</label>
+          <input id="password" type="password" formControlName="password" placeholder="••••••••••"
+                 autocomplete="new-password" />
+        </div>
+        <div>
+          <label class="field-label" for="confirmPassword">Ulitin ang password</label>
+          <input id="confirmPassword" type="password" formControlName="confirmPassword" placeholder="••••••••••"
+                 autocomplete="new-password" />
+        </div>
+      </div>
+
+      <p class="hint">Hindi bababa sa 6 na karakter.</p>
+
+      <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+      <button type="submit" class="btn-primary full-width" [disabled]="isLoading()">
+        {{ isLoading() ? 'Naglo-load…' : 'Gumawa ng account' }}
+      </button>
+
+      <p class="switch-link">
+        May account ka na? <a routerLink="/login">Mag-login dito</a>
+      </p>
+    </form>
+
+  </div>
 </div>

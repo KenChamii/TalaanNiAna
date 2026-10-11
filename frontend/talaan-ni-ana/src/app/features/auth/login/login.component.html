@@ -1,29 +1,64 @@
-<app-particles />
-<div class="login-wrap">
-  <form class="login-card" [formGroup]="form" (ngSubmit)="submit()">
-    <p class="eyebrow">POS System</p>
-    <h1>Talaan ni Ana<span>.</span></h1>
-    <p class="subtitle">Mag-login para makapasok sa tindahan</p>
+<div class="auth-page">
 
-    <label>Pangalan / Email</label>
-    <input type="text" formControlName="username" placeholder="ana_tindahan" />
+  <header class="auth-top">
+    <span class="brand">Talaan ni Ana</span>
+    <a routerLink="/register" class="badge badge--ok">Gumawa ng account</a>
+  </header>
 
-    <label>Password / Access</label>
-    <input type="password" formControlName="password" placeholder="••••••••••" />
+  <div class="banderitas" aria-hidden="true">
+    <div class="flags">
+      <i *ngFor="let f of flags"></i>
+    </div>
+  </div>
 
-    <label class="checkbox-row">
-      <input type="checkbox" formControlName="rememberMe" />
-      Tandaan Ako
-    </label>
+  <div class="auth-body">
 
-    <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+    <section class="pitch">
+      <span class="badge">Para sa sari-sari store</span>
 
-    <button type="submit" class="btn-primary full-width" [disabled]="isLoading()">
-      {{ isLoading() ? 'Naglo-load...' : 'Pumasok sa POS' }}
-    </button>
+      <h1 class="signwriting">Alam mo<br />ang tubo mo</h1>
 
-    <p class="switch-link">
-      Wala ka pang account? <a routerLink="/register">Mag-register dito</a>
-    </p>
-  </form>
+      <div class="pitch-stripe jeep-stripe" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+
+      <p class="pitch-copy">
+        Benta, stock at utang sa isang talaan. Gumagana kahit walang signal,
+        sumasabay kapag bumalik ang internet.
+      </p>
+
+      <div class="pitch-tags">
+        <span class="badge badge--ok">Offline-ready</span>
+        <span class="badge badge--info">Utang tracker</span>
+        <span class="badge badge--warn">Tingi at repack</span>
+      </div>
+    </section>
+
+    <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()">
+      <p class="eyebrow">Maligayang pagbabalik</p>
+      <h2 class="auth-title">Mag-login</h2>
+
+      <label class="field-label" for="username">Pangalan / Email</label>
+      <input id="username" type="text" formControlName="username" placeholder="ana_tindahan" />
+
+      <label class="field-label" for="password">Password</label>
+      <input id="password" type="password" formControlName="password" placeholder="••••••••••" />
+
+      <label class="checkbox-row">
+        <input type="checkbox" formControlName="rememberMe" />
+        <span>Tandaan ako</span>
+      </label>
+
+      <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+      <button type="submit" class="btn-primary full-width" [disabled]="isLoading()">
+        {{ isLoading() ? 'Naglo-load…' : 'Pumasok' }}
+      </button>
+
+      <p class="switch-link">
+        Wala ka pang account? <a routerLink="/register">Gumawa dito</a>
+      </p>
+    </form>
+
+  </div>
 </div>
