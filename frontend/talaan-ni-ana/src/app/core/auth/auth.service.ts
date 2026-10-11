@@ -1,68 +1,98 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import { Observable, catchError, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-/** /auth/login and /auth/register response. */
-interface AuthResponse {
-  token: string;
+/** Returned by login, register and refresh. The refresh token itself is an httpOnly cookie. */
+export interface AuthResult {
+  accessToken: string;
+  expiresInSeconds: number;
   displayName: string;
   storeName: string;
 }
 
-const TOKEN_KEY = 'talaan_token';
 const STORE_KEY = 'talaan_store';
 const NAME_KEY = 'talaan_display_name';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  isLoggedIn = signal(!!this.read(TOKEN_KEY));
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
-  /** Not in the JWT, so kept here from the auth response. */
-  storeName = signal(this.read(STORE_KEY) ?? '');
-  displayName = signal(this.read(NAME_KEY) ?? '');
+  /** Kept in memory only, so an XSS payload cannot read it from storage. */
+  private accessToken = signal<string | null>(null);
 
-  constructor(private http: HttpClient, private router: Router) {}
+  readonly isLoggedIn = computed(() => this.accessToken() !== null);
 
-  login(username: string, password: string) {
-    return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/login`, { username, password })
-      .pipe(tap(res => this.accept(res)));
+  /** Display-only, so these are safe to persist and avoid a blank topbar on reload. */
+  readonly storeName = signal(this.read(STORE_KEY) ?? '');
+  readonly displayName = signal(this.read(NAME_KEY) ?? '');
+
+  login(username: string, password: string): Observable<AuthResult> {
+    return this.post('login', { username, password });
   }
 
-  register(username: string, password: string, displayName: string, storeName: string) {
-    return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/register`, {
-        username,
-        password,
-        displayName,
-        storeName
-      })
-      .pipe(tap(res => this.accept(res)));
+  register(username: string, password: string, displayName: string, storeName: string): Observable<AuthResult> {
+    return this.post('register', { username, password, displayName, storeName });
   }
 
-  logout() {
-    this.write(TOKEN_KEY, null);
-    this.write(STORE_KEY, null);
-    this.write(NAME_KEY, null);
-    this.isLoggedIn.set(false);
-    this.storeName.set('');
-    this.displayName.set('');
-    this.router.navigate(['/login']);
+  /** Exchanges the refresh cookie for a new access token. */
+  refresh(): Observable<AuthResult | null> {
+    return this.http
+      .post<AuthResult>(`${environment.apiUrl}/auth/refresh`, {}, { withCredentials: true })
+      .pipe(
+        tap(result => this.accept(result)),
+        catchError(() => {
+          this.clear();
+          return of(null);
+        })
+      );
+  }
+
+  /** Called once at startup to restore a session from the cookie. */
+  restoreSession(): Observable<AuthResult | null> {
+    return this.refresh();
+  }
+
+  logout(): void {
+    this.http
+      .post(`${environment.apiUrl}/auth/logout`, {}, { withCredentials: true })
+      .subscribe({
+        next: () => this.finishLogout(),
+        error: () => this.finishLogout()
+      });
   }
 
   getToken(): string | null {
-    return this.read(TOKEN_KEY);
+    return this.accessToken();
   }
 
-  private accept(res: AuthResponse) {
-    this.write(TOKEN_KEY, res.token);
-    this.write(STORE_KEY, res.storeName ?? '');
-    this.write(NAME_KEY, res.displayName ?? '');
-    this.isLoggedIn.set(true);
-    this.storeName.set(res.storeName ?? '');
-    this.displayName.set(res.displayName ?? '');
+  private post(path: 'login' | 'register', body: unknown): Observable<AuthResult> {
+    return this.http
+      .post<AuthResult>(`${environment.apiUrl}/auth/${path}`, body, { withCredentials: true })
+      .pipe(tap(result => this.accept(result)));
+  }
+
+  private accept(result: AuthResult): void {
+    this.accessToken.set(result.accessToken);
+    this.storeName.set(result.storeName ?? '');
+    this.displayName.set(result.displayName ?? '');
+    this.write(STORE_KEY, result.storeName ?? '');
+    this.write(NAME_KEY, result.displayName ?? '');
+  }
+
+  private clear(): void {
+    this.accessToken.set(null);
+    this.storeName.set('');
+    this.displayName.set('');
+    this.write(STORE_KEY, null);
+    this.write(NAME_KEY, null);
+  }
+
+  private finishLogout(): void {
+    this.clear();
+    this.router.navigate(['/login']);
   }
 
   private read(key: string): string | null {
@@ -73,12 +103,12 @@ export class AuthService {
     }
   }
 
-  private write(key: string, value: string | null) {
+  private write(key: string, value: string | null): void {
     try {
       if (value === null) localStorage.removeItem(key);
       else localStorage.setItem(key, value);
     } catch {
-      // Blocked storage: session still works in memory.
+      // Blocked storage: the session still works in memory.
     }
   }
 }

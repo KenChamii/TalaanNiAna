@@ -25,8 +25,12 @@ export class CheckoutComponent implements OnInit {
     isProcessing = signal(false);
     customers = signal<{ id: number; fullName: string }[]>([]);
     currentReceipt = signal<ReceiptData | null>(null);
-    private toast = inject(ToastService);
 
+    private toast = inject(ToastService);
+    private checkoutService = inject(CheckoutService);
+
+    /** Held across retries so a failed attempt cannot become two sales. */
+    private pendingKey: string | null = null;
 
     subtotal = computed(() =>
         this.cart().reduce((sum, line) => sum + line.price * line.qty, 0)
@@ -36,8 +40,6 @@ export class CheckoutComponent implements OnInit {
         const term = this.searchTerm().toLowerCase();
         return this.quickItems().filter(i => i.name.toLowerCase().includes(term));
     });
-
-    constructor(private checkoutService: CheckoutService) { }
 
     ngOnInit() {
         this.checkoutService.getQuickItems().subscribe(items => this.quickItems.set(items));
@@ -61,27 +63,34 @@ export class CheckoutComponent implements OnInit {
     }
 
     checkout() {
-        if (this.cart().length === 0) return;
+        if (this.cart().length === 0 || this.isProcessing()) return;
+
         if (this.paymentType() === 'Credit' && !this.selectedCustomerId) {
             this.toast.warning('Pumili ng suki para sa Utang.');
             return;
         }
-        this.isProcessing.set(true);
 
-        // snapshot the cart/payment state now — checkout() resets it on success
+        this.isProcessing.set(true);
+        this.pendingKey ??= this.checkoutService.newIdempotencyKey();
+
+        // Snapshot the cart and payment state now, since success resets them.
         const lineItemsSnapshot = this.cart();
         const paymentTypeSnapshot = this.paymentType();
         const customerNameSnapshot = paymentTypeSnapshot === 'Credit'
             ? this.customers().find(c => c.id === this.selectedCustomerId)?.fullName ?? null
             : null;
 
-        const payload = {
+        this.checkoutService.processSale({
             paymentType: paymentTypeSnapshot,
             customerId: this.selectedCustomerId,
-            items: lineItemsSnapshot.map(l => ({ productId: l.productId, quantity: l.qty, unitPrice: l.price }))
-        };
-        this.checkoutService.processSale(payload).subscribe({
-            next: (result: any) => {
+            items: lineItemsSnapshot.map(l => ({
+                productId: l.productId,
+                quantity: l.qty,
+                unitPrice: l.price
+            })),
+            idempotencyKey: this.pendingKey
+        }).subscribe({
+            next: result => {
                 this.currentReceipt.set({
                     transactionId: result.transactionId,
                     transactionDate: result.transactionDate,
@@ -95,14 +104,18 @@ export class CheckoutComponent implements OnInit {
                     paymentType: paymentTypeSnapshot,
                     customerName: customerNameSnapshot
                 });
+
                 this.cart.set([]);
                 this.selectedCustomerId = null;
+                this.pendingKey = null;
                 this.isProcessing.set(false);
-                this.toast.success('Nasave na ang benta!');
+
+                this.toast.success(result.wasReplay ? 'Naitala na ang bentang ito.' : 'Nasave na ang benta!');
             },
             error: () => {
+                // The key is kept so a retry replays rather than duplicating.
+                // The error interceptor already showed the server's message.
                 this.isProcessing.set(false);
-                this.toast.error('May error sa pag-checkout. Subukan muli.');
             }
         });
     }
