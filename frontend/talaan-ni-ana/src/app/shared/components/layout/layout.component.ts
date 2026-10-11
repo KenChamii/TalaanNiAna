@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ThemeService } from '../../../core/theme/theme.service';
 import { ToastComponent } from '../toast/toast.component';
 
 @Component({
@@ -12,18 +13,22 @@ import { ToastComponent } from '../toast/toast.component';
   styleUrl: './layout.component.scss'
 })
 export class LayoutComponent {
-  storeName = 'Nanay Ana';
+  private auth = inject(AuthService);
+
+  readonly theme = inject(ThemeService);
+
+  /** From the auth response at login. */
+  readonly storeName = this.auth.storeName;
+  readonly displayName = this.auth.displayName;
 
   navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { path: '/inventory', label: 'Inventory', icon: '📦' },
-    { path: '/customers', label: 'Customers', icon: '👥' },
-    { path: '/transactions', label: 'Transactions', icon: '🧾' },
-    { path: '/checkout', label: 'Live Checkout', icon: '🛒' },
-    { path: '/settings', label: 'Settings', icon: '⚙' },
+    { path: '/dashboard', label: 'Dashboard' },
+    { path: '/checkout', label: 'Benta' },
+    { path: '/inventory', label: 'Imbentaryo' },
+    { path: '/customers', label: 'Suki' },
+    { path: '/transactions', label: 'Transaksyon' },
+    { path: '/settings', label: 'Settings' },
   ];
-
-  constructor(private auth: AuthService) {}
 
   logout() {
     this.auth.logout();

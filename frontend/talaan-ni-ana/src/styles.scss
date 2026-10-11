@@ -1,132 +1,660 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@use 'sass:color';
 
+/* Talaan ni Ana — design system */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap');
+
+/* Tokens — araw (light) */
 :root {
-  /* Brand */
-  --accent: #3B6FE8;
-  --accent-soft: rgba(59, 111, 232, 0.12);
-  --danger: #E5534B;
-  --danger-soft: rgba(229, 83, 75, 0.1);
-  --warning: #E8A120;
-  --warning-soft: rgba(232, 161, 32, 0.12);
-  --success: #2ECC71;
+  /* Ground */
+  --bg: #faf7f2;
+  --bg-sunk: #f6eedf;
+  --surface: #ffffff;
+  --surface-alt: #faf7f2;
 
-  /* Surfaces */
-  --bg: #080C14;
-  --bg-card: rgba(22, 28, 42, 0.7);
-  --bg-card-solid: #161C2A;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-light: rgba(255, 255, 255, 0.13);
-  --border-focus: rgba(59, 111, 232, 0.55);
+  /* Ink */
+  --ink: #111111;
+  --ink-on-accent: #111111;
+  --muted: #5c5649;
+  --body: #2e2e2c;
 
-  /* Glass */
-  --glass-bg: rgba(16, 22, 36, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.09);
+  /* Line and lift */
+  --line: #111111;
+  --line-w: 2px;
+  --lift: 4px 4px 0 var(--line);
+  --lift-sm: 3px 3px 0 var(--line);
+  --lift-lg: 6px 6px 0 var(--line);
+  --radius: 12px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
 
-  /* Text */
-  --text: #E8EEF8;
-  --text-muted: #6E7A94;
-  --text-dim: #3D4558;
+  /* Semantic — saturated for marks, soft for fills */
+  --action: #1769e8;
+  --action-ink: #ffffff;
+  --ok: #c8e832;
+  --ok-soft: #e4f2a8;
+  --warn: #f5b83c;
+  --warn-soft: #fadfa8;
+  --info: #3cbdb1;
+  --info-soft: #aee0db;
+  --danger: #d95c5c;
+  --danger-soft: #efbdbd;
+
+  /* Inverted hero surface */
+  --invert-bg: #111111;
+  --invert-ink: #faf7f2;
+  --invert-rule: #3a3a38;
+  --invert-lift: 4px 4px 0 var(--ok);
+
+  /* Type */
+  --font-display: 'Archivo Black', 'Arial Black', sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
 }
 
+/* Tokens — gabi (dark). Border goes bone, lift becomes the accent. */
+:root[data-theme='dark'] {
+  --bg: #141310;
+  --bg-sunk: #0e0d0a;
+  --surface: #1e1c17;
+  --surface-alt: #141310;
+
+  --ink: #f2ede1;
+  --ink-on-accent: #111111;
+  --muted: #a09883;
+  --body: #cfc8b8;
+
+  --line: #e8e2d4;
+  --lift: 4px 4px 0 var(--line);
+  --lift-sm: 3px 3px 0 var(--line);
+  --lift-lg: 6px 6px 0 var(--line);
+
+  --action: #5b9bff;
+  --action-ink: #111111;
+  --ok: #c8e832;
+  --ok-soft: #2f3a10;
+  --warn: #f5b83c;
+  --warn-soft: #3d2e0e;
+  --info: #3cbdb1;
+  --info-soft: #0f312e;
+  --danger: #f08a8a;
+  --danger-soft: #3b1515;
+
+  --invert-bg: #c8e832;
+  --invert-ink: #111111;
+  --invert-rule: #111111;
+  --invert-lift: 4px 4px 0 var(--line);
+}
+
+/* Old token names, for components not yet converted. Delete when done. */
+:root,
+:root[data-theme='dark'] {
+  --accent: var(--action);
+  --accent-soft: var(--info-soft);
+  --warning: var(--warn);
+  --warning-soft: var(--warn-soft);
+  --success: var(--ok);
+  --text: var(--ink);
+  --text-muted: var(--muted);
+  --text-dim: var(--muted);
+  --border: var(--line);
+  --border-light: var(--line);
+  --border-focus: var(--action);
+  --bg-card: var(--surface);
+  --bg-card-solid: var(--surface);
+  --glass-bg: var(--surface);
+  --glass-border: var(--line);
+}
+
+/* Base */
 * { box-sizing: border-box; }
+
+html { color-scheme: light; }
+html[data-theme='dark'] { color-scheme: dark; }
 
 body {
   margin: 0;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
   background: var(--bg);
-  color: var(--text);
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
-
-  /* Subtle grid background */
-  background-image:
-    radial-gradient(ellipse at 15% 30%, rgba(59, 111, 232, 0.13) 0%, transparent 55%),
-    radial-gradient(ellipse at 85% 70%, rgba(59, 111, 232, 0.07) 0%, transparent 50%),
-    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
-  background-attachment: fixed;
+  transition: background 0.18s ease, color 0.18s ease;
 }
 
-/* Buttons */
-.btn-primary {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  padding: 0.55rem 1.1rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
-}
-.btn-primary:hover { background: #4a7bf0; box-shadow: 0 0 16px rgba(59,111,232,0.3); }
-.btn-primary:active { background: #2f5ed4; }
+::selection { background: var(--ok); color: #111111; }
 
-.btn-secondary {
-  background: rgba(255,255,255,0.05);
-  color: var(--text);
-  border: 1px solid var(--border);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-.btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: var(--border-light); }
-
-/* Card — glass by default */
-.card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 10px;
-  padding: 1.25rem;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+:focus-visible {
+  outline: var(--line-w) solid var(--action);
+  outline-offset: 2px;
 }
 
-/* Inputs */
-input, select {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 6px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  font-family: inherit;
-  transition: border-color 0.15s ease, background 0.15s ease;
+/* Type */
+.eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
-input:focus, select:focus {
-  outline: none;
-  border-color: var(--border-focus);
-  background: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 0 0 3px rgba(59, 111, 232, 0.1);
-}
-input::placeholder { color: var(--text-dim); }
 
-/* Page title */
 .page-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0 0 1.25rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.875rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  letter-spacing: -0.027em;
+  color: var(--ink);
+}
+
+/* Peso amounts, counts, KPIs. Not body copy. */
+.display {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  font-weight: 400;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Surfaces */
+.card {
+  background: var(--surface);
+  border: var(--line-w) solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--lift);
+  padding: 1.25rem;
+}
+
+.card--ok     { background: var(--ok-soft); }
+.card--warn   { background: var(--warn-soft); }
+.card--info   { background: var(--info-soft); }
+.card--danger { background: var(--danger-soft); }
+
+:root[data-theme='dark'] .card--ok     { border-color: var(--ok);     box-shadow: 4px 4px 0 var(--ok);     color: var(--ok); }
+:root[data-theme='dark'] .card--warn   { border-color: var(--warn);   box-shadow: 4px 4px 0 var(--warn);   color: var(--warn); }
+:root[data-theme='dark'] .card--info   { border-color: var(--info);   box-shadow: 4px 4px 0 var(--info);   color: var(--info); }
+:root[data-theme='dark'] .card--danger { border-color: var(--danger); box-shadow: 4px 4px 0 var(--danger); color: var(--danger); }
+
+.card--ink {
+  background: var(--invert-bg);
+  color: var(--invert-ink);
+  border-color: var(--line);
+  box-shadow: var(--invert-lift);
+}
+
+.rule {
+  height: var(--line-w);
+  background: var(--line);
+  opacity: 0.3;
+  border: 0;
+  margin: 0;
+}
+
+/* Buttons. On press the lift drops and the control moves into its place. */
+%btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+  border: var(--line-w) solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--lift);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+
+  &:active:not(:disabled) {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: translate(4px, 4px);
+  }
+}
+
+.btn-primary {
+  @extend %btn-base;
+  background: var(--action);
+  color: var(--action-ink);
+  font-family: var(--font-display);
+  font-weight: 400;
   letter-spacing: -0.01em;
 }
 
-/* ---- Print isolation ----
-   When printing, hide the entire app (sidebar, header, page content)
-   and reveal only the receipt modal, no matter how deep it's nested.
-   The .receipt-backdrop itself is repositioned in
-   receipt-modal.component.scss to take over the page. */
-@media print {
-  body * {
-    visibility: hidden;
+.btn-confirm {
+  @extend %btn-base;
+  background: var(--ok);
+  color: #111111;
+}
+
+.btn-secondary {
+  @extend %btn-base;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.btn-danger {
+  @extend %btn-base;
+  background: var(--danger-soft);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] .btn-confirm,
+:root[data-theme='dark'] .btn-danger { color: #111111; }
+
+:root[data-theme='dark'] .btn-danger { background: var(--danger); }
+
+.btn-ghost {
+  @extend %btn-base;
+  background: transparent;
+  color: var(--ink);
+  border-color: transparent;
+  box-shadow: none;
+  font-weight: 500;
+
+  &:hover:not(:disabled) {
+    border-color: var(--line);
+    background: var(--surface);
+  }
+}
+
+.full-width { width: 100%; }
+
+/* Inputs */
+input,
+select,
+textarea {
+  width: 100%;
+  background: var(--surface-alt);
+  border: var(--line-w) solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  padding: 0.8125rem 0.9375rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  transition: box-shadow 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  background: var(--surface);
+  border-color: var(--action);
+  box-shadow: 3px 3px 0 var(--action);
+}
+
+input::placeholder,
+textarea::placeholder { color: var(--muted); }
+
+input[type='checkbox'],
+input[type='radio'] {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  accent-color: var(--action);
+}
+
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched {
+  border-color: var(--danger);
+  box-shadow: 3px 3px 0 var(--danger);
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 7px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: var(--line-w) solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 0.25rem 0.6875rem;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.badge--ok     { background: var(--ok-soft); }
+.badge--warn   { background: var(--warn-soft); }
+.badge--info   { background: var(--info-soft); }
+.badge--danger { background: var(--danger-soft); }
+
+:root[data-theme='dark'] {
+  .badge--ok     { border-color: var(--ok);     color: var(--ok); }
+  .badge--warn   { border-color: var(--warn);   color: var(--warn); }
+  .badge--info   { border-color: var(--info);   color: var(--info); }
+  .badge--danger { border-color: var(--danger); color: var(--danger); }
+}
+
+/* Auth shell — login and register */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-sunk);
+}
+
+.auth-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1.75rem;
+  background: var(--surface);
+  border-bottom: var(--line-w) solid var(--line);
+
+  .brand {
+    font-family: var(--font-display);
+    font-size: 1.3125rem;
+    letter-spacing: -0.024em;
+    color: var(--ink);
   }
 
-  .receipt-backdrop,
-  .receipt-backdrop * {
-    visibility: visible;
+  a { text-decoration: none; }
+}
+
+.auth-body {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3.5rem;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 3.5rem 1.75rem;
+}
+
+.auth-card {
+  flex: 1 1 380px;
+  min-width: 316px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: var(--line-w) solid var(--line);
+  border-radius: 14px;
+  box-shadow: 8px 8px 0 var(--line);
+  padding: 2rem;
+
+  .auth-title {
+    margin: 0 0 1.625rem;
+    font-family: var(--font-display);
+    font-size: 1.875rem;
+    letter-spacing: -0.033em;
   }
+
+  input { margin-bottom: 1.125rem; }
+
+  .error {
+    margin: 0 0 0.875rem;
+    padding: 0.625rem 0.75rem;
+    background: var(--danger-soft);
+    border: var(--line-w) solid var(--line);
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .switch-link {
+    margin: 1.25rem 0 0;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--body);
+
+    a { color: var(--action); font-weight: 700; }
+  }
+}
+
+:root[data-theme='dark'] .auth-card .error { color: var(--danger); border-color: var(--danger); }
+
+/* Two fields per row */
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 1rem;
+}
+
+@media (max-width: 520px) {
+  .field-grid { grid-template-columns: minmax(0, 1fr); }
+  .auth-body { padding: 2rem 1.25rem; gap: 2.25rem; }
+}
+
+/* Stat cards and lists */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.25rem;
+}
+
+.stat-card {
+  @extend .card;
+  padding: 1.125rem;
+}
+
+.stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.875rem;
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+
+  small { font-size: 0.9375rem; letter-spacing: 0; }
+}
+
+.stat-foot {
+  margin: 0.625rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: var(--line-w) solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.625rem 0.75rem;
+  background: var(--surface-alt);
+}
+
+.list-rank {
+  flex: 0 0 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+.list-name { flex: 1 1 auto; font-size: 0.875rem; font-weight: 500; }
+.list-meta { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); }
+.list-value { font-weight: 700; font-size: 0.875rem; }
+
+.empty-state {
+  border: var(--line-w) dashed var(--line);
+  border-radius: var(--radius-sm);
+  padding: 1.875rem 1rem;
+  text-align: center;
+  background: var(--surface-alt);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+/* ngx-charts axis colours. Global because ::ng-deep leaks here anyway. */
+.chart-wrap {
+  .tick text {
+    fill: var(--muted) !important;
+    font-family: var(--font-mono) !important;
+    font-size: 10px !important;
+  }
+
+  .gridline-path {
+    stroke: var(--line) !important;
+    opacity: 0.18;
+  }
+
+  .line-series .line { stroke-width: 3px; }
+
+  .pie-label { fill: var(--ink) !important; }
+}
+
+/* Motifs. All decorative — mark them aria-hidden in the template. */
+
+/* Jeepney striping. Under every top bar. */
+.jeep-stripe {
+  display: flex;
+  height: 9px;
+  border-bottom: var(--line-w) solid var(--line);
+  flex-shrink: 0;
+
+  span { display: block; }
+  span:nth-child(1) { flex: 2; background: var(--danger); }
+  span:nth-child(2) { flex: 1; background: var(--warn); }
+  span:nth-child(3) { flex: 4; background: var(--ok); }
+  span:nth-child(4) { flex: 1; background: var(--info); }
+  span:nth-child(5) { flex: 2; background: var(--action); }
+}
+
+/* Banderitas. Login, empty states and the receipt header only. */
+.banderitas {
+  background: var(--bg-sunk);
+  border-bottom: var(--line-w) solid var(--line);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    display: block;
+    height: 3px;
+    background: var(--line);
+  }
+
+  .flags {
+    display: flex;
+    overflow: hidden;
+    height: 26px;
+  }
+
+  .flags i {
+    flex: 0 0 auto;
+    width: 0;
+    height: 0;
+    margin-right: 6px;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 26px solid var(--ok);
+  }
+
+  .flags i:nth-child(5n + 1) { border-top-color: var(--danger); }
+  .flags i:nth-child(5n + 2) { border-top-color: var(--warn); }
+  .flags i:nth-child(5n + 3) { border-top-color: var(--ok); }
+  .flags i:nth-child(5n + 4) { border-top-color: var(--info); }
+  .flags i:nth-child(5n + 5) { border-top-color: var(--action); }
+}
+
+/* Sunburst. One per screen, behind a single number. Keep under 20% opacity. */
+.has-sunburst {
+  position: relative;
+  overflow: hidden;
+
+  > * { position: relative; }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -78px;
+    right: -78px;
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    opacity: 0.16;
+    background: repeating-conic-gradient(
+      from 0deg,
+      var(--ok) 0deg 7deg,
+      transparent 7deg 14deg
+    );
+    pointer-events: none;
+  }
+}
+
+/* Signwriting. Login and landing only. */
+.signwriting {
+  color: var(--ink);
+  text-shadow: 5px 5px 0 var(--ok), 5px 5px 0 var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Print: hide the app, show only the receipt modal. */
+@media print {
+  body * { visibility: hidden; }
+
+  .receipt-backdrop,
+  .receipt-backdrop * { visibility: visible; }
 
   .receipt-backdrop {
     position: absolute;

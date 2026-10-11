@@ -32,17 +32,17 @@ export class DashboardComponent implements OnInit {
 
   curve = curveMonotoneX;
 
-  lineScheme: any = { domain: ['#3B6FE8', '#E5534B'] };
+  lineScheme: any = { domain: ['#C8E832', '#D95C5C'] };
 
-  pieScheme: any = { domain: ['#3B6FE8', '#2ECC71', '#E5534B'] };
+  pieScheme: any = { domain: ['#C8E832', '#3CBDB1', '#D95C5C'] };
 
   getPieColor(name: string): string {
     const map: Record<string, string> = {
-      'Benta': '#3B6FE8',
-      'Koleksyon': '#2ECC71',
-      'Utang': '#E5534B'
+      'Benta': '#C8E832',
+      'Koleksyon': '#3CBDB1',
+      'Utang': '#D95C5C'
     };
-    return map[name] ?? '#6E7A94';
+    return map[name] ?? '#5C5649';
   }
 
   constructor(private dashboardService: DashboardService) {}
