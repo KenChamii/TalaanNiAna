@@ -32,6 +32,16 @@ public sealed class StoreClock
     /// </summary>
     public int UtcOffsetHours => (int)_zone.GetUtcOffset(_utcNow).TotalHours;
 
+    /// <summary>True when this id resolves here. Used to validate the setting.</summary>
+    public static bool CanResolve(string? timeZoneId)
+    {
+        if (string.IsNullOrWhiteSpace(timeZoneId)) return false;
+
+        return TimeZoneInfo.TryFindSystemTimeZoneById(timeZoneId, out _)
+            || (WindowsFallbacks.TryGetValue(timeZoneId, out var windowsId)
+                && TimeZoneInfo.TryFindSystemTimeZoneById(windowsId, out _));
+    }
+
     public DateRange Today()
     {
         var start = LocalNow.Date;
