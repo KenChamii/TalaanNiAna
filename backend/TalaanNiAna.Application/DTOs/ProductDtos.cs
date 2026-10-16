@@ -3,6 +3,9 @@ public record ProductDto(
     string Name,
     string Category,
     decimal Price,
+    decimal CostPrice,
+    decimal UnitMargin,
+    decimal MarginPercent,
     int StockQuantity,
     int LowStockThreshold,
     bool IsLowStock);
@@ -12,6 +15,7 @@ public record CreateProductDto(
     string Category,
     decimal Price,
     int StockQuantity,
+    decimal CostPrice = 0,
     int? LowStockThreshold = null);   // null falls back to the store's default
 
 public record UpdateProductDto(
@@ -19,4 +23,5 @@ public record UpdateProductDto(
     string Category,
     decimal Price,
     int StockQuantity,
+    decimal? CostPrice = null,        // null keeps the product's current cost
     int? LowStockThreshold = null);   // null keeps the product's current value

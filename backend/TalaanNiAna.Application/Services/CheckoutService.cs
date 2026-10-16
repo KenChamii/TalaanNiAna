@@ -92,7 +92,9 @@ public class CheckoutService
             {
                 ProductId = product.Id,
                 Quantity = item.Quantity,
-                UnitPrice = product.Price
+                UnitPrice = product.Price,
+                // Snapshot, so a later cost change does not rewrite past profit.
+                UnitCost = product.CostPrice
             });
         }
 
