@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Threading.RateLimiting;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -112,6 +112,7 @@ builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<CheckoutService>();
 builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<ZReportService>();
 builder.Services.AddScoped<SettingsService>();
 
 // Validation
