@@ -15,9 +15,12 @@ import { ToastService } from '../../../shared/services/toast.service';
   styleUrl: './customer-detail.component.scss'
 })
 export class CustomerDetailComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private customerService = inject(CustomerService);
+  private toast = inject(ToastService);
+
   customer = signal<CustomerDetail | null>(null);
   isLoading = signal(true);
-  private toast = inject(ToastService);
 
   showPaymentForm = signal(false);
   paymentAmount: number | null = null;
@@ -25,8 +28,6 @@ export class CustomerDetailComponent implements OnInit {
   isSubmittingPayment = signal(false);
 
   private customerId!: number;
-
-  constructor(private route: ActivatedRoute, private customerService: CustomerService) {}
 
   ngOnInit() {
     this.customerId = Number(this.route.snapshot.paramMap.get('id'));
@@ -39,10 +40,7 @@ export class CustomerDetailComponent implements OnInit {
         this.customer.set(data);
         this.isLoading.set(false);
       },
-      error: () => {
-        this.isLoading.set(false);
-        this.toast.error('Hindi ma-load ang impormasyon ng suki.');
-      }
+      error: () => this.isLoading.set(false)
     });
   }
 
@@ -57,31 +55,31 @@ export class CustomerDetailComponent implements OnInit {
   }
 
   submitPayment() {
-    const current = this.customer();
-    if (!current) return;
+    if (!this.customer()) return;
 
+    // Only the checks the server cannot make cheaply. Overpayment is the
+    // server's call, so its message is the one the user should see.
     if (!this.paymentAmount || this.paymentAmount <= 0) {
-      this.toast.warning('Maglagay ng valid na halaga.');
-      return;
-    }
-
-    if (this.paymentAmount > current.totalCredit) {
-      this.toast.warning('Hindi puwedeng lumagpas sa kasalukuyang utang ang bayad.');
+      this.toast.warning('Maglagay ng halaga na mas mataas sa zero.');
       return;
     }
 
     this.isSubmittingPayment.set(true);
-    this.customerService.recordPayment(this.customerId, this.paymentAmount, this.paymentNote || undefined).subscribe({
-      next: () => {
-        this.isSubmittingPayment.set(false);
-        this.showPaymentForm.set(false);
-        this.toast.success('Naitala ang bayad!');
-        this.load();
-      },
-      error: () => {
-        this.isSubmittingPayment.set(false);
-        this.toast.error('Hindi naitala ang bayad. Subukan muli.');
-      }
-    });
+
+    this.customerService
+      .recordPayment(this.customerId, this.paymentAmount, this.paymentNote || undefined)
+      .subscribe({
+        next: result => {
+          this.isSubmittingPayment.set(false);
+          this.showPaymentForm.set(false);
+          this.load();
+          this.toast.success(
+            result.remainingCredit > 0
+              ? `Naitala ang bayad. Natitira: ₱${result.remainingCredit.toFixed(2)}.`
+              : 'Naitala ang bayad. Wala nang utang.'
+          );
+        },
+        error: () => this.isSubmittingPayment.set(false)
+      });
   }
 }

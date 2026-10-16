@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CustomerService } from '../customer.service';
 import { CustomerFormComponent } from './customer-form/customer-form.component';
+import { SettingsService } from '../../settings/settings.service';
 import { Customer } from '../../../shared/models/customer.model';
 import { PesoPipe } from '../../../shared/pipes/peso.pipes';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -16,6 +17,10 @@ import { ToastService } from '../../../shared/services/toast.service';
   styleUrl: './customer-list.component.scss'
 })
 export class CustomerListComponent implements OnInit {
+  private customerService = inject(CustomerService);
+  private settingsService = inject(SettingsService);
+  private toast = inject(ToastService);
+
   customers = signal<Customer[]>([]);
   searchTerm = signal('');
   currentPage = signal(1);
@@ -23,11 +28,17 @@ export class CustomerListComponent implements OnInit {
   totalCount = signal(0);
   isModalOpen = signal(false);
 
-  constructor(private customerService: CustomerService) {}
-  private toast = inject(ToastService);
+  /** The store's own wording, falling back if settings have not loaded. */
+  private reminderTemplate =
+    'Hi {name}, paalala lang na may natitirang utang kang {amount} sa tindahan. Salamat po!';
 
   ngOnInit() {
     this.load();
+    this.settingsService.get().subscribe(settings => {
+      if (settings.smsAlertTemplate?.trim()) {
+        this.reminderTemplate = settings.smsAlertTemplate;
+      }
+    });
   }
 
   load() {
@@ -43,15 +54,26 @@ export class CustomerListComponent implements OnInit {
     this.load();
   }
 
-  copyReminder(customer: Customer) {
-    const message = `Hi ${customer.fullName}, paalala lang na may natitirang utang kang ₱${customer.totalCredit.toFixed(2)} sa tindahan. Salamat po!`;
-    navigator.clipboard.writeText(message).then(() => {
-      this.toast.success('Na-copy sa clipboard! I-paste sa Messenger o SMS.');
-    });
+  goToPage(page: number) {
+    this.currentPage.set(page);
+    this.load();
   }
 
-  onModalSaved() {
+  copyReminder(customer: Customer) {
+    const message = this.reminderTemplate
+      .replace('{name}', customer.fullName)
+      .replace('{amount}', `₱${customer.totalCredit.toFixed(2)}`);
+
+    navigator.clipboard.writeText(message)
+      .then(() => this.toast.success('Na-copy. I-paste sa Messenger o SMS.'))
+      .catch(() => this.toast.warning('Hindi ma-access ang clipboard sa browser na ito.'));
+  }
+
+  onModalSaved(name: string) {
     this.isModalOpen.set(false);
+    this.searchTerm.set('');
+    this.currentPage.set(1);
     this.load();
+    this.toast.success(`Nadagdag na si ${name}.`);
   }
 }

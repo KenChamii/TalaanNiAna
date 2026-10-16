@@ -55,6 +55,12 @@ export class AuthService {
     return this.refresh();
   }
 
+  /** Keeps the topbar current when the store is renamed in Settings. */
+  setStoreName(name: string): void {
+    this.storeName.set(name);
+    this.write(STORE_KEY, name);
+  }
+
   logout(): void {
     this.http
       .post(`${environment.apiUrl}/auth/logout`, {}, { withCredentials: true })
@@ -108,7 +114,7 @@ export class AuthService {
       if (value === null) localStorage.removeItem(key);
       else localStorage.setItem(key, value);
     } catch {
-      // Blocked storage: the session still works in memory.
+      // Blocked storage: session still works in memory.
     }
   }
 }

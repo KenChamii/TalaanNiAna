@@ -6,6 +6,9 @@ public interface IProductRepository
     /// <summary>Loads several products in one query. Used by checkout to avoid N+1.</summary>
     Task<IReadOnlyDictionary<int, Product>> GetByIdsAsync(IEnumerable<int> ids);
 
+    /// <summary>Distinct categories in use by this store, alphabetically.</summary>
+    Task<IEnumerable<string>> GetCategoriesAsync();
+
     Task<Product> CreateAsync(Product product);
     Task<Product?> UpdateAsync(Product product);
     Task<bool> DeleteAsync(int id);

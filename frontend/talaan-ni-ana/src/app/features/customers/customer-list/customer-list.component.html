@@ -35,7 +35,7 @@
     </tbody>
   </table>
 
-  <div class="pager">
+  <div class="pager" *ngIf="totalPages() > 1">
     <span>Pahina:</span>
     <button
       *ngFor="let p of [].constructor(totalPages()); let i = index"
@@ -49,6 +49,6 @@
 
 <app-customer-form
   *ngIf="isModalOpen()"
-  (saved)="onModalSaved()"
+  (saved)="onModalSaved($event)"
   (closed)="isModalOpen.set(false)">
 </app-customer-form>

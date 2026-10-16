@@ -1,8 +1,6 @@
 import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { CustomerService } from '../../customer.service';
-import { Customer } from '../../../../shared/models/customer.model';
-import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-customer-form',
@@ -14,36 +12,33 @@ import { ToastService } from '../../../../shared/services/toast.service';
 export class CustomerFormComponent {
   private fb = inject(FormBuilder);
   private customerService = inject(CustomerService);
-  private toast = inject(ToastService);
 
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<string>();
   @Output() closed = new EventEmitter<void>();
+
   isSaving = false;
 
   form = this.fb.group({
     fullName: ['', Validators.required],
-    contactNumber: ['', Validators.required]
+    // Optional on the API too; plenty of suki have no number on file.
+    contactNumber: ['']
   });
 
- submit() {
-  if (this.form.invalid) return;
-  this.isSaving = true;
-
-  const raw = this.form.value;
-  const payload: Partial<Customer> = {
-    fullName: raw.fullName ?? undefined,
-    contactNumber: raw.contactNumber ?? undefined,
-  };
-
-  this.customerService.create(payload).subscribe({
-    next: () => {
-      this.toast.success('Panibagong suki ang nadagdag!');
-      this.saved.emit();
-    },
-    error: () => {
-      this.isSaving = false;
-      this.toast.error('Hindi na-dagdag ang suki. Subukan muli.');
+  submit() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
     }
-  });
-}
+
+    this.isSaving = true;
+    const raw = this.form.getRawValue();
+
+    this.customerService.create({
+      fullName: raw.fullName!.trim(),
+      contactNumber: raw.contactNumber?.trim() || undefined
+    }).subscribe({
+      next: created => this.saved.emit(created.fullName),
+      error: () => { this.isSaving = false; }
+    });
+  }
 }
