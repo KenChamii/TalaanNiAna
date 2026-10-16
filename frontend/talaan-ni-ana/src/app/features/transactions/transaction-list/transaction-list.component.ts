@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { TransactionService } from '../transaction.service';
 import { TransactionView } from '../../../shared/models/transaction.model';
 import { PesoPipe } from '../../../shared/pipes/peso.pipes';
-import { ToastService } from '../../../shared/services/toast.service';
 import { ReceiptModalComponent, ReceiptData } from '../../../shared/components/receipt-modal/receipt-modal.component';
 
 @Component({
@@ -15,6 +14,8 @@ import { ReceiptModalComponent, ReceiptData } from '../../../shared/components/r
   styleUrl: './transaction-list.component.scss'
 })
 export class TransactionListComponent implements OnInit {
+  private transactionService = inject(TransactionService);
+
   transactions = signal<TransactionView[]>([]);
   dateFrom = signal('');
   dateTo = signal('');
@@ -26,9 +27,6 @@ export class TransactionListComponent implements OnInit {
   expandedId = signal<number | null>(null);
   currentReceipt = signal<ReceiptData | null>(null);
 
-  constructor(private transactionService: TransactionService) {}
-  private toast = inject(ToastService);
-
   ngOnInit() {
     this.load();
   }
@@ -39,13 +37,10 @@ export class TransactionListComponent implements OnInit {
         { dateFrom: this.dateFrom(), dateTo: this.dateTo(), paymentType: this.paymentType() },
         this.currentPage()
       )
-      .subscribe({
-        next: result => {
-          this.transactions.set(result.items);
-          this.totalPages.set(result.totalPages);
-          this.totalCount.set(result.totalCount);
-        },
-        error: () => this.toast.error('Hindi ma-load ang mga transaksyon.')
+      .subscribe(result => {
+        this.transactions.set(result.items);
+        this.totalPages.set(result.totalPages);
+        this.totalCount.set(result.totalCount);
       });
   }
 
@@ -59,7 +54,7 @@ export class TransactionListComponent implements OnInit {
   }
 
   viewReceipt(txn: TransactionView, event: MouseEvent) {
-    event.stopPropagation(); // don't also toggle the row expansion
+    event.stopPropagation(); // do not also toggle the row expansion
     this.currentReceipt.set({
       transactionId: txn.id,
       transactionDate: txn.transactionDate,
