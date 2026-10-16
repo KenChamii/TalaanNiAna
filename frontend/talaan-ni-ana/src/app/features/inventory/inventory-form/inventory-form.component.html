@@ -2,27 +2,38 @@
   <form class="modal-card card" [formGroup]="form" (ngSubmit)="submit()" (click)="$event.stopPropagation()">
     <h3>{{ product ? 'I-edit ang Item' : 'Magdagdag ng Item' }}</h3>
 
-    <label>Item Name</label>
-    <input type="text" formControlName="name" placeholder="e.g. Lucky Me! Pancit Canton" />
+    <label class="field-label" for="name">Pangalan ng item</label>
+    <input id="name" type="text" formControlName="name" placeholder="hal. Lucky Me Pancit Canton" />
 
-    <label>Category</label>
-    <input type="text" formControlName="category" placeholder="e.g. Noodles" />
+    <label class="field-label" for="category">Kategorya</label>
+    <input
+      id="category"
+      type="text"
+      formControlName="category"
+      list="product-categories"
+      placeholder="Pumili o mag-type ng bago" />
+    <datalist id="product-categories">
+      <option *ngFor="let cat of categories" [value]="cat"></option>
+    </datalist>
 
     <div class="row">
       <div>
-        <label>Price (₱)</label>
-        <input type="number" formControlName="price" step="0.50" />
+        <label class="field-label" for="price">Presyo (&#8369;)</label>
+        <input id="price" type="number" formControlName="price" step="0.50" min="0" />
       </div>
       <div>
-        <label>Stocks</label>
-        <input type="number" formControlName="stockQuantity" />
+        <label class="field-label" for="stock">Stock</label>
+        <input id="stock" type="number" formControlName="stockQuantity" min="0" />
       </div>
     </div>
+
+    <label class="field-label" for="threshold">Paalalahanan kapag bumaba sa</label>
+    <input id="threshold" type="number" formControlName="lowStockThreshold" min="0" />
 
     <div class="modal-actions">
       <button type="button" class="btn-secondary" (click)="closed.emit()">Kanselahin</button>
       <button type="submit" class="btn-primary" [disabled]="isSaving">
-        {{ isSaving ? 'Sine-save...' : 'I-save' }}
+        {{ isSaving ? 'Sine-save…' : 'I-save' }}
       </button>
     </div>
   </form>
