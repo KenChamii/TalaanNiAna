@@ -57,6 +57,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<Product>(entity =>
         {
             entity.Property(p => p.Price).HasColumnType("decimal(18,2)");
+            entity.Property(p => p.CostPrice).HasColumnType("decimal(18,2)");
             entity.Property(p => p.Name).HasMaxLength(120).IsRequired();
             entity.Property(p => p.Category).HasMaxLength(60).IsRequired();
             entity.Property(p => p.RowVersion).IsRowVersion();
@@ -103,6 +104,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<TransactionItem>(entity =>
         {
             entity.Property(i => i.UnitPrice).HasColumnType("decimal(18,2)");
+            entity.Property(i => i.UnitCost).HasColumnType("decimal(18,2)");
             entity.HasIndex(i => i.StoreId);
             entity.HasQueryFilter(i => i.StoreId == CurrentStoreId);
         });

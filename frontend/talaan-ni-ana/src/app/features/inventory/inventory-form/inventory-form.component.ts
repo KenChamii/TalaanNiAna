@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { InventoryService } from '../inventory.service';
 import { Product, ProductInput } from '../../../shared/models/product.model';
 
@@ -29,9 +30,24 @@ export class InventoryFormComponent implements OnInit {
     name: ['', Validators.required],
     category: ['', Validators.required],
     price: [0, [Validators.required, Validators.min(0.01)]],
+    // Zero is valid: the owner may not know the puhunan yet.
+    costPrice: [0, [Validators.required, Validators.min(0)]],
     stockQuantity: [0, [Validators.required, Validators.min(0)]],
     lowStockThreshold: [10, [Validators.required, Validators.min(0)]]
   });
+
+  private value = toSignal(this.form.valueChanges, { initialValue: this.form.value });
+
+  /** Peso kita per piece, recalculated as the owner types. */
+  margin = computed(() => (this.value().price ?? 0) - (this.value().costPrice ?? 0));
+
+  marginPercent = computed(() => {
+    const price = this.value().price ?? 0;
+    return price > 0 ? (this.margin() / price) * 100 : 0;
+  });
+
+  /** Cost above price is allowed, but worth flagging before saving. */
+  isLossLeader = computed(() => (this.value().costPrice ?? 0) > 0 && this.margin() < 0);
 
   ngOnInit() {
     if (this.product) {
@@ -39,6 +55,7 @@ export class InventoryFormComponent implements OnInit {
         name: this.product.name,
         category: this.product.category,
         price: this.product.price,
+        costPrice: this.product.costPrice,
         stockQuantity: this.product.stockQuantity,
         lowStockThreshold: this.product.lowStockThreshold
       });
@@ -58,6 +75,7 @@ export class InventoryFormComponent implements OnInit {
       name: raw.name!,
       category: raw.category!.trim(),
       price: raw.price!,
+      costPrice: raw.costPrice!,
       stockQuantity: raw.stockQuantity!,
       lowStockThreshold: raw.lowStockThreshold!
     };

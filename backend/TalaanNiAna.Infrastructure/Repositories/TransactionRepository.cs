@@ -50,6 +50,20 @@ public class TransactionRepository : ITransactionRepository
         return (totals?.Cash ?? 0m, totals?.Credit ?? 0m);
     }
 
+    public async Task<(decimal revenue, decimal cost)> GetMarginAsync(DateRange range)
+    {
+        var margin = await ItemsInRange(range)
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                Revenue = g.Sum(i => i.Quantity * i.UnitPrice),
+                Cost = g.Sum(i => i.Quantity * i.UnitCost)
+            })
+            .FirstOrDefaultAsync();
+
+        return (margin?.Revenue ?? 0m, margin?.Cost ?? 0m);
+    }
+
     public async Task<IEnumerable<DailySalesPoint>> GetDailySalesAsync(DateRange range, int utcOffsetHours)
     {
         // Shift to local time before taking the date, so a sale at 10pm Manila
@@ -81,41 +95,59 @@ public class TransactionRepository : ITransactionRepository
     }
 
     public async Task<IEnumerable<TopProductResult>> GetTopProductsAsync(DateRange range, int count)
+        => await TopBy(range, count, byProfit: false);
+
+    public async Task<IEnumerable<TopProductResult>> GetTopProfitableAsync(DateRange range, int count)
+        => await TopBy(range, count, byProfit: true);
+
+    private async Task<IEnumerable<TopProductResult>> TopBy(DateRange range, int count, bool byProfit)
     {
         // Project to a flat, navigation-free shape first so the GroupBy key and
         // aggregates are plain scalars — mixing navigation properties into a
         // GroupBy key alongside aggregates can fail to translate to SQL.
-        var flatItems = _context.TransactionItems
-            .Where(i => i.Transaction.TransactionDate >= range.FromUtc
-                     && i.Transaction.TransactionDate < range.ToUtc)
+        var flatItems = ItemsInRange(range)
             .Select(i => new
             {
                 i.ProductId,
                 ProductName = i.Product.Name,
                 i.Quantity,
-                i.UnitPrice
+                i.UnitPrice,
+                i.UnitCost
             });
 
-        var grouped = await flatItems
+        var grouped = flatItems
             .GroupBy(i => i.ProductId)
             .Select(g => new
             {
                 ProductId = g.Key,
                 ProductName = g.Select(i => i.ProductName).FirstOrDefault(),
                 TotalQuantitySold = g.Sum(i => i.Quantity),
-                TotalRevenue = g.Sum(i => i.Quantity * i.UnitPrice)
-            })
-            .OrderByDescending(r => r.TotalQuantitySold)
-            .Take(count)
-            .ToListAsync();
+                TotalRevenue = g.Sum(i => i.Quantity * i.UnitPrice),
+                TotalProfit = g.Sum(i => i.Quantity * (i.UnitPrice - i.UnitCost))
+            });
 
-        return grouped.Select(g => new TopProductResult(
-            g.ProductId, g.ProductName ?? "(walang pangalan)", g.TotalQuantitySold, g.TotalRevenue));
+        grouped = byProfit
+            ? grouped.OrderByDescending(r => r.TotalProfit)
+            : grouped.OrderByDescending(r => r.TotalQuantitySold);
+
+        var rows = await grouped.Take(count).ToListAsync();
+
+        return rows.Select(g => new TopProductResult(
+            g.ProductId,
+            g.ProductName ?? "(walang pangalan)",
+            g.TotalQuantitySold,
+            g.TotalRevenue,
+            g.TotalProfit));
     }
 
     private IQueryable<Transaction> InRange(DateRange range)
         => _context.Transactions
             .Where(t => t.TransactionDate >= range.FromUtc && t.TransactionDate < range.ToUtc);
+
+    private IQueryable<TransactionItem> ItemsInRange(DateRange range)
+        => _context.TransactionItems
+            .Where(i => i.Transaction.TransactionDate >= range.FromUtc
+                     && i.Transaction.TransactionDate < range.ToUtc);
 
     private IQueryable<Transaction> Filter(
         DateTime? dateFrom, DateTime? dateTo, PaymentType? paymentType)

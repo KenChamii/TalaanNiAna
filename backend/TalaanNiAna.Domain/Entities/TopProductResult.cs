@@ -1,1 +1,6 @@
-﻿public record TopProductResult(int ProductId, string ProductName, int TotalQuantitySold, decimal TotalRevenue);
+public record TopProductResult(
+    int ProductId,
+    string ProductName,
+    int TotalQuantitySold,
+    decimal TotalRevenue,
+    decimal TotalProfit);

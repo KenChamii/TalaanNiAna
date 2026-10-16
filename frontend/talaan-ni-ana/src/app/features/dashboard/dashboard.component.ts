@@ -1,29 +1,41 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { NgFor, NgStyle } from '@angular/common';
+import { DecimalPipe, NgFor, NgIf, NgStyle } from '@angular/common';
 import { curveMonotoneX } from 'd3-shape';
 import { DashboardService } from './dashboard.service';
 import { PesoPipe } from '../../shared/pipes/peso.pipes';
 
-interface TopProduct { productId: number; productName: string; totalQuantitySold: number; totalRevenue: number; }
+interface TopProduct {
+  productId: number;
+  productName: string;
+  totalQuantitySold: number;
+  totalRevenue: number;
+  totalProfit: number;
+}
+
 interface TopDebtor { customerId: number; fullName: string; totalCredit: number; }
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgxChartsModule, PesoPipe, NgFor, NgStyle],
+  imports: [NgxChartsModule, PesoPipe, DecimalPipe, NgFor, NgIf, NgStyle],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
   todaySales = signal(0);
+  todayProfit = signal(0);
   collections = signal(0);
   totalCredit = signal(0);
   lowStockCount = signal(0);
   creditorCount = signal(0);
   averageTransactionValue = signal(0);
   monthlyTransactionCount = signal(0);
+  monthRevenue = signal(0);
+  monthProfit = signal(0);
+  monthMarginPercent = signal(0);
   topProducts = signal<TopProduct[]>([]);
+  topProfitable = signal<TopProduct[]>([]);
   topDebtors = signal<TopDebtor[]>([]);
   chartData = signal<any[]>([]);
   pieData = signal<any[]>([]);
@@ -45,18 +57,29 @@ export class DashboardComponent implements OnInit {
     return map[name] ?? '#5C5649';
   }
 
+  /** Share of today's sales that is kita, shown under the profit card. */
+  todayMarginPercent(): number {
+    const sales = this.todaySales();
+    return sales > 0 ? (this.todayProfit() / sales) * 100 : 0;
+  }
+
   constructor(private dashboardService: DashboardService) {}
 
   ngOnInit() {
     this.dashboardService.getSummary().subscribe(data => {
       this.todaySales.set(data.todaySales);
+      this.todayProfit.set(data.todayProfit ?? 0);
       this.collections.set(data.totalCollections);
       this.totalCredit.set(data.totalCredit);
       this.lowStockCount.set(data.lowStockCount);
       this.creditorCount.set(data.creditorCount ?? 0);
       this.averageTransactionValue.set(data.averageTransactionValue ?? 0);
       this.monthlyTransactionCount.set(data.monthlyTransactionCount ?? 0);
+      this.monthRevenue.set(data.monthRevenue ?? 0);
+      this.monthProfit.set(data.monthProfit ?? 0);
+      this.monthMarginPercent.set(data.monthMarginPercent ?? 0);
       this.topProducts.set(data.topProducts ?? []);
+      this.topProfitable.set(data.topProfitable ?? []);
       this.topDebtors.set(data.topDebtors ?? []);
 
       this.chartData.set([

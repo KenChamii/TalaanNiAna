@@ -46,6 +46,7 @@ public class ProductService
             Name = dto.Name.Trim(),
             Category = dto.Category.Trim(),
             Price = dto.Price,
+            CostPrice = dto.CostPrice,
             StockQuantity = dto.StockQuantity,
             LowStockThreshold = threshold
         };
@@ -66,7 +67,8 @@ public class ProductService
             Category = dto.Category.Trim(),
             Price = dto.Price,
             StockQuantity = dto.StockQuantity,
-            // An omitted threshold must not silently reset it to zero.
+            // Omitted values must not silently reset what the store already set.
+            CostPrice = dto.CostPrice ?? existing.CostPrice,
             LowStockThreshold = dto.LowStockThreshold ?? existing.LowStockThreshold
         };
 
@@ -83,9 +85,16 @@ public class ProductService
     }
 
     private static ProductDto ToDto(Product p) => new(
-        p.Id, p.Name, p.Category, p.Price, p.StockQuantity,
-        p.LowStockThreshold,
+        p.Id, p.Name, p.Category,
+        p.Price, p.CostPrice, p.UnitMargin, MarginPercent(p),
+        p.StockQuantity, p.LowStockThreshold,
         p.StockQuantity <= p.LowStockThreshold);
+
+    /// <summary>Margin over price. Zero when no cost has been recorded yet.</summary>
+    private static decimal MarginPercent(Product p)
+        => p.Price <= 0 || p.CostPrice <= 0
+            ? 0
+            : Math.Round(p.UnitMargin / p.Price * 100, 1);
 }
 
 public record QuickItemDto(int Id, string Name, decimal Price);

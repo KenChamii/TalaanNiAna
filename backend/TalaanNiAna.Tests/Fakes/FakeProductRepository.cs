@@ -8,13 +8,14 @@ public sealed class FakeProductRepository : IProductRepository
 {
     private readonly Dictionary<int, Product> _products = [];
 
-    public Product Add(int id, string name, decimal price, int stock)
+    public Product Add(int id, string name, decimal price, int stock, decimal cost = 0m)
     {
         var product = new Product
         {
             Id = id,
             Name = name,
             Price = price,
+            CostPrice = cost,
             StockQuantity = stock,
             Category = "Test",
             IsActive = true
@@ -42,6 +43,7 @@ public sealed class FakeProductRepository : IProductRepository
     // Not exercised by these tests.
     public Task<IEnumerable<Product>> GetAllAsync(string? search, string? category, int page, int pageSize)
         => throw new NotSupportedException();
+    public Task<IEnumerable<string>> GetCategoriesAsync() => throw new NotSupportedException();
     public Task<Product> CreateAsync(Product product) => throw new NotSupportedException();
     public Task<Product?> UpdateAsync(Product product) => throw new NotSupportedException();
     public Task<bool> DeleteAsync(int id) => throw new NotSupportedException();

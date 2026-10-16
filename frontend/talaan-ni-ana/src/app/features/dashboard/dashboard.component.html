@@ -17,7 +17,20 @@
     </div>
     <span class="stat-value">{{ todaySales() | peso }}</span>
     <div class="stat-footer">
-      <span class="delta up">↑ 12% vs kahapon</span>
+      <span class="delta neutral">Bago bawasan ang puhunan</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      <span class="stat-label">Kita Ngayon</span>
+      <span class="stat-icon-wrap success">↑</span>
+    </div>
+    <span class="stat-value" [class.danger]="todayProfit() < 0">{{ todayProfit() | peso }}</span>
+    <div class="stat-footer">
+      <span class="delta" [class.up]="todayProfit() >= 0" [class.down]="todayProfit() < 0">
+        {{ todayMarginPercent() | number:'1.0-1' }}% margin
+      </span>
     </div>
   </div>
 
@@ -125,6 +138,56 @@
         <span class="pie-label">{{ d.name }}</span>
         <span class="pie-val">{{ d.value | peso }}</span>
       </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Profit Row -->
+<div class="insights-row">
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <p class="chart-eyebrow">Ngayong Buwan</p>
+        <h3 class="chart-title">Kita vs Benta</h3>
+      </div>
+    </div>
+    <div class="margin-summary">
+      <div class="margin-block">
+        <span class="margin-block-label">Benta</span>
+        <span class="margin-block-value">{{ monthRevenue() | peso }}</span>
+      </div>
+      <div class="margin-block">
+        <span class="margin-block-label">Puhunan</span>
+        <span class="margin-block-value">{{ monthRevenue() - monthProfit() | peso }}</span>
+      </div>
+      <div class="margin-block accent">
+        <span class="margin-block-label">Kita</span>
+        <span class="margin-block-value">{{ monthProfit() | peso }}</span>
+      </div>
+    </div>
+    <div class="margin-bar">
+      <div class="margin-bar-fill" [ngStyle]="{'width.%': monthMarginPercent()}"></div>
+    </div>
+    <p class="margin-caption">{{ monthMarginPercent() | number:'1.0-1' }}% ng benta ay kita.</p>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <p class="chart-eyebrow">Ngayong Buwan</p>
+        <h3 class="chart-title">Pinaka-kumikita</h3>
+      </div>
+    </div>
+    <div class="list-wrap">
+      <div class="list-row" *ngFor="let p of topProfitable(); let i = index">
+        <span class="list-rank">{{ i + 1 }}</span>
+        <span class="list-name">{{ p.productName }}</span>
+        <span class="list-qty">{{ p.totalQuantitySold }}x</span>
+        <span class="list-value">{{ p.totalProfit | peso }}</span>
+      </div>
+      <p class="empty" *ngIf="topProfitable().length === 0">Walang naitalang kita ngayong buwan.</p>
     </div>
   </div>
 

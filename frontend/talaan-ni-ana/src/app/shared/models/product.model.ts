@@ -3,16 +3,21 @@ export interface Product {
   name: string;
   category: string;
   price: number;
+  /** Puhunan. Zero means it has not been recorded yet. */
+  costPrice: number;
+  unitMargin: number;
+  marginPercent: number;
   stockQuantity: number;
   lowStockThreshold: number;
   isLowStock: boolean;
 }
 
-/** What the form posts. Omitting lowStockThreshold keeps the current value. */
+/** What the form posts. Omitting a field keeps the current value. */
 export interface ProductInput {
   name: string;
   category: string;
   price: number;
+  costPrice?: number;
   stockQuantity: number;
   lowStockThreshold?: number;
 }
