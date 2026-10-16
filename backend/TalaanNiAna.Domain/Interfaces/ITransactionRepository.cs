@@ -10,9 +10,17 @@ public interface ITransactionRepository
 
     Task<(decimal cashTotal, decimal creditTotal)> GetTotalsAsync(DateRange range);
 
+    /// <summary>Revenue and cost of goods sold, from the snapshotted line costs.</summary>
+    Task<(decimal revenue, decimal cost)> GetMarginAsync(DateRange range);
+
     /// <summary>Daily totals grouped by the store's local date, not UTC.</summary>
     Task<IEnumerable<DailySalesPoint>> GetDailySalesAsync(DateRange range, int utcOffsetHours);
 
     Task<(decimal averageValue, int count)> GetAverageTransactionAsync(DateRange range);
+
+    /// <summary>Best sellers by units moved.</summary>
     Task<IEnumerable<TopProductResult>> GetTopProductsAsync(DateRange range, int count);
+
+    /// <summary>Best earners by peso profit. Rarely the same list.</summary>
+    Task<IEnumerable<TopProductResult>> GetTopProfitableAsync(DateRange range, int count);
 }

@@ -5,7 +5,13 @@ public class Product : IHasStore
 
     public string Name { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
+
+    /// <summary>What the store sells it for.</summary>
     public decimal Price { get; set; }
+
+    /// <summary>What the store paid for it. Zero means not recorded yet.</summary>
+    public decimal CostPrice { get; set; }
+
     public int StockQuantity { get; set; }
     public int LowStockThreshold { get; set; } = 10;
     public bool IsActive { get; set; } = true;
@@ -15,4 +21,7 @@ public class Product : IHasStore
     /// <summary>Optimistic concurrency token. Stops two sales decrementing the same stock.</summary>
     /// <remarks>Becomes xmin when the provider changes to PostgreSQL.</remarks>
     public byte[]? RowVersion { get; set; }
+
+    /// <summary>Peso margin per unit. Negative on a loss leader, which is allowed.</summary>
+    public decimal UnitMargin => Price - CostPrice;
 }
