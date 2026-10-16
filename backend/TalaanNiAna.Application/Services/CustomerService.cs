@@ -1,4 +1,6 @@
-﻿public class CustomerService
+using TalaanNiAna.Application.Common.Exceptions;
+
+public class CustomerService
 {
     private readonly ICustomerRepository _repo;
 
@@ -49,22 +51,19 @@
 
     public async Task<CreditPaymentDto> RecordPaymentAsync(int customerId, RecordPaymentDto dto)
     {
-        if (dto.Amount <= 0)
-            throw new ArgumentException("Payment amount must be greater than zero.");
-
         var customer = await _repo.GetByIdAsync(customerId)
-            ?? throw new InvalidOperationException("Customer not found.");
+            ?? throw new NotFoundException("Suki", customerId);
 
         if (dto.Amount > customer.TotalCredit)
-            throw new InvalidOperationException(
-                $"Payment ({dto.Amount}) exceeds the customer's outstanding utang ({customer.TotalCredit}).");
+            throw new ConflictException(
+                $"Mas malaki ang bayad ({dto.Amount:N2}) kaysa sa utang ({customer.TotalCredit:N2}).",
+                "overpayment");
 
         var payment = await _repo.RecordPaymentAsync(customerId, dto.Amount, dto.Note);
-        var updated = await _repo.GetByIdAsync(customerId);
+        var remaining = await _repo.RecalculateCreditAsync(customerId);
 
         return new CreditPaymentDto(
-            payment.Id, payment.Amount, payment.PaidAt, payment.Note,
-            updated?.TotalCredit ?? 0);
+            payment.Id, payment.Amount, payment.PaidAt, payment.Note, remaining);
     }
 
     private static CustomerDto ToDto(Customer c) => new(

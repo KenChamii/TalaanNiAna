@@ -35,30 +35,32 @@ public class TransactionRepository : ITransactionRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.IdempotencyKey == idempotencyKey);
 
-    public async Task<(decimal cashTotal, decimal creditTotal)> GetTodayTotalsAsync()
+    public async Task<(decimal cashTotal, decimal creditTotal)> GetTotalsAsync(DateRange range)
     {
-        var today = DateTime.UtcNow.Date;
-        var todays = await _context.Transactions
-            .Where(t => t.TransactionDate >= today && t.TransactionDate < today.AddDays(1))
-            .ToListAsync();
+        // One round trip, both totals summed by the database.
+        var totals = await InRange(range)
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                Cash = g.Sum(t => t.PaymentType == PaymentType.Cash ? t.TotalAmount : 0m),
+                Credit = g.Sum(t => t.PaymentType == PaymentType.Credit ? t.TotalAmount : 0m)
+            })
+            .FirstOrDefaultAsync();
 
-        var cash = todays.Where(t => t.PaymentType == PaymentType.Cash).Sum(t => t.TotalAmount);
-        var credit = todays.Where(t => t.PaymentType == PaymentType.Credit).Sum(t => t.TotalAmount);
-        return (cash, credit);
+        return (totals?.Cash ?? 0m, totals?.Credit ?? 0m);
     }
 
-    public async Task<IEnumerable<DailySalesPoint>> GetMonthlySalesHistoryAsync()
+    public async Task<IEnumerable<DailySalesPoint>> GetDailySalesAsync(DateRange range, int utcOffsetHours)
     {
-        var monthStart = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
-
-        var grouped = await _context.Transactions
-            .Where(t => t.TransactionDate >= monthStart)
-            .GroupBy(t => t.TransactionDate.Date)
+        // Shift to local time before taking the date, so a sale at 10pm Manila
+        // lands on the day it was made rather than the next UTC day.
+        var grouped = await InRange(range)
+            .GroupBy(t => t.TransactionDate.AddHours(utcOffsetHours).Date)
             .Select(g => new
             {
                 Date = g.Key,
-                CashSales = g.Where(t => t.PaymentType == PaymentType.Cash).Sum(t => t.TotalAmount),
-                CreditSales = g.Where(t => t.PaymentType == PaymentType.Credit).Sum(t => t.TotalAmount)
+                CashSales = g.Sum(t => t.PaymentType == PaymentType.Cash ? t.TotalAmount : 0m),
+                CreditSales = g.Sum(t => t.PaymentType == PaymentType.Credit ? t.TotalAmount : 0m)
             })
             .OrderBy(g => g.Date)
             .ToListAsync();
@@ -66,29 +68,26 @@ public class TransactionRepository : ITransactionRepository
         return grouped.Select(g => new DailySalesPoint(g.Date, g.CashSales, g.CreditSales));
     }
 
-    public async Task<(decimal averageValue, int count)> GetMonthlyAverageTransactionAsync()
+    public async Task<(decimal averageValue, int count)> GetAverageTransactionAsync(DateRange range)
     {
-        var monthStart = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+        var summary = await InRange(range)
+            .GroupBy(_ => 1)
+            .Select(g => new { Count = g.Count(), Total = g.Sum(t => t.TotalAmount) })
+            .FirstOrDefaultAsync();
 
-        var monthly = await _context.Transactions
-            .Where(t => t.TransactionDate >= monthStart)
-            .ToListAsync();
+        if (summary is null || summary.Count == 0) return (0m, 0);
 
-        if (monthly.Count == 0) return (0m, 0);
-
-        return (monthly.Average(t => t.TotalAmount), monthly.Count);
+        return (summary.Total / summary.Count, summary.Count);
     }
 
-    public async Task<IEnumerable<TopProductResult>> GetTopProductsThisMonthAsync(int count)
+    public async Task<IEnumerable<TopProductResult>> GetTopProductsAsync(DateRange range, int count)
     {
-        var monthStart = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
-
-        // Project to a flat, navigation-free shape first so the GroupBy key/aggregates
-        // are plain scalars — mixing navigation properties (i.Product.Name) into a
-        // GroupBy key alongside aggregates over a filtered join can fail to translate
-        // to SQL (see: InvalidOperationException on GroupBy + Join + EF.Property<int?>).
+        // Project to a flat, navigation-free shape first so the GroupBy key and
+        // aggregates are plain scalars — mixing navigation properties into a
+        // GroupBy key alongside aggregates can fail to translate to SQL.
         var flatItems = _context.TransactionItems
-            .Where(i => i.Transaction.TransactionDate >= monthStart)
+            .Where(i => i.Transaction.TransactionDate >= range.FromUtc
+                     && i.Transaction.TransactionDate < range.ToUtc)
             .Select(i => new
             {
                 i.ProductId,
@@ -113,6 +112,10 @@ public class TransactionRepository : ITransactionRepository
         return grouped.Select(g => new TopProductResult(
             g.ProductId, g.ProductName ?? "(walang pangalan)", g.TotalQuantitySold, g.TotalRevenue));
     }
+
+    private IQueryable<Transaction> InRange(DateRange range)
+        => _context.Transactions
+            .Where(t => t.TransactionDate >= range.FromUtc && t.TransactionDate < range.ToUtc);
 
     private IQueryable<Transaction> Filter(
         DateTime? dateFrom, DateTime? dateTo, PaymentType? paymentType)

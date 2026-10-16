@@ -9,7 +9,11 @@ public interface IProductRepository
     Task<Product> CreateAsync(Product product);
     Task<Product?> UpdateAsync(Product product);
     Task<bool> DeleteAsync(int id);
-    Task<IEnumerable<Product>> GetLowStockAsync(int threshold);
+
+    /// <summary>Products at or below their own LowStockThreshold.</summary>
+    Task<IEnumerable<Product>> GetLowStockAsync();
+    Task<int> GetLowStockCountAsync();
+
     Task<int> GetTotalCountAsync(string? search, string? category);
     Task<IEnumerable<Product>> GetQuickItemsAsync(int count = 24);
 }

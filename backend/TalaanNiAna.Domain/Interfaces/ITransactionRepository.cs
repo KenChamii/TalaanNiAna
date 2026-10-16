@@ -8,8 +8,11 @@ public interface ITransactionRepository
     /// <summary>Returns the original transaction for a replayed checkout, if any.</summary>
     Task<Transaction?> GetByIdempotencyKeyAsync(string idempotencyKey);
 
-    Task<(decimal cashTotal, decimal creditTotal)> GetTodayTotalsAsync();
-    Task<IEnumerable<DailySalesPoint>> GetMonthlySalesHistoryAsync();
-    Task<(decimal averageValue, int count)> GetMonthlyAverageTransactionAsync();
-    Task<IEnumerable<TopProductResult>> GetTopProductsThisMonthAsync(int count);
+    Task<(decimal cashTotal, decimal creditTotal)> GetTotalsAsync(DateRange range);
+
+    /// <summary>Daily totals grouped by the store's local date, not UTC.</summary>
+    Task<IEnumerable<DailySalesPoint>> GetDailySalesAsync(DateRange range, int utcOffsetHours);
+
+    Task<(decimal averageValue, int count)> GetAverageTransactionAsync(DateRange range);
+    Task<IEnumerable<TopProductResult>> GetTopProductsAsync(DateRange range, int count);
 }

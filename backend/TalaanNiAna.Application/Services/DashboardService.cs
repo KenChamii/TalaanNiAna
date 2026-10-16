@@ -1,9 +1,13 @@
-﻿public class DashboardService
+using TalaanNiAna.Application.Common;
+
+public class DashboardService
 {
+    private const int TopListSize = 5;
+
     private readonly ITransactionRepository _transactionRepo;
     private readonly ICustomerRepository _customerRepo;
     private readonly IProductRepository _productRepo;
-    private readonly StoreSettings _defaultSettings; // see 4.10 — used for the low-stock threshold
+    private readonly IStoreSettingsRepository _settingsRepo;
 
     public DashboardService(
         ITransactionRepository transactionRepo,
@@ -14,38 +18,38 @@
         _transactionRepo = transactionRepo;
         _customerRepo = customerRepo;
         _productRepo = productRepo;
-        _defaultSettings = settingsRepo.GetAsync().GetAwaiter().GetResult(); // safe one-time read at startup of each scoped request
+        _settingsRepo = settingsRepo;
     }
 
     public async Task<DashboardDto> GetSummaryAsync()
     {
-        var (cashToday, creditToday) = await _transactionRepo.GetTodayTotalsAsync();
-        var totalCreditOutstanding = await GetTotalOutstandingCreditAsync();
-        var lowStockItems = await _productRepo.GetLowStockAsync(_defaultSettings.LowStockAlertLimit);
-        var history = await _transactionRepo.GetMonthlySalesHistoryAsync();
+        var settings = await _settingsRepo.GetAsync();
+        var clock = new StoreClock(settings.TimeZoneId);
 
+        var today = clock.Today();
+        var month = clock.MonthToDate();
+
+        var (cashToday, creditToday) = await _transactionRepo.GetTotalsAsync(today);
+        var paymentsToday = await _customerRepo.GetPaymentsTotalAsync(today);
+        var totalCredit = await _customerRepo.GetTotalOutstandingCreditAsync();
         var creditorCount = await _customerRepo.GetCreditorCountAsync();
-        var todayPaymentsCollected = await _customerRepo.GetTodayPaymentsTotalAsync();
-        var (avgTransactionValue, monthlyCount) = await _transactionRepo.GetMonthlyAverageTransactionAsync();
-        var topProducts = await _transactionRepo.GetTopProductsThisMonthAsync(5);
-        var topDebtors = await _customerRepo.GetTopDebtorsAsync(5);
+        var lowStockCount = await _productRepo.GetLowStockCountAsync();
+
+        var history = await _transactionRepo.GetDailySalesAsync(month, clock.UtcOffsetHours);
+        var (averageValue, monthlyCount) = await _transactionRepo.GetAverageTransactionAsync(month);
+        var topProducts = await _transactionRepo.GetTopProductsAsync(month, TopListSize);
+        var topDebtors = await _customerRepo.GetTopDebtorsAsync(TopListSize);
 
         return new DashboardDto(
             TodaySales: cashToday + creditToday,
-            TotalCollections: todayPaymentsCollected, // actual utang payments collected today, not cash sales
-            TotalCredit: totalCreditOutstanding,
-            LowStockCount: lowStockItems.Count(),
+            TotalCollections: paymentsToday,   // utang payments collected, not cash sales
+            TotalCredit: totalCredit,
+            LowStockCount: lowStockCount,
             CreditorCount: creditorCount,
-            AverageTransactionValue: avgTransactionValue,
+            AverageTransactionValue: averageValue,
             MonthlyTransactionCount: monthlyCount,
             SalesHistory: history,
             TopProducts: topProducts,
             TopDebtors: topDebtors.Select(c => new TopDebtorDto(c.Id, c.FullName, c.TotalCredit)));
-    }
-
-    private async Task<decimal> GetTotalOutstandingCreditAsync()
-    {
-        var customers = await _customerRepo.GetAllAsync(search: null, page: 1, pageSize: int.MaxValue);
-        return customers.Sum(c => c.TotalCredit);
     }
 }

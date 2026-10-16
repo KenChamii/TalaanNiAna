@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 public class CustomerRepository : ICustomerRepository
 {
@@ -10,26 +10,14 @@ public class CustomerRepository : ICustomerRepository
     }
 
     public async Task<IEnumerable<Customer>> GetAllAsync(string? search, int page, int pageSize)
-    {
-        var query = _context.Customers.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(c => c.FullName.Contains(search));
-
-        return await query
+        => await Filter(search)
             .OrderByDescending(c => c.LastActiveAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
-    }
 
     public async Task<int> GetTotalCountAsync(string? search)
-    {
-        var query = _context.Customers.AsQueryable();
-        if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(c => c.FullName.Contains(search));
-        return await query.CountAsync();
-    }
+        => await Filter(search).CountAsync();
 
     public async Task<Customer?> GetByIdAsync(int id)
         => await _context.Customers.FindAsync(id);
@@ -48,23 +36,38 @@ public class CustomerRepository : ICustomerRepository
         return customer;
     }
 
-    public async Task UpdateCreditAsync(int customerId, decimal delta)
+    public async Task<decimal> RecalculateCreditAsync(int customerId)
     {
-        var customer = await _context.Customers.FindAsync(customerId);
-        if (customer is null) return;
+        var customer = await _context.Customers.FindAsync(customerId)
+            ?? throw new InvalidOperationException($"Customer {customerId} not found.");
 
-        customer.TotalCredit += delta;
+        var charged = await _context.Transactions
+            .Where(t => t.CustomerId == customerId && t.PaymentType == PaymentType.Credit)
+            .SumAsync(t => (decimal?)t.TotalAmount) ?? 0m;
+
+        var paid = await _context.CreditPayments
+            .Where(p => p.CustomerId == customerId)
+            .SumAsync(p => (decimal?)p.Amount) ?? 0m;
+
+        customer.TotalCredit = charged - paid;
         customer.LastActiveAt = DateTime.UtcNow;
+
         await _context.SaveChangesAsync();
+        return customer.TotalCredit;
     }
 
     public async Task<int> GetCreditorCountAsync()
         => await _context.Customers.CountAsync(c => c.TotalCredit > 0);
 
+    public async Task<decimal> GetTotalOutstandingCreditAsync()
+        => await _context.Customers
+            .Where(c => c.TotalCredit > 0)
+            .SumAsync(c => (decimal?)c.TotalCredit) ?? 0m;
+
     public async Task<CreditPayment> RecordPaymentAsync(int customerId, decimal amount, string? note)
     {
-        var customer = await _context.Customers.FindAsync(customerId)
-            ?? throw new InvalidOperationException("Customer not found.");
+        _ = await _context.Customers.FindAsync(customerId)
+            ?? throw new InvalidOperationException($"Customer {customerId} not found.");
 
         var payment = new CreditPayment
         {
@@ -74,26 +77,33 @@ public class CustomerRepository : ICustomerRepository
             Note = note
         };
 
-        customer.TotalCredit -= amount;
-        customer.LastActiveAt = DateTime.UtcNow;
-
         _context.CreditPayments.Add(payment);
         await _context.SaveChangesAsync();
+
+        // The caller recalculates, so the balance is derived in one pass.
         return payment;
     }
 
-    public async Task<decimal> GetTodayPaymentsTotalAsync()
-    {
-        var today = DateTime.UtcNow.Date;
-        return await _context.CreditPayments
-            .Where(p => p.PaidAt >= today && p.PaidAt < today.AddDays(1))
-            .SumAsync(p => p.Amount);
-    }
+    public async Task<decimal> GetPaymentsTotalAsync(DateRange range)
+        => await _context.CreditPayments
+            .Where(p => p.PaidAt >= range.FromUtc && p.PaidAt < range.ToUtc)
+            .SumAsync(p => (decimal?)p.Amount) ?? 0m;
 
     public async Task<IEnumerable<Customer>> GetTopDebtorsAsync(int count)
         => await _context.Customers
+            .AsNoTracking()
             .Where(c => c.TotalCredit > 0)
             .OrderByDescending(c => c.TotalCredit)
             .Take(count)
             .ToListAsync();
+
+    private IQueryable<Customer> Filter(string? search)
+    {
+        var query = _context.Customers.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(c => c.FullName.Contains(search));
+
+        return query;
+    }
 }
