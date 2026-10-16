@@ -30,6 +30,15 @@ public class ProductRepository : IProductRepository
             .ToDictionaryAsync(p => p.Id);
     }
 
+    public async Task<IEnumerable<string>> GetCategoriesAsync()
+        => await _context.Products
+            .AsNoTracking()
+            .Where(p => p.IsActive && p.Category != "")
+            .Select(p => p.Category)
+            .Distinct()
+            .OrderBy(c => c)
+            .ToListAsync();
+
     public async Task<Product> CreateAsync(Product product)
     {
         _context.Products.Add(product);

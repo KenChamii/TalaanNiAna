@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -24,14 +24,15 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
-    // IMPORTANT: this must be registered BEFORE "{id}" or routing will try to
-    // parse "quick-items" as an int route param and 400 every time.
+    // Literal routes must be registered before "{id}", or routing tries to parse
+    // them as an int and returns 400 every time.
     [HttpGet("quick-items")]
     public async Task<IActionResult> GetQuickItems()
-    {
-        var items = await _service.GetQuickItemsAsync();
-        return Ok(items);
-    }
+        => Ok(await _service.GetQuickItemsAsync());
+
+    [HttpGet("categories")]
+    public async Task<IActionResult> GetCategories()
+        => Ok(await _service.GetCategoriesAsync());
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)

@@ -1,10 +1,14 @@
-﻿public class ProductService
+using TalaanNiAna.Application.Common.Exceptions;
+
+public class ProductService
 {
     private readonly IProductRepository _repo;
+    private readonly IStoreRepository _stores;
 
-    public ProductService(IProductRepository repo)
+    public ProductService(IProductRepository repo, IStoreRepository stores)
     {
         _repo = repo;
+        _stores = stores;
     }
 
     public async Task<PagedResult<ProductDto>> GetProductsAsync(
@@ -28,15 +32,22 @@
         return product is null ? null : ToDto(product);
     }
 
+    /// <summary>Categories actually in use, for the inventory filter and form.</summary>
+    public async Task<IEnumerable<string>> GetCategoriesAsync()
+        => await _repo.GetCategoriesAsync();
+
     public async Task<ProductDto> CreateAsync(CreateProductDto dto)
     {
+        // No threshold given means "use the store default", not "never warn me".
+        var threshold = dto.LowStockThreshold ?? (await _stores.GetCurrentAsync()).LowStockAlertLimit;
+
         var product = new Product
         {
-            Name = dto.Name,
-            Category = dto.Category,
+            Name = dto.Name.Trim(),
+            Category = dto.Category.Trim(),
             Price = dto.Price,
             StockQuantity = dto.StockQuantity,
-            LowStockThreshold = dto.LowStockThreshold
+            LowStockThreshold = threshold
         };
 
         var created = await _repo.CreateAsync(product);
@@ -45,14 +56,18 @@
 
     public async Task<ProductDto?> UpdateAsync(int id, UpdateProductDto dto)
     {
+        var existing = await _repo.GetByIdAsync(id)
+            ?? throw new NotFoundException("Produkto", id);
+
         var product = new Product
         {
             Id = id,
-            Name = dto.Name,
-            Category = dto.Category,
+            Name = dto.Name.Trim(),
+            Category = dto.Category.Trim(),
             Price = dto.Price,
             StockQuantity = dto.StockQuantity,
-            LowStockThreshold = dto.LowStockThreshold
+            // An omitted threshold must not silently reset it to zero.
+            LowStockThreshold = dto.LowStockThreshold ?? existing.LowStockThreshold
         };
 
         var updated = await _repo.UpdateAsync(product);
@@ -67,10 +82,9 @@
         return items.Select(p => new QuickItemDto(p.Id, p.Name, p.Price));
     }
 
-    // Maps Product -> ProductDto. Field order here must match ProductDto's
-    // positional record parameters exactly: Id, Name, Category, Price, StockQuantity, IsLowStock.
     private static ProductDto ToDto(Product p) => new(
         p.Id, p.Name, p.Category, p.Price, p.StockQuantity,
+        p.LowStockThreshold,
         p.StockQuantity <= p.LowStockThreshold);
 }
 
