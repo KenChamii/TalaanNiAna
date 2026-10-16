@@ -36,7 +36,9 @@ public class TokenService : ITokenService
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim("displayName", user.DisplayName)
+                new Claim("displayName", user.DisplayName),
+                // Every tenant query filter reads this.
+                new Claim(StoreClaims.StoreId, user.StoreId.ToString())
             ],
             expires: expires,
             signingCredentials: credentials);

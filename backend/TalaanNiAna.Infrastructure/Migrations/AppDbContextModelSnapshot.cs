@@ -70,9 +70,8 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StoreName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -90,6 +89,8 @@ namespace TalaanNiAna.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("StoreId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -115,9 +116,14 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.Property<DateTime>("PaidAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("StoreId", "PaidAt");
 
                     b.ToTable("CreditPayments");
                 });
@@ -145,10 +151,15 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.Property<DateTime>("LastActiveAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("TotalCredit")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StoreId");
 
                     b.ToTable("Customers");
                 });
@@ -324,12 +335,15 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.Property<int>("StockQuantity")
                         .HasColumnType("int");
 
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Category");
+                    b.HasIndex("StoreId", "Category");
 
                     b.ToTable("Products");
                 });
@@ -374,7 +388,7 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("StoreSettings", b =>
+            modelBuilder.Entity("Store", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -382,18 +396,21 @@ namespace TalaanNiAna.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("LowStockAlertLimit")
                         .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
 
                     b.Property<string>("SmsAlertTemplate")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("StoreName")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
 
                     b.Property<string>("TimeZoneId")
                         .IsRequired()
@@ -402,17 +419,7 @@ namespace TalaanNiAna.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StoreSettings");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            LowStockAlertLimit = 10,
-                            SmsAlertTemplate = "Hi Suki, paalala lang...",
-                            StoreName = "Nena's Sari-Sari Store",
-                            TimeZoneId = "Asia/Manila"
-                        });
+                    b.ToTable("Stores");
                 });
 
             modelBuilder.Entity("Transaction", b =>
@@ -433,6 +440,9 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.Property<int>("PaymentType")
                         .HasColumnType("int");
 
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -443,11 +453,11 @@ namespace TalaanNiAna.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("IdempotencyKey")
+                    b.HasIndex("StoreId", "IdempotencyKey")
                         .IsUnique()
                         .HasFilter("[IdempotencyKey] IS NOT NULL");
 
-                    b.HasIndex("TransactionDate");
+                    b.HasIndex("StoreId", "TransactionDate");
 
                     b.ToTable("Transactions");
                 });
@@ -466,6 +476,9 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
+
                     b.Property<int>("TransactionId")
                         .HasColumnType("int");
 
@@ -476,9 +489,22 @@ namespace TalaanNiAna.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
+                    b.HasIndex("StoreId");
+
                     b.HasIndex("TransactionId");
 
                     b.ToTable("TransactionItems");
+                });
+
+            modelBuilder.Entity("ApplicationUser", b =>
+                {
+                    b.HasOne("Store", "Store")
+                        .WithMany()
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("CreditPayment", b =>

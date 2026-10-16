@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using TalaanNiAna.API.Auth;
 using TalaanNiAna.API.Filters;
 using TalaanNiAna.API.Middleware;
 using TalaanNiAna.Application.Validators;
@@ -19,6 +20,10 @@ builder.Services
     .Bind(builder.Configuration.GetSection(JwtOptions.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+
+// Tenant context. Scoped, because AppDbContext reads it on every query.
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentStore, CurrentStore>();
 
 // EF Core + Identity
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -93,10 +98,10 @@ builder.Services.AddRateLimiter(options =>
 });
 
 // Persistence
+builder.Services.AddScoped<IStoreRepository, StoreRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-builder.Services.AddScoped<IStoreSettingsRepository, StoreSettingsRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();

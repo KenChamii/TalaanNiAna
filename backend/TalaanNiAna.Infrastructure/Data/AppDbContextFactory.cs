@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
 namespace TalaanNiAna.Infrastructure.Data;
 
+/// <summary>Used by dotnet-ef at design time, where there is no request and no store.</summary>
 public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 {
     public AppDbContext CreateDbContext(string[] args)
@@ -14,9 +15,15 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
             .Build();
 
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        optionsBuilder.UseSqlServer(connectionString);
+        optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 
-        return new AppDbContext(optionsBuilder.Options);
+        return new AppDbContext(optionsBuilder.Options, new NoStore());
+    }
+
+    /// <summary>Migrations only build the model, so no store context is needed.</summary>
+    private sealed class NoStore : ICurrentStore
+    {
+        public int? StoreId => null;
+        public int Required => throw new InvalidOperationException("No store at design time.");
     }
 }

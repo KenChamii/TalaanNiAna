@@ -7,24 +7,24 @@ public class DashboardService
     private readonly ITransactionRepository _transactionRepo;
     private readonly ICustomerRepository _customerRepo;
     private readonly IProductRepository _productRepo;
-    private readonly IStoreSettingsRepository _settingsRepo;
+    private readonly IStoreRepository _stores;
 
     public DashboardService(
         ITransactionRepository transactionRepo,
         ICustomerRepository customerRepo,
         IProductRepository productRepo,
-        IStoreSettingsRepository settingsRepo)
+        IStoreRepository stores)
     {
         _transactionRepo = transactionRepo;
         _customerRepo = customerRepo;
         _productRepo = productRepo;
-        _settingsRepo = settingsRepo;
+        _stores = stores;
     }
 
     public async Task<DashboardDto> GetSummaryAsync()
     {
-        var settings = await _settingsRepo.GetAsync();
-        var clock = new StoreClock(settings.TimeZoneId);
+        var store = await _stores.GetCurrentAsync();
+        var clock = new StoreClock(store.TimeZoneId);
 
         var today = clock.Today();
         var month = clock.MonthToDate();

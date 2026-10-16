@@ -14,6 +14,7 @@ public class AuthController : ControllerBase
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ITokenService _tokenService;
     private readonly IRefreshTokenRepository _refreshTokens;
+    private readonly IStoreRepository _stores;
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<AuthController> _logger;
 
@@ -22,6 +23,7 @@ public class AuthController : ControllerBase
         SignInManager<ApplicationUser> signInManager,
         ITokenService tokenService,
         IRefreshTokenRepository refreshTokens,
+        IStoreRepository stores,
         IWebHostEnvironment environment,
         ILogger<AuthController> logger)
     {
@@ -29,10 +31,12 @@ public class AuthController : ControllerBase
         _signInManager = signInManager;
         _tokenService = tokenService;
         _refreshTokens = refreshTokens;
+        _stores = stores;
         _environment = environment;
         _logger = logger;
     }
 
+    /// <summary>Creates the store and its first account together.</summary>
     [HttpPost("register")]
     [ProducesResponseType(typeof(AuthResultDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<AuthResultDto>> Register([FromBody] RegisterDto dto)
@@ -40,18 +44,23 @@ public class AuthController : ControllerBase
         if (await _userManager.FindByNameAsync(dto.Username) is not null)
             throw new ConflictException("Ginamit na ang username na ito. Pumili ng iba.", "username_taken");
 
+        var store = await _stores.CreateAsync(new Store { Name = dto.StoreName });
+
         var user = new ApplicationUser
         {
             UserName = dto.Username,
             Email = dto.Username,
             DisplayName = dto.DisplayName,
-            StoreName = dto.StoreName
+            StoreId = store.Id
         };
 
         var result = await _userManager.CreateAsync(user, dto.Password);
 
         if (!result.Succeeded)
         {
+            // The store has no owner now, so undo it rather than leave it orphaned.
+            await _stores.DeleteAsync(store.Id);
+
             var errors = result.Errors
                 .GroupBy(e => e.Code.Contains("Password") ? nameof(dto.Password) : nameof(dto.Username))
                 .ToDictionary(g => g.Key, g => g.Select(e => e.Description).ToArray());
@@ -59,7 +68,7 @@ public class AuthController : ControllerBase
             throw new RequestValidationException(errors);
         }
 
-        return await IssueAsync(user);
+        return await IssueAsync(user, store);
     }
 
     [HttpPost("login")]
@@ -118,7 +127,7 @@ public class AuthController : ControllerBase
         var rotated = _tokenService.CreateRefreshToken();
         await _refreshTokens.RevokeAsync(stored, rotated.Hash);
 
-        return await IssueAsync(stored.User, rotated);
+        return await IssueAsync(stored.User, rotated: rotated);
     }
 
     [HttpPost("logout")]
@@ -138,8 +147,12 @@ public class AuthController : ControllerBase
 
     private async Task<ActionResult<AuthResultDto>> IssueAsync(
         ApplicationUser user,
+        Store? store = null,
         RefreshTokenPair? rotated = null)
     {
+        // Looked up by id: there is no store context on the token yet.
+        store ??= await _stores.GetByIdAsync(user.StoreId);
+
         var refresh = rotated ?? _tokenService.CreateRefreshToken();
 
         await _refreshTokens.AddAsync(new RefreshToken
@@ -157,7 +170,7 @@ public class AuthController : ControllerBase
             access.Value,
             access.ExpiresInSeconds,
             user.DisplayName,
-            user.StoreName));
+            store?.Name ?? string.Empty));
     }
 
     private void SetRefreshCookie(RefreshTokenPair refresh)
