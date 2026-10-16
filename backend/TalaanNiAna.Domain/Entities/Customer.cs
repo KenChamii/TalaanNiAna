@@ -1,6 +1,8 @@
-public class Customer
+public class Customer : IHasStore
 {
     public int Id { get; set; }
+    public int StoreId { get; set; }
+
     public string FullName { get; set; } = string.Empty;
     public string? ContactNumber { get; set; }
 

@@ -1,6 +1,13 @@
-﻿public class TransactionItem
+public class TransactionItem : IHasStore
 {
     public int Id { get; set; }
+
+    /// <summary>
+    /// Denormalised from the parent transaction. Reporting queries read this
+    /// table directly, and a filter on a navigation would not cover them.
+    /// </summary>
+    public int StoreId { get; set; }
+
     public int TransactionId { get; set; }
     public Transaction Transaction { get; set; } = null!;
     public int ProductId { get; set; }

@@ -1,6 +1,8 @@
-public class Product
+public class Product : IHasStore
 {
     public int Id { get; set; }
+    public int StoreId { get; set; }
+
     public string Name { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
     public decimal Price { get; set; }

@@ -1,20 +1,20 @@
 public class SettingsService
 {
-    private readonly IStoreSettingsRepository _repo;
+    private readonly IStoreRepository _stores;
 
-    public SettingsService(IStoreSettingsRepository repo)
+    public SettingsService(IStoreRepository stores)
     {
-        _repo = repo;
+        _stores = stores;
     }
 
     public async Task<StoreSettingsDto> GetAsync()
-        => ToDto(await _repo.GetAsync());
+        => ToDto(await _stores.GetCurrentAsync());
 
     public async Task<StoreSettingsDto> SaveAsync(StoreSettingsDto dto)
     {
-        var saved = await _repo.SaveAsync(new StoreSettings
+        var saved = await _stores.UpdateCurrentAsync(new Store
         {
-            StoreName = dto.StoreName,
+            Name = dto.StoreName,
             LowStockAlertLimit = dto.LowStockAlertLimit,
             SmsAlertTemplate = dto.SmsAlertTemplate,
             TimeZoneId = dto.TimeZoneId
@@ -23,6 +23,6 @@ public class SettingsService
         return ToDto(saved);
     }
 
-    private static StoreSettingsDto ToDto(StoreSettings s) => new(
-        s.StoreName, s.LowStockAlertLimit, s.SmsAlertTemplate, s.TimeZoneId);
+    private static StoreSettingsDto ToDto(Store s) => new(
+        s.Name, s.LowStockAlertLimit, s.SmsAlertTemplate, s.TimeZoneId);
 }

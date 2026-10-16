@@ -85,7 +85,7 @@ public class ProductRepository : IProductRepository
             .Take(count)
             .ToListAsync();
 
-    /// <summary>Per-product threshold. StoreSettings supplies the default for new products.</summary>
+    /// <summary>Per-product threshold. Store supplies the default for new products.</summary>
     private IQueryable<Product> LowStock()
         => _context.Products.Where(p => p.IsActive && p.StockQuantity <= p.LowStockThreshold);
 
