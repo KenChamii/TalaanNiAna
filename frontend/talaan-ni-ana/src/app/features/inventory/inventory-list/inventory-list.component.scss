@@ -85,3 +85,9 @@ table {
 
   .total { margin-left: auto; }
 }
+/* Puhunan and kita columns. */
+.muted-cell { color: var(--muted); }
+
+.negative-margin { color: var(--danger); font-weight: 600; }
+
+td small { opacity: 0.7; margin-left: 0.2rem; }

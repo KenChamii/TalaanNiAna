@@ -21,7 +21,9 @@
       <tr>
         <th>Item Name</th>
         <th>Category</th>
+        <th>Puhunan</th>
         <th>Price</th>
+        <th>Kita</th>
         <th>Stocks Left</th>
         <th>Actions</th>
       </tr>
@@ -30,7 +32,12 @@
       <tr *ngFor="let item of products()">
         <td>{{ item.name }}</td>
         <td>{{ item.category }}</td>
+        <td class="muted-cell">{{ item.costPrice ? (item.costPrice | peso) : '—' }}</td>
         <td>{{ item.price | peso }}</td>
+        <td [class.negative-margin]="item.unitMargin < 0">
+          {{ item.unitMargin | peso }}
+          <small *ngIf="item.costPrice">({{ item.marginPercent | number:'1.0-0' }}%)</small>
+        </td>
         <td [class.low-stock]="item.isLowStock">
           {{ item.stockQuantity }} pcs <span *ngIf="item.isLowStock">(!)</span>
         </td>
@@ -40,7 +47,7 @@
         </td>
       </tr>
       <tr *ngIf="products().length === 0">
-        <td colspan="5">
+        <td colspan="7">
           <p class="empty-state">Walang nahanap na paninda.</p>
         </td>
       </tr>
