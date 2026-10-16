@@ -21,13 +21,13 @@ export const routes: Routes = [
           import('./features/customers/customer-list/customer-list.component').then(m => m.CustomerListComponent) },
       { path: 'customers/:id', loadComponent: () =>
           import('./features/customers/customer-detail/customer-detail.component').then(m => m.CustomerDetailComponent) },
-
-       { path: 'checkout', loadComponent: () =>
+      { path: 'checkout', loadComponent: () =>
           import('./features/checkout/checkout.component').then(m => m.CheckoutComponent) },
       { path: 'transactions', loadComponent: () =>
           import('./features/transactions/transaction-list/transaction-list.component').then(m => m.TransactionListComponent) },
-
-       { path: 'settings', loadComponent: () =>
+      { path: 'reports/z', loadComponent: () =>
+          import('./features/reports/z-report.component').then(m => m.ZReportComponent) },
+      { path: 'settings', loadComponent: () =>
           import('./features/settings/settings.component').then(m => m.SettingsComponent) },
     ]
   },

@@ -26,6 +26,9 @@ public sealed class StoreClock
 
     public DateTime LocalNow => TimeZoneInfo.ConvertTimeFromUtc(_utcNow, _zone);
 
+    /// <summary>The store's own calendar date right now.</summary>
+    public DateOnly LocalToday => DateOnly.FromDateTime(LocalNow);
+
     /// <summary>
     /// Whole hours the store is ahead of UTC. Used to group by local date in SQL,
     /// which is exact only where the zone has no DST. The Philippines has none.
@@ -42,9 +45,12 @@ public sealed class StoreClock
                 && TimeZoneInfo.TryFindSystemTimeZoneById(windowsId, out _));
     }
 
-    public DateRange Today()
+    public DateRange Today() => Day(LocalToday);
+
+    /// <summary>One whole local day, for reprinting an earlier Z-report.</summary>
+    public DateRange Day(DateOnly localDate)
     {
-        var start = LocalNow.Date;
+        var start = localDate.ToDateTime(TimeOnly.MinValue);
         return Range(start, start.AddDays(1));
     }
 

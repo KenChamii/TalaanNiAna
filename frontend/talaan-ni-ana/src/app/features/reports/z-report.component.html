@@ -1,0 +1,93 @@
+<div class="dash-header no-print">
+  <div>
+    <p class="eyebrow">Pagsasara ng Araw</p>
+    <h2 class="page-title">Z-Report</h2>
+  </div>
+
+  <div class="report-controls">
+    <input
+      type="date"
+      [(ngModel)]="selectedDate"
+      [max]="maxDate"
+      (ngModelChange)="load()"
+      aria-label="Petsa ng report" />
+    <button type="button" class="btn-secondary" (click)="print()" [disabled]="!report()">
+      I-print
+    </button>
+  </div>
+</div>
+
+<p class="empty-state no-print" *ngIf="isLoading()">Kinukuha ang report…</p>
+
+<div class="print-area" *ngIf="report() as r">
+
+  <div class="card z-sheet">
+
+    <header class="z-head">
+      <div>
+        <p class="z-store">{{ r.storeName }}</p>
+        <h3 class="z-title">Z-Report</h3>
+      </div>
+      <div class="z-date">
+        <span>{{ formatDate(r.businessDate) }}</span>
+        <small>Ginawa noong {{ r.generatedAtUtc | date:'short' }}</small>
+      </div>
+    </header>
+
+    <div class="banderitas" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <section class="z-block">
+      <h4 class="z-block-title">Benta</h4>
+      <div class="z-row"><span>Bilang ng transaksyon</span><span>{{ r.sales.transactionCount }}</span></div>
+      <div class="z-row"><span>Piraso na naibenta</span><span>{{ r.sales.itemsSold }}</span></div>
+      <div class="z-row"><span>Average kada benta</span><span>{{ r.sales.averageSale | peso }}</span></div>
+      <div class="z-row z-row--total"><span>Kabuuang benta</span><span>{{ r.sales.grossSales | peso }}</span></div>
+    </section>
+
+    <section class="z-block">
+      <h4 class="z-block-title">Kita</h4>
+      <div class="z-row"><span>Puhunan ng naibenta</span><span>{{ r.sales.costOfGoods | peso }}</span></div>
+      <div class="z-row"><span>Margin</span><span>{{ r.sales.marginPercent | number:'1.0-1' }}%</span></div>
+      <div class="z-row z-row--total" [class.negative]="r.sales.grossProfit < 0">
+        <span>Kitang natira</span><span>{{ r.sales.grossProfit | peso }}</span>
+      </div>
+    </section>
+
+    <section class="z-block z-block--drawer">
+      <h4 class="z-block-title">Dapat nasa Kahon</h4>
+      <div class="z-row"><span>Bentang cash</span><span>{{ r.cash.cashSales | peso }}</span></div>
+      <div class="z-row"><span>Bayad sa utang</span><span>{{ r.cash.collectionsReceived | peso }}</span></div>
+      <div class="z-row z-row--total"><span>Inaasahang laman</span><span>{{ r.cash.expectedInDrawer | peso }}</span></div>
+      <p class="z-note">Ihambing ito sa aktwal na bilang ng pera bago magsara.</p>
+    </section>
+
+    <section class="z-block">
+      <h4 class="z-block-title">Utang</h4>
+      <div class="z-row"><span>Bagong utang ngayong araw</span><span>{{ r.credit.newCreditIssued | peso }}</span></div>
+      <div class="z-row"><span>Nakolekta</span><span>{{ r.credit.collectionsReceived | peso }}</span></div>
+      <div class="z-row" [class.negative]="r.credit.netCreditChange > 0">
+        <span>Netong galaw</span><span>{{ r.credit.netCreditChange | peso }}</span>
+      </div>
+      <div class="z-row z-row--total"><span>Kabuuang utang sa ngayon</span><span>{{ r.credit.outstandingTotal | peso }}</span></div>
+    </section>
+
+    <section class="z-block" *ngIf="r.topSellers.length > 0">
+      <h4 class="z-block-title">Pinakamabenta Ngayong Araw</h4>
+      <div class="z-row" *ngFor="let line of r.topSellers">
+        <span>{{ line.productName }} <small>{{ line.quantitySold }}x</small></span>
+        <span>{{ line.revenue | peso }}</span>
+      </div>
+    </section>
+
+    <footer class="z-foot">
+      <div class="z-sign">
+        <span class="z-sign-line"></span>
+        <small>Lagda ng nagsara</small>
+      </div>
+      <p class="signwriting">Salamat po!</p>
+    </footer>
+
+  </div>
+</div>

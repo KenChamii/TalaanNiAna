@@ -653,13 +653,25 @@ select.ng-invalid.ng-touched {
 @media print {
   body * { visibility: hidden; }
 
+  /* Only the receipt or the report sheet reaches the paper. */
   .receipt-backdrop,
-  .receipt-backdrop * { visibility: visible; }
+  .receipt-backdrop *,
+  .print-area,
+  .print-area * { visibility: visible; }
 
-  .receipt-backdrop {
+  .receipt-backdrop,
+  .print-area {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
+  }
+
+  .no-print { display: none !important; }
+
+  .print-area .card {
+    border: none;
+    box-shadow: none;
+    max-width: 100%;
   }
 }

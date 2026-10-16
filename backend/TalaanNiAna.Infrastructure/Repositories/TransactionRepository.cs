@@ -64,6 +64,37 @@ public class TransactionRepository : ITransactionRepository
         return (margin?.Revenue ?? 0m, margin?.Cost ?? 0m);
     }
 
+    public async Task<DaySalesSummary> GetDaySummaryAsync(DateRange range)
+    {
+        var sales = await InRange(range)
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                Count = g.Count(),
+                Cash = g.Sum(t => t.PaymentType == PaymentType.Cash ? t.TotalAmount : 0m),
+                Credit = g.Sum(t => t.PaymentType == PaymentType.Credit ? t.TotalAmount : 0m)
+            })
+            .FirstOrDefaultAsync();
+
+        var lines = await ItemsInRange(range)
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                Items = g.Sum(i => i.Quantity),
+                Revenue = g.Sum(i => i.Quantity * i.UnitPrice),
+                Cost = g.Sum(i => i.Quantity * i.UnitCost)
+            })
+            .FirstOrDefaultAsync();
+
+        return new DaySalesSummary(
+            TransactionCount: sales?.Count ?? 0,
+            ItemsSold: lines?.Items ?? 0,
+            CashSales: sales?.Cash ?? 0m,
+            CreditSales: sales?.Credit ?? 0m,
+            Revenue: lines?.Revenue ?? 0m,
+            Cost: lines?.Cost ?? 0m);
+    }
+
     public async Task<IEnumerable<DailySalesPoint>> GetDailySalesAsync(DateRange range, int utcOffsetHours)
     {
         // Shift to local time before taking the date, so a sale at 10pm Manila
