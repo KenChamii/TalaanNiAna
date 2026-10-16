@@ -1,4 +1,4 @@
-﻿public class SettingsService
+public class SettingsService
 {
     private readonly IStoreSettingsRepository _repo;
 
@@ -8,10 +8,7 @@
     }
 
     public async Task<StoreSettingsDto> GetAsync()
-    {
-        var settings = await _repo.GetAsync();
-        return new StoreSettingsDto(settings.StoreName, settings.LowStockAlertLimit, settings.SmsAlertTemplate);
-    }
+        => ToDto(await _repo.GetAsync());
 
     public async Task<StoreSettingsDto> SaveAsync(StoreSettingsDto dto)
     {
@@ -19,9 +16,13 @@
         {
             StoreName = dto.StoreName,
             LowStockAlertLimit = dto.LowStockAlertLimit,
-            SmsAlertTemplate = dto.SmsAlertTemplate
+            SmsAlertTemplate = dto.SmsAlertTemplate,
+            TimeZoneId = dto.TimeZoneId
         });
 
-        return new StoreSettingsDto(saved.StoreName, saved.LowStockAlertLimit, saved.SmsAlertTemplate);
+        return ToDto(saved);
     }
+
+    private static StoreSettingsDto ToDto(StoreSettings s) => new(
+        s.StoreName, s.LowStockAlertLimit, s.SmsAlertTemplate, s.TimeZoneId);
 }

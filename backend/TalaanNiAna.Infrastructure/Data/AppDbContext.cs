@@ -87,12 +87,20 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        builder.Entity<StoreSettings>().HasData(new StoreSettings
+        builder.Entity<StoreSettings>(entity =>
         {
-            Id = 1,
-            StoreName = "Nena's Sari-Sari Store",
-            LowStockAlertLimit = 10,
-            SmsAlertTemplate = "Hi Suki, paalala lang..."
+            entity.Property(s => s.StoreName).HasMaxLength(120).IsRequired();
+            entity.Property(s => s.TimeZoneId).HasMaxLength(64).IsRequired();
+            entity.Property(s => s.SmsAlertTemplate).HasMaxLength(500);
+
+            entity.HasData(new StoreSettings
+            {
+                Id = 1,
+                StoreName = "Nena's Sari-Sari Store",
+                LowStockAlertLimit = 10,
+                SmsAlertTemplate = "Hi Suki, paalala lang...",
+                TimeZoneId = "Asia/Manila"
+            });
         });
     }
 }

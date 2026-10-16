@@ -387,11 +387,18 @@ namespace TalaanNiAna.Infrastructure.Migrations
 
                     b.Property<string>("SmsAlertTemplate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("StoreName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("TimeZoneId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
 
@@ -403,7 +410,8 @@ namespace TalaanNiAna.Infrastructure.Migrations
                             Id = 1,
                             LowStockAlertLimit = 10,
                             SmsAlertTemplate = "Hi Suki, paalala lang...",
-                            StoreName = "Nena's Sari-Sari Store"
+                            StoreName = "Nena's Sari-Sari Store",
+                            TimeZoneId = "Asia/Manila"
                         });
                 });
 

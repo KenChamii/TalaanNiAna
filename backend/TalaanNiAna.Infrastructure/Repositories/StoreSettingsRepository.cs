@@ -1,4 +1,4 @@
-﻿public class StoreSettingsRepository : IStoreSettingsRepository
+public class StoreSettingsRepository : IStoreSettingsRepository
 {
     private readonly AppDbContext _context;
 
@@ -14,9 +14,11 @@
     public async Task<StoreSettings> SaveAsync(StoreSettings settings)
     {
         var existing = await GetAsync();
+
         existing.StoreName = settings.StoreName;
         existing.LowStockAlertLimit = settings.LowStockAlertLimit;
         existing.SmsAlertTemplate = settings.SmsAlertTemplate;
+        existing.TimeZoneId = settings.TimeZoneId;
 
         await _context.SaveChangesAsync();
         return existing;
