@@ -27,6 +27,7 @@ export class LayoutComponent {
     { path: '/inventory', label: 'Imbentaryo' },
     { path: '/customers', label: 'Suki' },
     { path: '/transactions', label: 'Transaksyon' },
+    { path: '/reports/z', label: 'Z-Report' },
     { path: '/settings', label: 'Settings' },
   ];
 
