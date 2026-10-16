@@ -65,11 +65,14 @@ public class ProductRepository : IProductRepository
         return true;
     }
 
-    public async Task<IEnumerable<Product>> GetLowStockAsync(int threshold)
-        => await _context.Products
+    public async Task<IEnumerable<Product>> GetLowStockAsync()
+        => await LowStock()
             .AsNoTracking()
-            .Where(p => p.IsActive && p.StockQuantity <= threshold)
+            .OrderBy(p => p.StockQuantity)
             .ToListAsync();
+
+    public async Task<int> GetLowStockCountAsync()
+        => await LowStock().CountAsync();
 
     public async Task<int> GetTotalCountAsync(string? search, string? category)
         => await Filter(search, category).CountAsync();
@@ -81,6 +84,10 @@ public class ProductRepository : IProductRepository
             .OrderByDescending(p => p.StockQuantity)
             .Take(count)
             .ToListAsync();
+
+    /// <summary>Per-product threshold. StoreSettings supplies the default for new products.</summary>
+    private IQueryable<Product> LowStock()
+        => _context.Products.Where(p => p.IsActive && p.StockQuantity <= p.LowStockThreshold);
 
     private IQueryable<Product> Filter(string? search, string? category)
     {

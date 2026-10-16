@@ -42,7 +42,8 @@ public class CheckoutService
                 if (await _unitOfWork.Customers.GetByIdAsync(customerId) is null)
                     throw new NotFoundException("Suki", customerId);
 
-                await _unitOfWork.Customers.UpdateCreditAsync(customerId, transaction.TotalAmount);
+                // Derived from the ledger, which now includes the transaction above.
+                await _unitOfWork.Customers.RecalculateCreditAsync(customerId);
             }
 
             await _unitOfWork.CommitAsync();
