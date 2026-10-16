@@ -24,10 +24,14 @@ public sealed class FakeTransactionRepository : ITransactionRepository
         => throw new NotSupportedException();
     public Task<(decimal cashTotal, decimal creditTotal)> GetTotalsAsync(DateRange range)
         => throw new NotSupportedException();
+    public Task<(decimal revenue, decimal cost)> GetMarginAsync(DateRange range)
+        => throw new NotSupportedException();
     public Task<IEnumerable<DailySalesPoint>> GetDailySalesAsync(DateRange range, int utcOffsetHours)
         => throw new NotSupportedException();
     public Task<(decimal averageValue, int count)> GetAverageTransactionAsync(DateRange range)
         => throw new NotSupportedException();
     public Task<IEnumerable<TopProductResult>> GetTopProductsAsync(DateRange range, int count)
+        => throw new NotSupportedException();
+    public Task<IEnumerable<TopProductResult>> GetTopProfitableAsync(DateRange range, int count)
         => throw new NotSupportedException();
 }
