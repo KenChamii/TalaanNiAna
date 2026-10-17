@@ -99,6 +99,8 @@ public class TransactionRepository : ITransactionRepository
     {
         // Shift to local time before taking the date, so a sale at 10pm Manila
         // lands on the day it was made rather than the next UTC day.
+        // .Date becomes date_trunc, which reads the session timezone, so the
+        // connection string pins Timezone=UTC and the offset above does the work.
         var grouped = await InRange(range)
             .GroupBy(t => t.TransactionDate.AddHours(utcOffsetHours).Date)
             .Select(g => new
@@ -186,14 +188,30 @@ public class TransactionRepository : ITransactionRepository
         var query = _context.Transactions.AsQueryable();
 
         if (dateFrom.HasValue)
-            query = query.Where(t => t.TransactionDate >= dateFrom.Value);
+        {
+            var from = AsUtc(dateFrom.Value);
+            query = query.Where(t => t.TransactionDate >= from);
+        }
 
         if (dateTo.HasValue)
-            query = query.Where(t => t.TransactionDate < dateTo.Value.AddDays(1));
+        {
+            var to = AsUtc(dateTo.Value).AddDays(1);
+            query = query.Where(t => t.TransactionDate < to);
+        }
 
         if (paymentType.HasValue)
             query = query.Where(t => t.PaymentType == paymentType.Value);
 
         return query;
     }
+
+    /// <summary>
+    /// Dates bound from the query string arrive with Kind=Unspecified, which
+    /// Npgsql refuses to write to a timestamptz column. Everything stored is
+    /// already UTC, so the value is labelled rather than converted.
+    /// </summary>
+    private static DateTime AsUtc(DateTime value)
+        => value.Kind == DateTimeKind.Unspecified
+            ? DateTime.SpecifyKind(value, DateTimeKind.Utc)
+            : value.ToUniversalTime();
 }

@@ -1,4 +1,5 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TalaanNiAna.Infrastructure.Repositories;
 
 public class CustomerRepository : ICustomerRepository
 {
@@ -101,8 +102,13 @@ public class CustomerRepository : ICustomerRepository
     {
         var query = _context.Customers.AsQueryable();
 
+        // ILIKE, because Postgres compares case-sensitively and a cashier
+        // typing "ana" should still find Ana.
         if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(c => c.FullName.Contains(search));
+        {
+            var pattern = SearchPattern.Contains(search);
+            query = query.Where(c => EF.Functions.ILike(c.FullName, pattern, SearchPattern.Escape));
+        }
 
         return query;
     }

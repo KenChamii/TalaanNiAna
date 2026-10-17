@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TalaanNiAna.Infrastructure.Repositories;
 
 public class ProductRepository : IProductRepository
 {
@@ -112,7 +113,11 @@ public class ProductRepository : IProductRepository
         // Typing a code into the search box finds the item, for when the
         // scanner is unplugged and the owner reads the number off the pack.
         if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(p => p.Name.Contains(search) || p.Barcode == search);
+        {
+            var pattern = SearchPattern.Contains(search);
+            query = query.Where(p =>
+                EF.Functions.ILike(p.Name, pattern, SearchPattern.Escape) || p.Barcode == search);
+        }
 
         if (!string.IsNullOrWhiteSpace(category))
             query = query.Where(p => p.Category == category);
