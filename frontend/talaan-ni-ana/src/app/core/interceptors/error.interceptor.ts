@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { ToastService } from '../../shared/services/toast.service';
+import { SILENT_404 } from './silent-404.token';
 
 /** RFC 7807 payload the API returns for every handled error. */
 interface ProblemDetails {
@@ -37,6 +38,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (error.status === 429) {
         toast.warning('Masyadong mabilis. Sandali lang bago subukan ulit.');
+        return throwError(() => error);
+      }
+
+      // A lookup that found nothing is the caller's business, not a failure.
+      if (error.status === 404 && req.context.get(SILENT_404)) {
         return throwError(() => error);
       }
 
