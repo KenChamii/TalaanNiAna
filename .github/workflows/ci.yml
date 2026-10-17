@@ -136,3 +136,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: frontend/talaan-ni-ana
+          # The action defaults to wrangler 3, which predates Workers Static
+          # Assets. wrangler.jsonc uses assets.directory and
+          # not_found_handling, so it needs 4.
+          wranglerVersion: '4.151.1'
