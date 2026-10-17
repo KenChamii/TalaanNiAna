@@ -14,6 +14,12 @@ public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
             .NotEmpty().WithMessage("Kailangan ang kategorya.")
             .MaximumLength(60);
 
+        // Blank is allowed: loose goods have nothing printed to scan.
+        RuleFor(x => x.Barcode!)
+            .MaximumLength(32).WithMessage("Masyadong mahaba ang barcode.")
+            .Matches(ProductRules.BarcodePattern).WithMessage(ProductRules.BarcodeMessage)
+            .When(x => !string.IsNullOrWhiteSpace(x.Barcode));
+
         RuleFor(x => x.Price)
             .GreaterThan(0).WithMessage("Dapat mas mataas sa zero ang presyo.")
             .LessThanOrEqualTo(1_000_000);
@@ -46,6 +52,11 @@ public class UpdateProductDtoValidator : AbstractValidator<UpdateProductDto>
             .NotEmpty().WithMessage("Kailangan ang kategorya.")
             .MaximumLength(60);
 
+        RuleFor(x => x.Barcode!)
+            .MaximumLength(32).WithMessage("Masyadong mahaba ang barcode.")
+            .Matches(ProductRules.BarcodePattern).WithMessage(ProductRules.BarcodeMessage)
+            .When(x => !string.IsNullOrWhiteSpace(x.Barcode));
+
         RuleFor(x => x.Price)
             .GreaterThan(0).WithMessage("Dapat mas mataas sa zero ang presyo.")
             .LessThanOrEqualTo(1_000_000);
@@ -63,4 +74,13 @@ public class UpdateProductDtoValidator : AbstractValidator<UpdateProductDto>
             .LessThanOrEqualTo(100_000)
             .When(x => x.LowStockThreshold.HasValue);
     }
+}
+
+/// <summary>Shared so create and update cannot drift apart.</summary>
+internal static class ProductRules
+{
+    /// <summary>No spaces: a scanner sends one unbroken token.</summary>
+    public const string BarcodePattern = "^[A-Za-z0-9._-]+$";
+
+    public const string BarcodeMessage = "Letra, numero, at - . _ lang ang pwede sa barcode.";
 }
