@@ -40,14 +40,26 @@ services:
       Jwt__Key: ${JWT_KEY:?set JWT_KEY in .env, at least 32 characters}
       Jwt__Issuer: ${JWT_ISSUER:-TalaanNiAna}
       Jwt__Audience: ${JWT_AUDIENCE:-TalaanNiAnaUsers}
-      Cors__AllowedOrigins__0: ${CORS_ORIGIN:-http://localhost:4200}
+      # nginx serves the browser, so the API is never called cross-origin here.
+      # Kept rather than removed, so a setup that does need it has somewhere to put it.
+      Cors__AllowedOrigins__0: ${CORS_ORIGIN:-http://localhost:8080}
       # No shell on the host that runs this, so the app applies its own migrations.
       Hosting__RunMigrationsOnStartup: "true"
-    ports:
-      - "${API_PORT:-8080}:8080"
+      # nginx terminates the connection and forwards.
+      Hosting__BehindReverseProxy: "true"
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend/talaan-ni-ana
+      dockerfile: Dockerfile
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - api
     restart: unless-stopped
 
 volumes:
