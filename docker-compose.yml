@@ -1,0 +1,54 @@
+# Database and API, as a deployment runs them.
+#   docker compose up --build
+# The API is then on http://localhost:8080
+#
+# Copy .env.example to .env first. Compose reads it for the values below.
+# For the database alone, with the API in Visual Studio, use docker-compose.dev.yml.
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-talaanniana}
+      POSTGRES_USER: ${POSTGRES_USER:-talaanniana}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      # The daily sales chart truncates dates in the session timezone, so this
+      # has to match Timezone=UTC in the connection string below.
+      TZ: UTC
+      PGTZ: UTC
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      # Exposed so Visual Studio and dotnet ef can reach the same database the
+      # stack uses. Host side is 5433 to stay clear of a natively installed
+      # PostgreSQL. The API reaches it as db:5432 over the compose network.
+      - "${DB_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-talaanniana} -d ${POSTGRES_DB:-talaanniana}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: TalaanNiAna.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ConnectionStrings__DefaultConnection: >-
+        Host=db;Port=5432;Database=${POSTGRES_DB:-talaanniana};Username=${POSTGRES_USER:-talaanniana};Password=${POSTGRES_PASSWORD};Timezone=UTC
+      Jwt__Key: ${JWT_KEY:?set JWT_KEY in .env, at least 32 characters}
+      Jwt__Issuer: ${JWT_ISSUER:-TalaanNiAna}
+      Jwt__Audience: ${JWT_AUDIENCE:-TalaanNiAnaUsers}
+      Cors__AllowedOrigins__0: ${CORS_ORIGIN:-http://localhost:4200}
+      # No shell on the host that runs this, so the app applies its own migrations.
+      Hosting__RunMigrationsOnStartup: "true"
+    ports:
+      - "${API_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db-data:

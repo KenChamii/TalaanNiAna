@@ -1,7 +1,8 @@
-﻿using System.Text;
+using System.Text;
 using System.Threading.RateLimiting;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -21,13 +22,25 @@ builder.Services
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
+var hosting = builder.Configuration.GetSection(HostingOptions.SectionName).Get<HostingOptions>()
+              ?? new HostingOptions();
+
+// The connection string is the one setting with no safe default, so say which
+// variable is missing rather than failing later inside Npgsql.
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "ConnectionStrings:DefaultConnection is required. " +
+        "Set ConnectionStrings__DefaultConnection in the environment.");
+}
+
 // Tenant context. Scoped, because AppDbContext reads it on every query.
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentStore, CurrentStore>();
 
 // EF Core + Identity
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
@@ -124,6 +137,26 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Must run before anything that reads the scheme or the client IP, so the rate
+// limiter partitions on the real caller rather than the proxy.
+if (hosting.BehindReverseProxy)
+{
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+        // The proxy is the platform's own and its address is not known ahead of
+        // time, so the usual allow-list cannot be filled in.
+        KnownIPNetworks = { },
+        KnownProxies = { }
+    });
+}
+
+if (hosting.RunMigrationsOnStartup)
+{
+    using var scope = app.Services.CreateScope();
+    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+}
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -131,8 +164,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-else
+else if (!hosting.BehindReverseProxy)
 {
+    // The proxy already serves HTTPS, so redirecting again would loop.
     app.UseHsts();
     app.UseHttpsRedirection();
 }
@@ -142,5 +176,16 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Liveness: the process is up. Cheap enough for a platform to poll often.
+app.MapGet("/health", () => Results.Ok(new { status = "ok" }))
+   .AllowAnonymous();
+
+// Readiness: the database answers too. Used after a deploy, not as a heartbeat.
+app.MapGet("/health/ready", async (AppDbContext db) =>
+    await db.Database.CanConnectAsync()
+        ? Results.Ok(new { status = "ready" })
+        : Results.Json(new { status = "database unreachable" }, statusCode: 503))
+   .AllowAnonymous();
 
 app.Run();

@@ -1,0 +1,43 @@
+# Render blueprint. The database is not declared here: it lives on Neon, so
+# DATABASE_URL style values are set by hand in the dashboard rather than
+# provisioned by Render.
+
+services:
+  - type: web
+    name: talaanniana-api
+    runtime: docker
+    region: singapore
+    plan: free
+    dockerfilePath: ./backend/TalaanNiAna.API/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+
+      # Render terminates TLS and forwards. Without this the API would redirect
+      # to HTTPS forever and would rate-limit every caller as one IP.
+      - key: Hosting__BehindReverseProxy
+        value: "true"
+
+      # No shell on the free plan, so the app migrates itself on boot.
+      - key: Hosting__RunMigrationsOnStartup
+        value: "true"
+
+      # Set in the dashboard, not here. The Neon string needs Timezone=UTC
+      # appended or the daily sales chart silently shifts days.
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+
+      # openssl rand -base64 48, and not the key used in development.
+      - key: Jwt__Key
+        sync: false
+
+      # The deployed frontend origin, exactly, with no trailing slash.
+      - key: Cors__AllowedOrigins__0
+        sync: false
+
+      - key: Jwt__Issuer
+        value: TalaanNiAna
+      - key: Jwt__Audience
+        value: TalaanNiAnaUsers
