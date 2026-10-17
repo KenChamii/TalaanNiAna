@@ -1,7 +1,9 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 using TalaanNiAna.Application.Common.Exceptions;
+using TalaanNiAna.Infrastructure.Options;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -99,6 +101,34 @@ public class AuthController : ControllerBase
         if (!result.Succeeded)
             return Unauthorized(InvalidCredentials());
 
+        return await IssueAsync(user);
+    }
+
+    /// <summary>
+    /// Signs in the public demo store. The password stays on the server, so the
+    /// bundle ships no credential and the demo cannot be reused as a login form.
+    /// Returns 404 wherever the demo is switched off, which is everywhere by default.
+    /// </summary>
+    [HttpPost("demo")]
+    [ProducesResponseType(typeof(AuthResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<AuthResultDto>> Demo(
+        [FromServices] IOptions<DemoOptions> demoOptions)
+    {
+        var demo = demoOptions.Value;
+
+        if (!demo.Enabled || string.IsNullOrWhiteSpace(demo.Password))
+            return NotFound();
+
+        var user = await _userManager.FindByNameAsync(demo.Username);
+
+        if (user is null)
+        {
+            _logger.LogWarning("Demo is enabled but the demo user does not exist.");
+            return NotFound();
+        }
+
+        // No lockout here: a shared account that strangers hammer would lock
+        // itself out permanently, and there is no secret to brute force.
         return await IssueAsync(user);
     }
 
