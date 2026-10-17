@@ -29,6 +29,8 @@ export class InventoryFormComponent implements OnInit {
   form = this.fb.group({
     name: ['', Validators.required],
     category: ['', Validators.required],
+    // Optional: loose goods have nothing printed to scan.
+    barcode: ['', Validators.pattern(/^[A-Za-z0-9._-]*$/)],
     price: [0, [Validators.required, Validators.min(0.01)]],
     // Zero is valid: the owner may not know the puhunan yet.
     costPrice: [0, [Validators.required, Validators.min(0)]],
@@ -54,6 +56,7 @@ export class InventoryFormComponent implements OnInit {
       this.form.patchValue({
         name: this.product.name,
         category: this.product.category,
+        barcode: this.product.barcode ?? '',
         price: this.product.price,
         costPrice: this.product.costPrice,
         stockQuantity: this.product.stockQuantity,
@@ -74,6 +77,8 @@ export class InventoryFormComponent implements OnInit {
     const payload: ProductInput = {
       name: raw.name!,
       category: raw.category!.trim(),
+      // Always sent, so clearing the field clears the stored code.
+      barcode: raw.barcode!.trim(),
       price: raw.price!,
       costPrice: raw.costPrice!,
       stockQuantity: raw.stockQuantity!,

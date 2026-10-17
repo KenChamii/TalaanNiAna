@@ -34,6 +34,14 @@ public class ProductsController : ControllerBase
     public async Task<IActionResult> GetCategories()
         => Ok(await _service.GetCategoriesAsync());
 
+    /// <summary>Scanner lookup at the till. 404 means the code is not on file yet.</summary>
+    [HttpGet("barcode/{code}")]
+    public async Task<IActionResult> GetByBarcode(string code)
+    {
+        var product = await _service.GetByBarcodeAsync(code);
+        return product is null ? NotFound() : Ok(product);
+    }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {

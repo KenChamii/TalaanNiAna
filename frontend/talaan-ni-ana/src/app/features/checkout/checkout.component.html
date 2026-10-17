@@ -1,67 +1,141 @@
-<div class="pos-header">
-  <span class="pos-title">Talaan ni Ana POS</span>
-  <span class="pos-total">Total: <span class="total-amount">{{ subtotal() | peso }}</span></span>
+<header class="pos-header">
+  <div>
+    <p class="eyebrow">Bentahan</p>
+    <h2 class="pos-title">Talaan ni Ana POS</h2>
+  </div>
+
+  <div class="pos-total">
+    <span class="pos-total-label">Kabuuan</span>
+    <span class="pos-total-amount">{{ subtotal() | peso }}</span>
+    <span class="pos-total-count">{{ itemCount() }} piraso</span>
+  </div>
+</header>
+
+<div class="scan-bar" [class.busy]="isScanning()">
+  <span class="scan-chip" aria-hidden="true">SCAN</span>
+  <input
+    #scanBox
+    type="text"
+    class="scan-input"
+    autocomplete="off"
+    placeholder="I-scan ang barcode, o i-type ang code at Enter"
+    [(ngModel)]="scannedCode"
+    (keyup.enter)="scan()"
+    [disabled]="isScanning()"
+    aria-label="Barcode" />
+  <span class="scan-feedback" *ngIf="lastScanMessage()">{{ lastScanMessage() }}</span>
 </div>
 
 <div class="pos-grid">
   <section class="quick-tiles">
-    <h4>MABILISANG PINDUTAN (ISANG TAP LANG)</h4>
-    <input
-      type="text"
-      placeholder="Itype o i-search ang paninda..."
-      [(ngModel)]="searchTerm" />
+    <div class="tiles-head">
+      <div>
+        <p class="eyebrow">Isang tap lang</p>
+        <h3 class="section-title">Mabilisang Pindutan</h3>
+      </div>
+      <input
+        type="text"
+        class="tile-search"
+        placeholder="Hanapin ang paninda…"
+        [(ngModel)]="searchTerm" />
+    </div>
 
     <div class="tile-grid">
       <button
         *ngFor="let item of filteredItems()"
+        type="button"
         class="tile"
         (click)="addToCart(item)">
         <span class="tile-name">{{ item.name }}</span>
         <span class="tile-price">{{ item.price | peso }}</span>
       </button>
     </div>
+
+    <p class="empty tiles-empty" *ngIf="filteredItems().length === 0">
+      Walang tugmang paninda.
+    </p>
   </section>
 
   <section class="receipt card">
-    <h4>ANG RESIBO (KASALUKUYANG KARETA)</h4>
+    <div class="receipt-head">
+      <div>
+        <p class="eyebrow">Kasalukuyang kareta</p>
+        <h3 class="section-title">Ang Resibo</h3>
+      </div>
+      <button
+        type="button"
+        class="clear-btn"
+        (click)="clearCart()"
+        *ngIf="cart().length > 0">
+        Linisin
+      </button>
+    </div>
 
     <div class="receipt-lines">
       <div class="receipt-line" *ngFor="let line of cart()">
-        <span>{{ line.qty }}x {{ line.name }}</span>
-        <span>{{ (line.price * line.qty) | peso }}</span>
-        <button class="remove-btn" (click)="removeLine(line.productId)">✕</button>
+        <div class="qty-stepper">
+          <button type="button" (click)="changeQty(line.productId, -1)" aria-label="Bawasan">&minus;</button>
+          <span class="qty">{{ line.qty }}</span>
+          <button type="button" (click)="changeQty(line.productId, 1)" aria-label="Dagdagan">+</button>
+        </div>
+
+        <div class="line-text">
+          <span class="line-name">{{ line.name }}</span>
+          <span class="line-unit">{{ line.price | peso }} bawat isa</span>
+        </div>
+
+        <span class="line-total">{{ (line.price * line.qty) | peso }}</span>
+
+        <button
+          type="button"
+          class="remove-btn"
+          (click)="removeLine(line.productId)"
+          aria-label="Alisin">&#10005;</button>
       </div>
-      <p class="empty" *ngIf="cart().length === 0">Walang item sa kart pa.</p>
+
+      <p class="empty" *ngIf="cart().length === 0">
+        Walang item sa kart pa.<br />
+        <small>I-scan o i-tap ang paninda.</small>
+      </p>
     </div>
 
-    <div class="subtotal-row">
-      <span>Subtotal:</span>
-      <span>{{ subtotal() | peso }}</span>
+    <div class="total-block">
+      <span class="total-label">Bayaran</span>
+      <span class="total-amount">{{ subtotal() | peso }}</span>
     </div>
 
     <div class="payment-toggle">
-      <span>Paraan ng Pagbayad:</span>
-      <label>
-        <input type="radio" name="payment" value="Cash" [(ngModel)]="paymentType" />
-        CASH (Abot-Kamay)
-      </label>
-      <label>
-        <input type="radio" name="payment" value="Credit" [(ngModel)]="paymentType" />
-        UTANG (Listahan)
-      </label>
+      <span class="payment-label">Paraan ng pagbayad</span>
+      <div class="payment-options">
+        <label class="payment-option" [class.selected]="paymentType() === 'Cash'">
+          <input type="radio" name="payment" value="Cash" [(ngModel)]="paymentType" />
+          <span class="option-title">Cash</span>
+          <span class="option-sub">Abot-kamay</span>
+        </label>
+        <label class="payment-option" [class.selected]="paymentType() === 'Credit'">
+          <input type="radio" name="payment" value="Credit" [(ngModel)]="paymentType" />
+          <span class="option-title">Utang</span>
+          <span class="option-sub">Listahan</span>
+        </label>
+      </div>
     </div>
 
     <div class="customer-select" *ngIf="paymentType() === 'Credit'">
-  <label>Piliin ang Suki:</label>
-  <select [(ngModel)]="selectedCustomerId">
-    <option [ngValue]="null">-- Pumili ng Suki --</option>
-    <option *ngFor="let c of customers()" [ngValue]="c.id">
-      {{ c.fullName }}
-    </option>
-  </select>
-</div>
-    <button class="checkout-btn" (click)="checkout()" [disabled]="isProcessing() || cart().length === 0">
-      {{ isProcessing() ? 'Pinoproseso...' : 'Checkout — Irehistro ang Benta' }}
+      <label class="field-label" for="suki">Piliin ang suki</label>
+      <select id="suki" [(ngModel)]="selectedCustomerId">
+        <option [ngValue]="null">-- Pumili ng suki --</option>
+        <option *ngFor="let c of customers()" [ngValue]="c.id">
+          {{ c.fullName }}
+        </option>
+      </select>
+    </div>
+
+    <button
+      type="button"
+      class="btn-confirm full-width checkout-btn"
+      (click)="checkout()"
+      [disabled]="isProcessing() || cart().length === 0">
+      {{ isProcessing() ? 'Pinoproseso…' : 'Irehistro ang Benta' }}
     </button>
   </section>
 </div>

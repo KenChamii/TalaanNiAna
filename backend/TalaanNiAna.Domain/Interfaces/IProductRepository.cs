@@ -3,6 +3,9 @@ public interface IProductRepository
     Task<IEnumerable<Product>> GetAllAsync(string? search, string? category, int page, int pageSize);
     Task<Product?> GetByIdAsync(int id);
 
+    /// <summary>Exact match on a scanned code. Null when nothing carries it.</summary>
+    Task<Product?> GetByBarcodeAsync(string barcode);
+
     /// <summary>Loads several products in one query. Used by checkout to avoid N+1.</summary>
     Task<IReadOnlyDictionary<int, Product>> GetByIdsAsync(IEnumerable<int> ids);
 

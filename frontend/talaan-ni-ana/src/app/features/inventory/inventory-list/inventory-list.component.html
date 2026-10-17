@@ -3,7 +3,7 @@
 <div class="toolbar">
   <input
     type="text"
-    placeholder="Maghanap ng paninda..."
+    placeholder="Maghanap ng pangalan o barcode..."
     [(ngModel)]="searchTerm"
     (ngModelChange)="onSearchChange()" />
 
@@ -30,7 +30,10 @@
     </thead>
     <tbody>
       <tr *ngFor="let item of products()">
-        <td>{{ item.name }}</td>
+        <td>
+          {{ item.name }}
+          <small class="barcode-cell" *ngIf="item.barcode">{{ item.barcode }}</small>
+        </td>
         <td>{{ item.category }}</td>
         <td class="muted-cell">{{ item.costPrice ? (item.costPrice | peso) : '—' }}</td>
         <td>{{ item.price | peso }}</td>

@@ -16,6 +16,17 @@
       <option *ngFor="let cat of categories" [value]="cat"></option>
     </datalist>
 
+    <label class="field-label" for="barcode">Barcode <small>(opsyonal)</small></label>
+    <input
+      id="barcode"
+      type="text"
+      formControlName="barcode"
+      autocomplete="off"
+      placeholder="I-scan o i-type ang code" />
+    <p class="field-hint" *ngIf="form.controls.barcode.invalid && form.controls.barcode.touched">
+      Letra, numero, at - . _ lang ang pwede.
+    </p>
+
     <div class="row">
       <div>
         <label class="field-label" for="cost">Puhunan (&#8369;)</label>

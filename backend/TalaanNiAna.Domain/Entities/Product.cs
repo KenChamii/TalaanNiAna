@@ -6,6 +6,12 @@ public class Product : IHasStore
     public string Name { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Scanned code, usually EAN-13 on packaged goods. Null for loose items
+    /// sold by the piece, which have nothing printed on them.
+    /// </summary>
+    public string? Barcode { get; set; }
+
     /// <summary>What the store sells it for.</summary>
     public decimal Price { get; set; }
 
