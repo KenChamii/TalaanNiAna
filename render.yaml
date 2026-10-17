@@ -37,6 +37,13 @@ services:
       - key: Cors__AllowedOrigins__0
         sync: false
 
+      # The public demo store, seeded on first boot. Password is set in the
+      # dashboard; without it the seeder skips and the endpoint 404s.
+      - key: Demo__Enabled
+        value: "true"
+      - key: Demo__Password
+        sync: false
+
       - key: Jwt__Issuer
         value: TalaanNiAna
       - key: Jwt__Audience
