@@ -1,0 +1,13 @@
+# Build output and local state. Copying these in would bloat the image and can
+# overwrite the container's own restore with artifacts built on another OS.
+**/bin/
+**/obj/
+**/.vs/
+**/node_modules/
+**/dist/
+**/.angular/
+
+.git/
+.github/
+.env
+*.user
