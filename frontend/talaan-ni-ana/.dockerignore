@@ -1,0 +1,6 @@
+# Local build output and dependencies. npm ci installs these in the image, and
+# copying a host node_modules in can carry platform-specific binaries.
+node_modules/
+dist/
+.angular/
+.vscode/
