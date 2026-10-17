@@ -2,6 +2,8 @@ export interface Product {
   id: number;
   name: string;
   category: string;
+  /** Null for loose items with nothing printed to scan. */
+  barcode: string | null;
   price: number;
   /** Puhunan. Zero means it has not been recorded yet. */
   costPrice: number;
@@ -16,6 +18,8 @@ export interface Product {
 export interface ProductInput {
   name: string;
   category: string;
+  /** Empty string clears the code; omitting it keeps the current one. */
+  barcode?: string;
   price: number;
   costPrice?: number;
   stockQuantity: number;

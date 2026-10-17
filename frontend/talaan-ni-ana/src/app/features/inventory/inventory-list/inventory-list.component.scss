@@ -91,3 +91,12 @@ table {
 .negative-margin { color: var(--danger); font-weight: 600; }
 
 td small { opacity: 0.7; margin-left: 0.2rem; }
+
+/* Code printed under the item name, for checking against the pack. */
+.barcode-cell {
+  display: block;
+  margin-top: 0.1rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  color: var(--muted);
+}
