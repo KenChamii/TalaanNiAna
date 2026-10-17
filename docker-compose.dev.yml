@@ -1,0 +1,33 @@
+# Just the database, for working in Visual Studio with the API and frontend running locally.
+#   docker compose -f docker-compose.dev.yml up -d
+#
+# The full stack arrives with the Dockerfiles, in the deploy branch.
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: talaanniana
+      POSTGRES_USER: talaanniana
+      # Local only, never reachable from outside this machine. A deployed database takes its
+      # password from the environment instead.
+      POSTGRES_PASSWORD: localdev
+      # Matches Timezone=UTC in the connection string. The daily sales chart truncates dates
+      # in the session timezone, so both ends have to agree or the chart shifts days.
+      TZ: UTC
+      PGTZ: UTC
+    ports:
+      # 5433 on the host, not 5432. A machine with PostgreSQL installed natively already has
+      # that port, and both can bind without error, so the clash shows up later as a
+      # confusing authentication failure against the wrong server.
+      - "5433:5432"
+    volumes:
+      - db-data-dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U talaanniana -d talaanniana"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db-data-dev:
