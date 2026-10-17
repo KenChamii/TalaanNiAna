@@ -60,9 +60,16 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(p => p.CostPrice).HasColumnType("decimal(18,2)");
             entity.Property(p => p.Name).HasMaxLength(120).IsRequired();
             entity.Property(p => p.Category).HasMaxLength(60).IsRequired();
+            entity.Property(p => p.Barcode).HasMaxLength(32);
             entity.Property(p => p.RowVersion).IsRowVersion();
 
             entity.HasIndex(p => new { p.StoreId, p.Category });
+
+            // One active product per code per store. Deleted products keep their
+            // barcode but stop reserving it, so the code can be reused.
+            entity.HasIndex(p => new { p.StoreId, p.Barcode })
+                .IsUnique()
+                .HasFilter("[Barcode] IS NOT NULL AND [IsActive] = 1");
             entity.HasQueryFilter(p => p.StoreId == CurrentStoreId);
         });
 

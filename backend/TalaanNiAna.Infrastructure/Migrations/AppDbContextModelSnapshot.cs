@@ -305,6 +305,10 @@ namespace TalaanNiAna.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Barcode")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasMaxLength(60)
@@ -345,6 +349,10 @@ namespace TalaanNiAna.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StoreId", "Barcode")
+                        .IsUnique()
+                        .HasFilter("[Barcode] IS NOT NULL AND [IsActive] = 1");
 
                     b.HasIndex("StoreId", "Category");
 
