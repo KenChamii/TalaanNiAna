@@ -82,7 +82,7 @@ export class AuthService {
     return this.accessToken();
   }
 
-  private post(path: 'login' | 'register', body: unknown): Observable<AuthResult> {
+  private post(path: 'login' | 'register' | 'demo', body: unknown): Observable<AuthResult> {
     return this.http
       .post<AuthResult>(`${environment.apiUrl}/auth/${path}`, body, { withCredentials: true })
       .pipe(tap(result => this.accept(result)));
