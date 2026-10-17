@@ -55,6 +55,17 @@
         {{ isLoading() ? 'Naglo-load…' : 'Pumasok' }}
       </button>
 
+      <div class="demo-split" aria-hidden="true"><span>o</span></div>
+
+      <button
+        type="button"
+        class="btn-confirm full-width"
+        (click)="startDemo()"
+        [disabled]="isStartingDemo()">
+        {{ isStartingDemo() ? 'Binubuksan…' : 'Subukan ang demo' }}
+      </button>
+      <p class="demo-note">Totoong tindahan na may dalawang linggong benta. Walang sign-up.</p>
+
       <p class="switch-link">
         Wala ka pang account? <a routerLink="/register">Gumawa dito</a>
       </p>
