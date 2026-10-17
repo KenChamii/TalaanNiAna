@@ -409,6 +409,9 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsDemo")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("LowStockAlertLimit")
                         .HasColumnType("integer");
 
