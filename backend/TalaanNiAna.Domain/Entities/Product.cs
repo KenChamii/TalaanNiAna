@@ -24,10 +24,6 @@ public class Product : IHasStore
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    /// <summary>Optimistic concurrency token. Stops two sales decrementing the same stock.</summary>
-    /// <remarks>Becomes xmin when the provider changes to PostgreSQL.</remarks>
-    public byte[]? RowVersion { get; set; }
-
     /// <summary>Peso margin per unit. Negative on a loss leader, which is allowed.</summary>
     public decimal UnitMargin => Price - CostPrice;
 }
