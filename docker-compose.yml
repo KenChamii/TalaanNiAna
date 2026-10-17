@@ -47,6 +47,9 @@ services:
       Hosting__RunMigrationsOnStartup: "true"
       # nginx terminates the connection and forwards.
       Hosting__BehindReverseProxy: "true"
+      # Seeds the demo store on an empty database. Leave off for anything real.
+      Demo__Enabled: ${DEMO_ENABLED:-false}
+      Demo__Password: ${DEMO_PASSWORD:-}
     depends_on:
       db:
         condition: service_healthy

@@ -37,6 +37,14 @@ export class AuthService {
     return this.post('register', { username, password, displayName, storeName });
   }
 
+  /**
+   * Signs into the public demo. No credential travels from here: the server
+   * holds the password and 404s when the demo is switched off.
+   */
+  demo(): Observable<AuthResult> {
+    return this.post('demo', {});
+  }
+
   /** Exchanges the refresh cookie for a new access token. */
   refresh(): Observable<AuthResult | null> {
     return this.http
@@ -74,7 +82,7 @@ export class AuthService {
     return this.accessToken();
   }
 
-  private post(path: 'login' | 'register', body: unknown): Observable<AuthResult> {
+  private post(path: 'login' | 'register' | 'demo', body: unknown): Observable<AuthResult> {
     return this.http
       .post<AuthResult>(`${environment.apiUrl}/auth/${path}`, body, { withCredentials: true })
       .pipe(tap(result => this.accept(result)));

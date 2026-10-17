@@ -10,6 +10,7 @@ using TalaanNiAna.API.Auth;
 using TalaanNiAna.API.Filters;
 using TalaanNiAna.API.Middleware;
 using TalaanNiAna.Application.Validators;
+using TalaanNiAna.Infrastructure.Data;
 using TalaanNiAna.Infrastructure.Options;
 using TalaanNiAna.Infrastructure.Services;
 
@@ -24,6 +25,11 @@ builder.Services
 
 var hosting = builder.Configuration.GetSection(HostingOptions.SectionName).Get<HostingOptions>()
               ?? new HostingOptions();
+
+var demo = builder.Configuration.GetSection(DemoOptions.SectionName).Get<DemoOptions>()
+           ?? new DemoOptions();
+
+builder.Services.Configure<DemoOptions>(builder.Configuration.GetSection(DemoOptions.SectionName));
 
 // The connection string is the one setting with no safe default, so say which
 // variable is missing rather than failing later inside Npgsql.
@@ -128,6 +134,13 @@ builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<ZReportService>();
 builder.Services.AddScoped<SettingsService>();
 
+// Only registered when the demo is on, so nothing can seed by accident.
+if (demo.Enabled)
+{
+    builder.Services.AddSingleton(demo);
+    builder.Services.AddScoped<DemoSeeder>();
+}
+
 // Validation
 builder.Services.AddValidatorsFromAssemblyContaining<CheckoutDtoValidator>();
 
@@ -151,10 +164,16 @@ if (hosting.BehindReverseProxy)
     });
 }
 
-if (hosting.RunMigrationsOnStartup)
+if (hosting.RunMigrationsOnStartup || demo.Enabled)
 {
     using var scope = app.Services.CreateScope();
-    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+
+    if (hosting.RunMigrationsOnStartup)
+        scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+
+    // After the migration, or the tables it writes to may not exist yet.
+    if (demo.Enabled)
+        await scope.ServiceProvider.GetRequiredService<DemoSeeder>().SeedAsync();
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

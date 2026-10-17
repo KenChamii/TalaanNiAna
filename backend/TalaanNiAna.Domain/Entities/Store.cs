@@ -14,5 +14,12 @@ public class Store
     public int LowStockAlertLimit { get; set; } = 10;
 
     public string SmsAlertTemplate { get; set; } = "Hi Suki, paalala lang...";
+
+    /// <summary>
+    /// The public demo store. Marked rather than matched by name, so the seeder
+    /// can tell whether it has already run without caring what the store is called.
+    /// </summary>
+    public bool IsDemo { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

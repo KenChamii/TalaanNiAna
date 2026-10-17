@@ -18,6 +18,7 @@ export class LoginComponent {
 
   errorMessage = signal<string | null>(null);
   isLoading = signal(false);
+  isStartingDemo = signal(false);
 
   /** Banderitas pennants. Colour cycles in CSS. */
   readonly flags = Array.from({ length: 44 });
@@ -27,6 +28,22 @@ export class LoginComponent {
     password: ['', Validators.required],
     rememberMe: [true]
   });
+
+  /** One tap into a seeded store, for anyone who does not want to sign up. */
+  startDemo() {
+    if (this.isStartingDemo()) return;
+
+    this.isStartingDemo.set(true);
+    this.errorMessage.set(null);
+
+    this.auth.demo().subscribe({
+      next: () => this.router.navigate(['/dashboard']),
+      error: () => {
+        this.errorMessage.set('Hindi available ang demo sa ngayon.');
+        this.isStartingDemo.set(false);
+      }
+    });
+  }
 
   submit() {
     if (this.form.invalid) return;
