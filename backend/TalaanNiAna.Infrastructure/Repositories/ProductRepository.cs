@@ -20,6 +20,11 @@ public class ProductRepository : IProductRepository
     public async Task<Product?> GetByIdAsync(int id)
         => await _context.Products.FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
 
+    public async Task<Product?> GetByBarcodeAsync(string barcode)
+        => await _context.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.IsActive && p.Barcode == barcode);
+
     public async Task<IReadOnlyDictionary<int, Product>> GetByIdsAsync(IEnumerable<int> ids)
     {
         var distinct = ids.Distinct().ToArray();
@@ -53,7 +58,9 @@ public class ProductRepository : IProductRepository
 
         existing.Name = product.Name;
         existing.Category = product.Category;
+        existing.Barcode = product.Barcode;
         existing.Price = product.Price;
+        existing.CostPrice = product.CostPrice;
         existing.StockQuantity = product.StockQuantity;
         existing.LowStockThreshold = product.LowStockThreshold;
         existing.UpdatedAt = DateTime.UtcNow;
@@ -102,8 +109,10 @@ public class ProductRepository : IProductRepository
     {
         var query = _context.Products.Where(p => p.IsActive);
 
+        // Typing a code into the search box finds the item, for when the
+        // scanner is unplugged and the owner reads the number off the pack.
         if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(p => p.Name.Contains(search));
+            query = query.Where(p => p.Name.Contains(search) || p.Barcode == search);
 
         if (!string.IsNullOrWhiteSpace(category))
             query = query.Where(p => p.Category == category);
