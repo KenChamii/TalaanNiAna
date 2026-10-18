@@ -58,6 +58,24 @@
       </div>
     </div>
 
+    <fieldset class="tingi">
+      <legend class="field-label">Tingi <small>(opsyonal)</small></legend>
+
+      <label class="field-label" for="parent">Galing sa paketeng</label>
+      <select id="parent" formControlName="parentProductId">
+        <option [ngValue]="null">Hindi tingi</option>
+        <option *ngFor="let parent of parentOptions" [ngValue]="parent.id">{{ parent.name }}</option>
+      </select>
+
+      <ng-container *ngIf="isTingi()">
+        <label class="field-label" for="units">Ilan ang lalabas sa isa</label>
+        <input id="units" type="number" formControlName="unitsPerParent" min="2" placeholder="hal. 12" />
+        <p class="tingi-note">
+          Hahatiin ang puhunan ng pakete sa bilang na ito tuwing magbubukas.
+        </p>
+      </ng-container>
+    </fieldset>
+
     <div class="modal-actions">
       <button type="button" class="btn-secondary" (click)="closed.emit()">Kanselahin</button>
       <button type="submit" class="btn-primary" [disabled]="isSaving">

@@ -1,37 +1,57 @@
 <app-toast></app-toast>
+
 <div class="shell">
   <header class="topbar">
+    <button
+      type="button"
+      class="nav-toggle"
+      (click)="toggleNav()"
+      [attr.aria-expanded]="isNavOpen()"
+      aria-label="Menu">
+      <span aria-hidden="true">{{ isNavOpen() ? '✕' : '☰' }}</span>
+    </button>
+
     <span class="brand">Talaan ni Ana</span>
 
     <div class="topbar-right">
+      <button type="button" class="theme-toggle" (click)="i18n.toggle()">
+        {{ i18n.language() === 'tl' ? 'EN' : 'TL' }}
+      </button>
+
       <button
         type="button"
         class="theme-toggle"
         (click)="theme.toggle()"
-        [attr.aria-label]="theme.theme() === 'dark' ? 'Lumipat sa araw mode' : 'Lumipat sa gabi mode'">
-        {{ theme.theme() === 'dark' ? 'Araw' : 'Gabi' }}
+        [attr.aria-label]="theme.theme() === 'dark' ? ('theme.toLight' | t) : ('theme.toDark' | t)">
+        {{ theme.theme() === 'dark' ? ('theme.toLight' | t) : ('theme.toDark' | t) }}
       </button>
-      <span class="badge badge--ok store-name">{{ storeName() || 'Walang pangalan' }}</span>
+
+      <span class="badge badge--ok store-name">{{ storeName() || ('nav.noStore' | t) }}</span>
     </div>
   </header>
+
+  <app-offline-banner></app-offline-banner>
 
   <div class="jeep-stripe" aria-hidden="true">
     <span></span><span></span><span></span><span></span><span></span>
   </div>
 
   <div class="body">
-    <nav class="sidebar">
-      <p class="meta nav-heading">Menu</p>
+    <!-- Closes the menu when tapped past it, which is what a phone user expects. -->
+    <div class="scrim" *ngIf="isNavOpen()" (click)="toggleNav()"></div>
+
+    <nav class="sidebar" [class.is-open]="isNavOpen()">
+      <p class="meta nav-heading">{{ 'nav.menu' | t }}</p>
 
       <a *ngFor="let item of navItems"
          [routerLink]="item.path"
          routerLinkActive="active"
          class="nav-link">
-        {{ item.label }}
+        {{ item.key | t }}
       </a>
 
       <button type="button" class="nav-link logout" (click)="logout()">
-        Mag-logout
+        {{ 'nav.logout' | t }}
       </button>
     </nav>
 

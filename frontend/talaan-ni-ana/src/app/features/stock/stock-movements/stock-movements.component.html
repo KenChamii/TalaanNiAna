@@ -1,0 +1,104 @@
+<div class="modal-overlay" (click)="closed.emit()">
+  <div class="movements-card card" (click)="$event.stopPropagation()">
+
+    <header class="movements-head">
+      <div>
+        <p class="eyebrow">Galaw ng stock</p>
+        <h3 class="section-title">{{ product.name }}</h3>
+      </div>
+      <button type="button" class="close-btn" (click)="closed.emit()" aria-label="Isara">&#10005;</button>
+    </header>
+
+    <div class="balance-strip">
+      <span class="balance-label">Natitira ngayon</span>
+      <span class="balance-value">{{ balance() }} <small>pcs</small></span>
+    </div>
+
+    <!-- Tingi -->
+    <section class="repack" *ngIf="product.parentProductName">
+      <p class="record-title">Magbukas ng pakete</p>
+
+      <p class="repack-copy">
+        Isang {{ product.parentProductName }} ay
+        <strong>{{ product.unitsPerParent }}</strong> nito. Hahatiin ang puhunan
+        ng pakete sa bilang na iyon.
+      </p>
+
+      <div class="repack-row">
+        <input type="number" min="1" [(ngModel)]="packsToOpen" aria-label="Ilang pakete" />
+        <button type="button" class="btn-secondary" (click)="repack()" [disabled]="isRepacking()">
+          {{ isRepacking() ? 'Binubuksan…' : 'Buksan' }}
+        </button>
+      </div>
+    </section>
+
+    <!-- Record a movement -->
+    <section class="record">
+      <p class="record-title">Magtala ng galaw</p>
+
+      <div class="reason-grid">
+        <label
+          class="reason"
+          *ngFor="let option of reasons"
+          [class.selected]="reason === option.value">
+          <input type="radio" name="reason" [value]="option.value" [(ngModel)]="reason" />
+          <span class="reason-label">{{ option.label }}</span>
+          <span class="reason-hint">{{ option.hint }}</span>
+        </label>
+      </div>
+
+      <div class="record-row">
+        <div class="record-field">
+          <label class="field-label" for="amount">
+            {{ isCount ? 'Aktwal na bilang' : 'Ilang piraso' }}
+          </label>
+          <input id="amount" type="number" min="0" [(ngModel)]="amount" placeholder="0" />
+        </div>
+
+        <div class="record-field">
+          <label class="field-label" for="note">Dahilan <small>(opsyonal)</small></label>
+          <input id="note" type="text" [(ngModel)]="note" placeholder="hal. nabasag" maxlength="250" />
+        </div>
+      </div>
+
+      <p class="preview" *ngIf="amount !== null">
+        Magiging <strong>{{ preview }}</strong> ang natitira.
+      </p>
+
+      <button type="button" class="btn-confirm full-width" (click)="submit()" [disabled]="isSaving()">
+        {{ isSaving() ? 'Itinatala…' : 'Itala' }}
+      </button>
+    </section>
+
+    <!-- History -->
+    <section class="history">
+      <p class="record-title">Kasaysayan</p>
+
+      <p class="empty" *ngIf="isLoading()">Kinukuha…</p>
+
+      <div class="movement" *ngFor="let movement of movements()">
+        <span class="movement-qty" [class.out]="movement.quantity < 0">
+          {{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}
+        </span>
+
+        <div class="movement-text">
+          <span class="movement-reason">{{ labels[movement.reason] || movement.reason }}</span>
+          <span class="movement-note" *ngIf="movement.note">{{ movement.note }}</span>
+          <span class="movement-note" *ngIf="movement.transactionId">
+            Transaksyon #{{ movement.transactionId }}
+          </span>
+        </div>
+
+        <div class="movement-meta">
+          <span class="movement-balance">{{ movement.balanceAfter }}</span>
+          <span class="movement-date">{{ movement.occurredAt | date:'MMM d, h:mm a' }}</span>
+        </div>
+      </div>
+
+      <p class="empty" *ngIf="!isLoading() && movements().length === 0">
+        Walang naitalang galaw pa.
+      </p>
+    </section>
+
+  </div>
+</div>

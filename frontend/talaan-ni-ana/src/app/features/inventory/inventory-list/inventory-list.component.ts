@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../inventory.service';
 import { InventoryFormComponent } from '../inventory-form/inventory-form.component';
+import { StockMovementsComponent } from '../../stock/stock-movements/stock-movements.component';
 import { Product } from '../../../shared/models/product.model';
 import { PesoPipe } from '../../../shared/pipes/peso.pipes';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -10,7 +11,7 @@ import { ToastService } from '../../../shared/services/toast.service';
 @Component({
   selector: 'app-inventory-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, InventoryFormComponent, PesoPipe],
+  imports: [CommonModule, FormsModule, InventoryFormComponent, StockMovementsComponent, PesoPipe],
   templateUrl: './inventory-list.component.html',
   styleUrl: './inventory-list.component.scss'
 })
@@ -30,9 +31,16 @@ export class InventoryListComponent implements OnInit {
   isModalOpen = signal(false);
   editingProduct = signal<Product | null>(null);
 
+  /** The product whose stock history is open, if any. */
+  movementsFor = signal<Product | null>(null);
+
+  /** Packs a tingi line can come out of: anything that is not itself tingi. */
+  parentOptions = signal<Product[]>([]);
+
   ngOnInit() {
     this.load();
     this.loadCategories();
+    this.loadParentOptions();
   }
 
   load() {
@@ -43,6 +51,15 @@ export class InventoryListComponent implements OnInit {
         this.totalCount.set(result.totalCount);
         this.totalPages.set(result.totalPages);
       });
+  }
+
+  /**
+   * Loaded separately from the paged list, because the pack a tingi line comes
+   * out of is often not on the page being looked at.
+   */
+  loadParentOptions() {
+    this.inventoryService.getAll('', '', 1, 200).subscribe(result =>
+      this.parentOptions.set(result.items.filter(p => p.parentProductId === null)));
   }
 
   /** Real categories, so a typed one is filterable instead of invisible. */
@@ -68,6 +85,10 @@ export class InventoryListComponent implements OnInit {
   openEditModal(product: Product) {
     this.editingProduct.set(product);
     this.isModalOpen.set(true);
+  }
+
+  openMovements(product: Product) {
+    this.movementsFor.set(product);
   }
 
   onModalSaved(saved: Product) {

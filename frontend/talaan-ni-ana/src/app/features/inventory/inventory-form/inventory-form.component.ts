@@ -35,7 +35,10 @@ export class InventoryFormComponent implements OnInit {
     // Zero is valid: the owner may not know the puhunan yet.
     costPrice: [0, [Validators.required, Validators.min(0)]],
     stockQuantity: [0, [Validators.required, Validators.min(0)]],
-    lowStockThreshold: [10, [Validators.required, Validators.min(0)]]
+    lowStockThreshold: [10, [Validators.required, Validators.min(0)]],
+    // Tingi. Both empty, or both filled: half a link cannot be repacked.
+    parentProductId: [null as number | null],
+    unitsPerParent: [null as number | null]
   });
 
   private value = toSignal(this.form.valueChanges, { initialValue: this.form.value });
@@ -51,6 +54,11 @@ export class InventoryFormComponent implements OnInit {
   /** Cost above price is allowed, but worth flagging before saving. */
   isLossLeader = computed(() => (this.value().costPrice ?? 0) > 0 && this.margin() < 0);
 
+  /** Packs this could be broken out of. Never itself, never another tingi line. */
+  @Input() parentOptions: Product[] = [];
+
+  isTingi = computed(() => !!this.value().parentProductId);
+
   ngOnInit() {
     if (this.product) {
       this.form.patchValue({
@@ -60,7 +68,9 @@ export class InventoryFormComponent implements OnInit {
         price: this.product.price,
         costPrice: this.product.costPrice,
         stockQuantity: this.product.stockQuantity,
-        lowStockThreshold: this.product.lowStockThreshold
+        lowStockThreshold: this.product.lowStockThreshold,
+        parentProductId: this.product.parentProductId,
+        unitsPerParent: this.product.unitsPerParent
       });
     }
   }
@@ -82,7 +92,10 @@ export class InventoryFormComponent implements OnInit {
       price: raw.price!,
       costPrice: raw.costPrice!,
       stockQuantity: raw.stockQuantity!,
-      lowStockThreshold: raw.lowStockThreshold!
+      lowStockThreshold: raw.lowStockThreshold!,
+      // Zero clears the link on the server; null would leave it as it was.
+      parentProductId: raw.parentProductId ?? 0,
+      unitsPerParent: raw.parentProductId ? (raw.unitsPerParent ?? undefined) : undefined
     };
 
     const request = this.product
