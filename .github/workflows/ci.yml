@@ -39,7 +39,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
           cache-dependency-path: frontend/talaan-ni-ana/package-lock.json
 
@@ -118,7 +118,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
           cache-dependency-path: frontend/talaan-ni-ana/package-lock.json
 
@@ -136,3 +136,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: frontend/talaan-ni-ana
+          # The action defaults to wrangler 3, which predates Workers Static
+          # Assets. wrangler.jsonc uses assets.directory and
+          # not_found_handling, so it needs 4.
+          wranglerVersion: '4.151.1'
