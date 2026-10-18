@@ -1,14 +1,19 @@
-using TalaanNiAna.Application.Common.Exceptions;
+﻿using TalaanNiAna.Application.Common.Exceptions;
 
 public class ProductService
 {
     private readonly IProductRepository _repo;
     private readonly IStoreRepository _stores;
+    private readonly IStockMovementRepository _movements;
 
-    public ProductService(IProductRepository repo, IStoreRepository stores)
+    public ProductService(
+        IProductRepository repo,
+        IStoreRepository stores,
+        IStockMovementRepository movements)
     {
         _repo = repo;
         _stores = stores;
+        _movements = movements;
     }
 
     public async Task<PagedResult<ProductDto>> GetProductsAsync(
@@ -62,10 +67,28 @@ public class ProductService
             Price = dto.Price,
             CostPrice = dto.CostPrice,
             StockQuantity = dto.StockQuantity,
-            LowStockThreshold = threshold
+            LowStockThreshold = threshold,
+            ParentProductId = dto.ParentProductId,
+            UnitsPerParent = dto.UnitsPerParent
         };
 
+        await EnsureTingiLinkIsSound(product, productId: null);
+
         var created = await _repo.CreateAsync(product);
+
+        // Opening count, so the ledger explains the stock a product starts with
+        // rather than beginning with an unexplained number.
+        if (created.StockQuantity != 0)
+        {
+            await _movements.RecordAsync(new StockMovement
+            {
+                ProductId = created.Id,
+                Quantity = created.StockQuantity,
+                Reason = StockReason.Opening,
+                BalanceAfter = created.StockQuantity
+            });
+        }
+
         return ToDto(created);
     }
 
@@ -89,11 +112,41 @@ public class ProductService
             StockQuantity = dto.StockQuantity,
             // Omitted values must not silently reset what the store already set.
             CostPrice = dto.CostPrice ?? existing.CostPrice,
-            LowStockThreshold = dto.LowStockThreshold ?? existing.LowStockThreshold
+            LowStockThreshold = dto.LowStockThreshold ?? existing.LowStockThreshold,
+            // Zero is the form clearing the link; null leaves it as it was.
+            ParentProductId = dto.ParentProductId switch
+            {
+                null => existing.ParentProductId,
+                0 => null,
+                var value => value
+            },
+            UnitsPerParent = dto.ParentProductId == 0
+                ? null
+                : dto.UnitsPerParent ?? existing.UnitsPerParent
         };
 
+        await EnsureTingiLinkIsSound(product, productId: id);
+
+        // Captured before the update, so the movement records the size of the change.
+        var stockDelta = dto.StockQuantity - existing.StockQuantity;
+
         var updated = await _repo.UpdateAsync(product);
-        return updated is null ? null : ToDto(updated);
+        if (updated is null) return null;
+
+        // Editing the stock field is a correction, not a sale. Recorded as one.
+        if (stockDelta != 0)
+        {
+            await _movements.RecordAsync(new StockMovement
+            {
+                ProductId = updated.Id,
+                Quantity = stockDelta,
+                Reason = StockReason.Adjustment,
+                BalanceAfter = updated.StockQuantity,
+                Note = "Binago sa form ng imbentaryo"
+            });
+        }
+
+        return ToDto(updated);
     }
 
     public async Task<bool> DeleteAsync(int id) => await _repo.DeleteAsync(id);
@@ -102,6 +155,37 @@ public class ProductService
     {
         var items = await _repo.GetQuickItemsAsync();
         return items.Select(p => new QuickItemDto(p.Id, p.Name, p.Price));
+    }
+
+    /// <summary>
+    /// A tingi line needs a pack to come out of and a count of what it yields.
+    /// Both or neither: half a link would leave repacking unable to run and no
+    /// obvious reason why.
+    /// </summary>
+    private async Task EnsureTingiLinkIsSound(Product product, int? productId)
+    {
+        if (product.ParentProductId is null && product.UnitsPerParent is null) return;
+
+        if (product.ParentProductId is null)
+            throw new RequestValidationException(nameof(product.ParentProductId),
+                "Piliin kung saang pakete galing.");
+
+        if (product.UnitsPerParent is null or < 2)
+            throw new RequestValidationException(nameof(product.UnitsPerParent),
+                "Ilan ang lalabas sa isang pakete? Dapat dalawa pataas.");
+
+        if (product.ParentProductId == productId)
+            throw new RequestValidationException(nameof(product.ParentProductId),
+                "Hindi pwedeng ang sarili nito ang pinagmulan.");
+
+        var parent = await _repo.GetByIdAsync(product.ParentProductId.Value)
+            ?? throw new NotFoundException("Produkto", product.ParentProductId.Value);
+
+        // One level only. A sack to a cup is a repack; a sack to a cup to a
+        // spoonful is a supply chain, and nothing here is built for it.
+        if (parent.ParentProductId is not null)
+            throw new RequestValidationException(nameof(product.ParentProductId),
+                $"Tingi na rin ang {parent.Name}. Isang antas lang ang pwede.");
     }
 
     /// <summary>
@@ -130,7 +214,8 @@ public class ProductService
         p.Id, p.Name, p.Category, p.Barcode,
         p.Price, p.CostPrice, p.UnitMargin, MarginPercent(p),
         p.StockQuantity, p.LowStockThreshold,
-        p.StockQuantity <= p.LowStockThreshold);
+        p.StockQuantity <= p.LowStockThreshold,
+        p.ParentProductId, p.ParentProduct?.Name, p.UnitsPerParent);
 
     /// <summary>Margin over price. Zero when no cost has been recorded yet.</summary>
     private static decimal MarginPercent(Product p)

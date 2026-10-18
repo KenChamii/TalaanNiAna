@@ -1,4 +1,4 @@
-using TalaanNiAna.Application.Common.Exceptions;
+﻿using TalaanNiAna.Application.Common.Exceptions;
 
 public class CheckoutService
 {
@@ -35,6 +35,9 @@ public class CheckoutService
 
             await _unitOfWork.Transactions.CreateAsync(transaction);
 
+            // After the save, so the movements can point at a transaction that has an id.
+            RecordStockMovements(transaction, products);
+
             if (paymentType == PaymentType.Credit)
             {
                 var customerId = dto.CustomerId!.Value;
@@ -56,6 +59,27 @@ public class CheckoutService
             // first. The middleware maps that to 409; Application stays free of EF.
             await _unitOfWork.RollbackAsync();
             throw;
+        }
+    }
+
+    /// <summary>
+    /// One ledger row per line. Written here rather than inside the loop above
+    /// because a movement needs the transaction's id, which only exists once
+    /// the transaction has been saved.
+    /// </summary>
+    private void RecordStockMovements(Transaction transaction, IReadOnlyDictionary<int, Product> products)
+    {
+        foreach (var line in transaction.Items)
+        {
+            _unitOfWork.StockMovements.Add(new StockMovement
+            {
+                ProductId = line.ProductId,
+                Quantity = -line.Quantity,
+                Reason = StockReason.Sale,
+                BalanceAfter = products[line.ProductId].StockQuantity,
+                TransactionId = transaction.Id,
+                OccurredAt = transaction.TransactionDate
+            });
         }
     }
 
