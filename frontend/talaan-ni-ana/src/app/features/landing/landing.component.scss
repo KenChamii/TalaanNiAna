@@ -1,0 +1,278 @@
+.landing {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ---- Chrome ---- */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--surface);
+  border-bottom: var(--line-w) solid var(--line);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  a { text-decoration: none; }
+}
+
+.theme-toggle {
+  padding: 0.35rem 0.7rem;
+  background: transparent;
+  border: var(--line-w) solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover { background: var(--bg-sunk); }
+}
+
+/* ---- Hero ---- */
+.hero {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 3rem;
+  text-align: center;
+}
+
+.hero-title {
+  margin: 0.5rem 0 0;
+  font-size: clamp(2.75rem, 9vw, 5rem);
+  line-height: 0.95;
+}
+
+.hero-stripe {
+  width: 220px;
+  margin: 1.25rem auto 1.5rem;
+}
+
+.hero-copy {
+  margin: 0 auto;
+  max-width: 54ch;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--body);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1.75rem 0 1rem;
+
+  a { text-decoration: none; }
+}
+
+.hero-cta {
+  min-height: 56px;
+  padding-inline: 2rem;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.hero-note {
+  margin: 0 auto;
+  max-width: 46ch;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--muted);
+
+  &--error { color: var(--danger); }
+  a { color: inherit; }
+}
+
+/* ---- Bands ---- */
+.band {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+
+  &--sunk {
+    max-width: none;
+    background: var(--bg-sunk);
+    border-block: var(--line-w) solid var(--line);
+
+    > * { max-width: 1040px; margin-inline: auto; }
+  }
+}
+
+.band-head {
+  margin-bottom: 1.5rem;
+}
+
+/* ---- Features ---- */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1rem;
+}
+
+.feature {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.1rem;
+}
+
+.feature-tag { align-self: flex-start; }
+
+.feature-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.feature-body {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* The part a reviewer reads. Quieter, because the headline comes first. */
+.feature-detail {
+  margin: 0;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--line);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* ---- Stack ---- */
+.stack {
+  margin: 0 0 2rem;
+  border-top: var(--line-w) solid var(--line);
+}
+
+.stack-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 1rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px dashed var(--line);
+
+  dt {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--ink);
+  }
+}
+
+/* ---- Decisions ---- */
+.decisions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem 2rem;
+}
+
+.decision-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.decision-body {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--body);
+}
+
+/* ---- Roadmap ---- */
+.roadmap {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.5rem 0;
+    font-size: 0.92rem;
+    color: var(--muted);
+    border-bottom: 1px dashed var(--line);
+
+    &:last-child { border-bottom: none; }
+    &.is-done { color: var(--ink); }
+  }
+}
+
+.roadmap-mark {
+  flex-shrink: 0;
+  width: 1.1rem;
+  font-family: var(--font-mono);
+}
+
+.roadmap-note {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* ---- Close ---- */
+.close {
+  text-align: center;
+  padding-block: 3.5rem;
+}
+
+.close-title {
+  margin: 0 0 1.5rem;
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1;
+}
+
+/* ---- Footer ---- */
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  border-top: var(--line-w) solid var(--line);
+  background: var(--surface);
+  font-size: 0.82rem;
+  color: var(--muted);
+
+  a { color: var(--ink); }
+}
+
+@media (max-width: 640px) {
+  .stack-row { grid-template-columns: 1fr; gap: 0.15rem; }
+  .hero { padding-top: 2.5rem; }
+}

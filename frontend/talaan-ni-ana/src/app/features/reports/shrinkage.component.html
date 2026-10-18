@@ -1,0 +1,71 @@
+<div class="dash-header">
+  <div>
+    <p class="eyebrow">Nawawalang stock</p>
+    <h2 class="page-title">Lugi sa Sira</h2>
+  </div>
+
+  <div class="report-controls">
+    <input type="date" [(ngModel)]="from" [max]="maxDate" (ngModelChange)="load()" aria-label="Mula" />
+    <span class="dash">–</span>
+    <input type="date" [(ngModel)]="to" [max]="maxDate" (ngModelChange)="load()" aria-label="Hanggang" />
+  </div>
+</div>
+
+<p class="empty" *ngIf="isLoading()">Kinukuha ang report…</p>
+
+<ng-container *ngIf="report() as r">
+
+  <div class="totals">
+    <div class="total-card card">
+      <span class="total-label">Piraso na nawala</span>
+      <span class="total-value">{{ r.totalPieces }}</span>
+    </div>
+    <div class="total-card card card--danger">
+      <span class="total-label">Halaga ng puhunan</span>
+      <span class="total-value">{{ r.totalCost | peso }}</span>
+    </div>
+  </div>
+
+  <p class="explainer">
+    Puhunan ang ginamit na halaga, hindi presyo. Ito ang talagang nagastos,
+    hindi ang sana kinita.
+  </p>
+
+  <ng-container *ngIf="r.lines.length > 0; else nothingLost">
+
+    <section class="card block">
+      <h3 class="section-title">Alin ang paulit-ulit</h3>
+      <div class="rank" *ngFor="let item of byProduct(r); let i = index">
+        <span class="rank-num">{{ i + 1 }}</span>
+        <span class="rank-name">{{ item.name }}</span>
+        <span class="rank-pieces">{{ item.pieces }} pcs</span>
+        <span class="rank-cost">{{ item.cost | peso }}</span>
+      </div>
+    </section>
+
+    <section class="card block">
+      <h3 class="section-title">Bawat pangyayari</h3>
+      <div class="line" *ngFor="let line of r.lines">
+        <span class="line-qty">{{ line.quantity }}</span>
+        <div class="line-text">
+          <span class="line-name">{{ line.productName }}</span>
+          <span class="line-note">
+            {{ labels[line.reason] || line.reason }}<ng-container *ngIf="line.note"> · {{ line.note }}</ng-container>
+          </span>
+        </div>
+        <div class="line-meta">
+          <span class="line-cost">{{ line.costLost | peso }}</span>
+          <span class="line-date">{{ line.occurredAt | date:'MMM d' }}</span>
+        </div>
+      </div>
+    </section>
+
+  </ng-container>
+
+  <ng-template #nothingLost>
+    <p class="empty-state card">
+      Walang naitalang sira o kulang sa panahong ito.
+    </p>
+  </ng-template>
+
+</ng-container>

@@ -26,6 +26,13 @@ public class DemoSeeder
     // a screenshot worth keeping and a bug report worth reproducing.
     private readonly Random _random = new(20261018);
 
+    /// <summary>
+    /// Stock on hand as the seeded history plays forward. The ledger has to add
+    /// up, so every movement reads and writes this rather than the entity, and
+    /// the product's final quantity is whatever is left at the end.
+    /// </summary>
+    private readonly Dictionary<int, int> _balances = [];
+
     public DemoSeeder(
         AppDbContext context,
         UserManager<ApplicationUser> users,
@@ -82,7 +89,9 @@ public class DemoSeeder
         var customers = AddCustomers(store.Id);
         await _context.SaveChangesAsync();
 
+        AddOpeningCounts(store.Id, products);
         AddTrading(store.Id, products, customers);
+        AddSpoilage(store.Id, products);
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Seeded the demo store with {Products} products and {Days} days of sales.",
@@ -204,6 +213,23 @@ public class DemoSeeder
 
                 transaction.TotalAmount = transaction.Items.Sum(line => line.Quantity * line.UnitPrice);
 
+                // The ledger explains every sale, the same as a real checkout would.
+                foreach (var line in transaction.Items)
+                {
+                    _balances[line.Product.Id] -= line.Quantity;
+
+                    _context.StockMovements.Add(new StockMovement
+                    {
+                        StoreId = storeId,
+                        Product = line.Product,
+                        Quantity = -line.Quantity,
+                        Reason = StockReason.Sale,
+                        BalanceAfter = _balances[line.Product.Id],
+                        Transaction = transaction,
+                        OccurredAt = whenUtc
+                    });
+                }
+
                 if (customer is not null)
                 {
                     customer.TotalCredit += transaction.TotalAmount;
@@ -215,6 +241,68 @@ public class DemoSeeder
 
             AddPayments(storeId, customers, localDay, manila);
         }
+    }
+
+    /// <summary>
+    /// What was on the shelf on day one. Without these the history screen opens
+    /// on a stock figure that nothing in the ledger accounts for.
+    /// </summary>
+    private void AddOpeningCounts(int storeId, List<Product> products)
+    {
+        var openedAt = DateTime.UtcNow.AddDays(-DaysOfHistory).Date;
+
+        foreach (var product in products)
+        {
+            // Opened with enough to trade through the fortnight and still have
+            // the shelf stock the product is declared with.
+            var opening = product.StockQuantity * 3;
+            _balances[product.Id] = opening;
+
+            _context.StockMovements.Add(new StockMovement
+            {
+                StoreId = storeId,
+                Product = product,
+                Quantity = opening,
+                Reason = StockReason.Opening,
+                BalanceAfter = opening,
+                OccurredAt = DateTime.SpecifyKind(openedAt, DateTimeKind.Utc)
+            });
+        }
+    }
+
+    /// <summary>
+    /// Eggs break and bread goes stale. A shrinkage report with nothing in it
+    /// would not show what the screen is for.
+    /// </summary>
+    private void AddSpoilage(int storeId, List<Product> products)
+    {
+        var spoilable = products
+            .Where(p => p.Category is "Sariwa" or "Meryenda" or "Gatas")
+            .ToList();
+
+        foreach (var product in spoilable)
+        {
+            var lost = _random.Next(1, 5);
+            var daysAgo = _random.Next(1, DaysOfHistory);
+
+            _balances[product.Id] -= lost;
+
+            _context.StockMovements.Add(new StockMovement
+            {
+                StoreId = storeId,
+                Product = product,
+                Quantity = -lost,
+                Reason = StockReason.Spoilage,
+                BalanceAfter = _balances[product.Id],
+                Note = product.Category == "Sariwa" ? "Nabasag" : "Expired na",
+                OccurredAt = DateTime.UtcNow.AddDays(-daysAgo)
+            });
+        }
+
+        // The shelf now holds what the ledger says it holds, not what the
+        // product was declared with.
+        foreach (var product in products)
+            product.StockQuantity = Math.Max(0, _balances[product.Id]);
     }
 
     /// <summary>Someone settles part of their utang most days, so collections are not zero.</summary>

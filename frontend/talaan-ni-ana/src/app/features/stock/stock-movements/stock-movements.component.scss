@@ -1,0 +1,243 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+}
+
+.movements-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 1.2rem;
+}
+
+.movements-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.close-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: var(--line-w) solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 0.72rem;
+  cursor: pointer;
+
+  &:hover { background: var(--danger-soft); }
+}
+
+.balance-strip {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0.9rem 0 1.1rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--ok-soft);
+  border: var(--line-w) solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.balance-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.balance-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--ink);
+
+  small { font-size: 0.7rem; font-family: var(--font-mono); }
+}
+
+/* Only shown on a tingi line, so it reads as an action rather than a field. */
+.repack {
+  margin-bottom: 1.2rem;
+  padding: 0.75rem 0.85rem;
+  background: var(--info-soft);
+  border: var(--line-w) solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.repack-copy {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.repack-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 0.5rem;
+}
+
+.record-title {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- Reason picker ---- */
+.reason-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.reason {
+  display: grid;
+  gap: 0.05rem;
+  padding: 0.5rem 0.6rem;
+  background: var(--surface);
+  border: var(--line-w) solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  &:hover { background: var(--bg-sunk); }
+
+  &.selected {
+    background: var(--ok);
+    box-shadow: var(--lift-sm);
+
+    .reason-label, .reason-hint { color: #111111; }
+  }
+}
+
+.reason-label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.reason-hint {
+  font-size: 0.65rem;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+.record-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.record-field label small { font-weight: 400; opacity: 0.7; }
+
+.preview {
+  margin: 0 0 0.7rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+
+  strong { color: var(--ink); }
+}
+
+/* ---- History ---- */
+.history {
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: var(--line-w) solid var(--line);
+}
+
+.movement {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--line);
+
+  &:last-child { border-bottom: none; }
+}
+
+.movement-qty {
+  padding: 0.2rem 0;
+  background: var(--ok-soft);
+  border: var(--line-w) solid var(--line);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  color: var(--ink);
+
+  &.out { background: var(--danger-soft); }
+}
+
+.movement-text {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.movement-reason {
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.movement-note {
+  font-size: 0.68rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.movement-meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.05rem;
+}
+
+.movement-balance {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.movement-date {
+  font-size: 0.64rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.empty {
+  padding: 1.2rem 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .reason-grid { grid-template-columns: 1fr; }
+  .record-row { grid-template-columns: 1fr; }
+}

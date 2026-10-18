@@ -122,6 +122,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IStockMovementRepository, StockMovementRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
@@ -132,6 +133,8 @@ builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<CheckoutService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<ZReportService>();
+builder.Services.AddScoped<StockService>();
+builder.Services.AddScoped<RepackService>();
 builder.Services.AddScoped<SettingsService>();
 
 // Only registered when the demo is on, so nothing can seed by accident.

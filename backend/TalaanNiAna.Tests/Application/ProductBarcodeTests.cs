@@ -9,11 +9,12 @@ public class ProductBarcodeTests
 {
     private readonly FakeProductRepository _products = new();
     private readonly FakeStoreRepository _stores = new();
+    private readonly FakeStockMovementRepository _movements = new();
     private readonly ProductService _service;
 
     public ProductBarcodeTests()
     {
-        _service = new ProductService(_products, _stores);
+        _service = new ProductService(_products, _stores, _movements);
     }
 
     [Fact]

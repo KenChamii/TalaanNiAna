@@ -1,0 +1,160 @@
+.report-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  input { width: auto; }
+}
+
+.dash { color: var(--muted); }
+
+.totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.total-card {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.9rem 1rem;
+}
+
+.total-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.total-value {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.explainer {
+  margin: 0 0 1.5rem;
+  max-width: 60ch;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.block {
+  margin-bottom: 1.25rem;
+  padding: 1.1rem;
+
+  .section-title { margin-bottom: 0.8rem; }
+}
+
+/* ---- Ranked by what it cost ---- */
+.rank {
+  display: grid;
+  grid-template-columns: 28px 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--line);
+
+  &:last-child { border-bottom: none; }
+}
+
+.rank-num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.rank-name {
+  font-size: 0.9rem;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rank-pieces {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.rank-cost {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--danger);
+}
+
+/* ---- Every incident ---- */
+.line {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--line);
+
+  &:last-child { border-bottom: none; }
+}
+
+.line-qty {
+  padding: 0.2rem 0;
+  background: var(--danger-soft);
+  border: var(--line-w) solid var(--line);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-align: center;
+  color: var(--ink);
+}
+
+.line-text {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.line-name {
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+.line-note {
+  font-size: 0.68rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.05rem;
+}
+
+.line-cost {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.line-date {
+  font-size: 0.64rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.empty,
+.empty-state {
+  padding: 2rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+  text-align: center;
+}

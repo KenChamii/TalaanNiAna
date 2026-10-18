@@ -32,19 +32,23 @@
       <tr *ngFor="let item of products()">
         <td>
           {{ item.name }}
+          <small class="tingi-cell" *ngIf="item.parentProductName">
+            tingi ng {{ item.parentProductName }}
+          </small>
           <small class="barcode-cell" *ngIf="item.barcode">{{ item.barcode }}</small>
         </td>
-        <td>{{ item.category }}</td>
-        <td class="muted-cell">{{ item.costPrice ? (item.costPrice | peso) : '—' }}</td>
-        <td>{{ item.price | peso }}</td>
-        <td [class.negative-margin]="item.unitMargin < 0">
+        <td data-label="Kategorya">{{ item.category }}</td>
+        <td class="muted-cell" data-label="Puhunan">{{ item.costPrice ? (item.costPrice | peso) : '—' }}</td>
+        <td data-label="Presyo">{{ item.price | peso }}</td>
+        <td data-label="Kita" [class.negative-margin]="item.unitMargin < 0">
           {{ item.unitMargin | peso }}
           <small *ngIf="item.costPrice">({{ item.marginPercent | number:'1.0-0' }}%)</small>
         </td>
-        <td [class.low-stock]="item.isLowStock">
+        <td data-label="Stock" [class.low-stock]="item.isLowStock">
           {{ item.stockQuantity }} pcs <span *ngIf="item.isLowStock">(!)</span>
         </td>
-        <td class="actions">
+        <td class="actions" data-label="">
+          <button class="link-btn" (click)="openMovements(item)">Stock</button>
           <button class="link-btn" (click)="openEditModal(item)">Edit</button>
           <button class="link-btn danger" (click)="deleteProduct(item)" aria-label="Tanggalin">&#10005;</button>
         </td>
@@ -69,10 +73,18 @@
   </div>
 </div>
 
+<app-stock-movements
+  *ngIf="movementsFor() as product"
+  [product]="product"
+  (recorded)="load()"
+  (closed)="movementsFor.set(null)">
+</app-stock-movements>
+
 <app-inventory-form
   *ngIf="isModalOpen()"
   [product]="editingProduct()"
   [categories]="categories()"
+  [parentOptions]="parentOptions()"
   (saved)="onModalSaved($event)"
   (closed)="isModalOpen.set(false)">
 </app-inventory-form>

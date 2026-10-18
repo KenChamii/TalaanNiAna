@@ -24,6 +24,22 @@ public class Product : IHasStore
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    /// <summary>
+    /// The sack, box or pack this is broken out of. A sachet of shampoo points
+    /// at the twelve-pack it came from; the pack itself points at nothing.
+    /// </summary>
+    public int? ParentProductId { get; set; }
+    public Product? ParentProduct { get; set; }
+
+    /// <summary>
+    /// How many of this come out of one parent. Twelve sachets to a pack, forty
+    /// cups to a sack of rice. Null unless this is a tingi line.
+    /// </summary>
+    public int? UnitsPerParent { get; set; }
+
+    /// <summary>True when opening a parent produces this.</summary>
+    public bool IsTingi => ParentProductId is not null && UnitsPerParent > 0;
+
     /// <summary>Peso margin per unit. Negative on a loss leader, which is allowed.</summary>
     public decimal UnitMargin => Price - CostPrice;
 }

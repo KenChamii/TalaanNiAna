@@ -130,16 +130,20 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
             ? this.customers().find(c => c.id === this.selectedCustomerId)?.fullName ?? null
             : null;
 
-        this.checkoutService.processSale({
-            paymentType: paymentTypeSnapshot,
-            customerId: this.selectedCustomerId,
-            items: lineItemsSnapshot.map(l => ({
-                productId: l.productId,
-                quantity: l.qty,
-                unitPrice: l.price
-            })),
-            idempotencyKey: this.pendingKey
-        }).subscribe({
+        this.checkoutService.processSale(
+            {
+                paymentType: paymentTypeSnapshot,
+                customerId: this.selectedCustomerId,
+                items: lineItemsSnapshot.map(l => ({
+                    productId: l.productId,
+                    quantity: l.qty,
+                    unitPrice: l.price
+                })),
+                idempotencyKey: this.pendingKey
+            },
+            this.subtotal(),
+            this.itemCount()
+        ).subscribe({
             next: result => {
                 this.currentReceipt.set({
                     transactionId: result.transactionId,
@@ -161,7 +165,12 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
                 this.lastScanMessage.set('');
                 this.isProcessing.set(false);
 
-                this.toast.success(result.wasReplay ? 'Naitala na ang bentang ito.' : 'Nasave na ang benta!');
+                this.toast.success(
+                    result.isPending
+                        ? 'Nakatala muna rito. Ipapadala kapag may signal.'
+                        : result.wasReplay
+                            ? 'Naitala na ang bentang ito.'
+                            : 'Nasave na ang benta!');
             },
             error: () => {
                 // The key is kept so a retry replays rather than duplicating.

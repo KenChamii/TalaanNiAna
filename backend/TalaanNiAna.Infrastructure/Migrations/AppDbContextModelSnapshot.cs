@@ -329,6 +329,9 @@ namespace TalaanNiAna.Infrastructure.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("character varying(120)");
 
+                    b.Property<int?>("ParentProductId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric(18,2)");
 
@@ -336,6 +339,9 @@ namespace TalaanNiAna.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("StoreId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("UnitsPerParent")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -348,6 +354,8 @@ namespace TalaanNiAna.Infrastructure.Migrations
                         .HasColumnName("xmin");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentProductId");
 
                     b.HasIndex("StoreId", "Barcode")
                         .IsUnique()
@@ -396,6 +404,52 @@ namespace TalaanNiAna.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("StockMovement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BalanceAfter")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Reason")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StoreId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TransactionId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("TransactionId");
+
+                    b.HasIndex("StoreId", "OccurredAt");
+
+                    b.HasIndex("StoreId", "ProductId", "OccurredAt");
+
+                    b.ToTable("StockMovements");
                 });
 
             modelBuilder.Entity("Store", b =>
@@ -585,6 +639,16 @@ namespace TalaanNiAna.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.HasOne("Product", "ParentProduct")
+                        .WithMany()
+                        .HasForeignKey("ParentProductId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentProduct");
+                });
+
             modelBuilder.Entity("RefreshToken", b =>
                 {
                     b.HasOne("ApplicationUser", "User")
@@ -594,6 +658,24 @@ namespace TalaanNiAna.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("StockMovement", b =>
+                {
+                    b.HasOne("Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Transaction", "Transaction")
+                        .WithMany()
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("Transaction", b =>

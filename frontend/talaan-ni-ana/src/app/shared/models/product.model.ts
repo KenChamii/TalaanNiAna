@@ -12,6 +12,11 @@ export interface Product {
   stockQuantity: number;
   lowStockThreshold: number;
   isLowStock: boolean;
+  /** The pack this is broken out of, when it is a tingi line. */
+  parentProductId: number | null;
+  parentProductName: string | null;
+  /** How many come out of one pack. */
+  unitsPerParent: number | null;
 }
 
 /** What the form posts. Omitting a field keeps the current value. */
@@ -24,6 +29,9 @@ export interface ProductInput {
   costPrice?: number;
   stockQuantity: number;
   lowStockThreshold?: number;
+  /** Zero clears the tingi link; omitting it keeps the current one. */
+  parentProductId?: number;
+  unitsPerParent?: number;
 }
 
 export interface PagedResult<T> {

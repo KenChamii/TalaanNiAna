@@ -92,6 +92,15 @@ table {
 
 td small { opacity: 0.7; margin-left: 0.2rem; }
 
+/* Says which pack this is broken out of. */
+.tingi-cell {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--muted);
+}
+
 /* Code printed under the item name, for checking against the pack. */
 .barcode-cell {
   display: block;
@@ -99,4 +108,66 @@ td small { opacity: 0.7; margin-left: 0.2rem; }
   font-family: var(--font-mono, monospace);
   font-size: 0.68rem;
   color: var(--muted);
+}
+
+/* ---- Small screens ----
+   A seven-column table cannot be made to fit a phone, so each row becomes a
+   card and the headers are dropped. The labels come from the cells themselves
+   via data-label, so the markup stays one table. */
+@media (max-width: 780px) {
+  .toolbar {
+    flex-wrap: wrap;
+
+    input, select, button { width: 100%; }
+  }
+
+  .table-card { padding: 0.5rem; }
+
+  table, tbody, tr, td { display: block; width: 100%; }
+
+  thead { display: none; }
+
+  tr {
+    margin-bottom: 0.7rem;
+    padding: 0.7rem 0.8rem;
+    border: var(--line-w) solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+  }
+
+  td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.28rem 0;
+    border: none;
+    text-align: right;
+
+    &::before {
+      content: attr(data-label);
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+    }
+
+    /* The name is the card's heading, so it keeps the full width. */
+    &:first-child {
+      display: block;
+      text-align: left;
+      font-weight: 700;
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.35rem;
+      border-bottom: 1px dashed var(--line);
+
+      &::before { content: none; }
+    }
+  }
+
+  .actions { justify-content: flex-end; padding-top: 0.5rem; }
+
+  .pager { flex-wrap: wrap; }
 }

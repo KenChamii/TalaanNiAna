@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 public class AppDbContext : IdentityDbContext<ApplicationUser>
@@ -23,6 +23,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<TransactionItem> TransactionItems => Set<TransactionItem>();
     public DbSet<CreditPayment> CreditPayments => Set<CreditPayment>();
+    public DbSet<StockMovement> StockMovements => Set<StockMovement>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     public override int SaveChanges()
@@ -78,6 +79,13 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             entity.HasIndex(p => new { p.StoreId, p.Barcode })
                 .IsUnique()
                 .HasFilter("\"Barcode\" IS NOT NULL AND \"IsActive\"");
+
+            // A pack cannot be deleted while something is still broken out of
+            // it, or the tingi line would point at nothing.
+            entity.HasOne(p => p.ParentProduct)
+                .WithMany()
+                .HasForeignKey(p => p.ParentProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasQueryFilter(p => p.StoreId == CurrentStoreId);
         });
@@ -137,6 +145,28 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
             entity.HasIndex(p => new { p.StoreId, p.PaidAt });
             entity.HasQueryFilter(p => p.StoreId == CurrentStoreId);
+        });
+
+        builder.Entity<StockMovement>(entity =>
+        {
+            entity.Property(m => m.Note).HasMaxLength(250);
+
+            entity.HasOne(m => m.Product)
+                .WithMany()
+                .HasForeignKey(m => m.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // A deleted sale must not take its ledger rows with it: the history
+            // of what left the shelf outlives the transaction that caused it.
+            entity.HasOne(m => m.Transaction)
+                .WithMany()
+                .HasForeignKey(m => m.TransactionId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasIndex(m => new { m.StoreId, m.ProductId, m.OccurredAt });
+            entity.HasIndex(m => new { m.StoreId, m.OccurredAt });
+
+            entity.HasQueryFilter(m => m.StoreId == CurrentStoreId);
         });
 
         builder.Entity<RefreshToken>(entity =>
