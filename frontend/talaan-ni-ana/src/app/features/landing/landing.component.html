@@ -1,0 +1,139 @@
+<div class="landing">
+
+  <header class="top">
+    <span class="brand">Talaan ni Ana</span>
+
+    <nav class="top-nav">
+      <button
+        type="button"
+        class="theme-toggle"
+        (click)="theme.toggle()"
+        [attr.aria-label]="theme.theme() === 'dark' ? 'Lumipat sa araw mode' : 'Lumipat sa gabi mode'">
+        {{ theme.theme() === 'dark' ? 'Araw' : 'Gabi' }}
+      </button>
+      <a [href]="repoUrl" target="_blank" rel="noopener" class="badge">Source</a>
+      <a *ngIf="!isLoggedIn()" routerLink="/login" class="badge badge--ok">Mag-login</a>
+      <a *ngIf="isLoggedIn()" routerLink="/dashboard" class="badge badge--ok">Dashboard</a>
+    </nav>
+  </header>
+
+  <div class="banderitas" aria-hidden="true">
+    <div class="flags"><i *ngFor="let f of flags"></i></div>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <p class="eyebrow">Point of sale para sa sari-sari store</p>
+
+    <h1 class="signwriting hero-title">Alam mo<br />ang tubo mo</h1>
+
+    <div class="jeep-stripe hero-stripe" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <p class="hero-copy">
+      Most sari-sari stores run on a notebook. It records what was sold but never
+      what it cost, so the owner knows the day took three thousand pesos and has
+      no idea how much of that was theirs. This is the notebook, kept properly.
+    </p>
+
+    <div class="hero-actions">
+      <button
+        type="button"
+        class="btn-confirm hero-cta"
+        (click)="startDemo()"
+        [disabled]="isStartingDemo()">
+        {{ isStartingDemo() ? 'Binubuksan…' : 'Subukan ang demo' }}
+      </button>
+      <a [href]="repoUrl" target="_blank" rel="noopener" class="btn-secondary">Basahin ang code</a>
+    </div>
+
+    <p class="hero-note" *ngIf="!demoFailed()">
+      A real store with two weeks of sales. No sign-up, nothing to install.
+      The API sleeps when idle, so the first load can take a minute.
+    </p>
+    <p class="hero-note hero-note--error" *ngIf="demoFailed()">
+      Hindi available ang demo sa ngayon. Subukan ang
+      <a routerLink="/register">gumawa ng account</a> para makita ang app.
+    </p>
+  </section>
+
+  <!-- What it does -->
+  <section class="band">
+    <div class="band-head">
+      <p class="eyebrow">Ano ang kaya nito</p>
+      <h2 class="section-title">Six things a notebook cannot do</h2>
+    </div>
+
+    <div class="feature-grid">
+      <article class="feature card" *ngFor="let feature of features">
+        <span class="badge feature-tag">{{ feature.tag }}</span>
+        <h3 class="feature-title">{{ feature.title }}</h3>
+        <p class="feature-body">{{ feature.body }}</p>
+        <p class="feature-detail">{{ feature.detail }}</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- How it is built -->
+  <section class="band band--sunk">
+    <div class="band-head">
+      <p class="eyebrow">Paano ginawa</p>
+      <h2 class="section-title">The build</h2>
+    </div>
+
+    <dl class="stack">
+      <div class="stack-row" *ngFor="let item of stack">
+        <dt>{{ item.label }}</dt>
+        <dd>{{ item.value }}</dd>
+      </div>
+    </dl>
+
+    <div class="decisions">
+      <article class="decision" *ngFor="let decision of decisions">
+        <h3 class="decision-title">{{ decision.title }}</h3>
+        <p class="decision-body">{{ decision.body }}</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section class="band">
+    <div class="band-head">
+      <p class="eyebrow">Susunod</p>
+      <h2 class="section-title">What is built, and what is not</h2>
+    </div>
+
+    <ul class="roadmap">
+      <li *ngFor="let item of roadmap" [class.is-done]="item.state === 'done'">
+        <span class="roadmap-mark" aria-hidden="true">{{ item.state === 'done' ? '✓' : '○' }}</span>
+        <span>{{ item.label }}</span>
+      </li>
+    </ul>
+
+    <p class="roadmap-note">
+      The login screen promises it works without signal. It does not yet, and
+      saying so here is cheaper than pretending otherwise.
+    </p>
+  </section>
+
+  <!-- Close -->
+  <section class="band close">
+    <h2 class="close-title signwriting">Tingnan mo na</h2>
+    <button
+      type="button"
+      class="btn-confirm hero-cta"
+      (click)="startDemo()"
+      [disabled]="isStartingDemo()">
+      {{ isStartingDemo() ? 'Binubuksan…' : 'Subukan ang demo' }}
+    </button>
+  </section>
+
+  <footer class="foot">
+    <span>Talaan ni Ana</span>
+    <a [href]="repoUrl" target="_blank" rel="noopener">GitHub</a>
+    <a routerLink="/login">Mag-login</a>
+    <a routerLink="/register">Gumawa ng account</a>
+  </footer>
+
+</div>

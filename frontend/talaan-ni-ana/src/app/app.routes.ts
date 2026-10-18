@@ -2,6 +2,11 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
+  // Public landing page. Matched on the empty path only, so the guarded shell
+  // below still owns every named route beneath it.
+  { path: '', pathMatch: 'full', loadComponent: () =>
+      import('./features/landing/landing.component').then(m => m.LandingComponent) },
+
   { path: 'login', loadComponent: () =>
       import('./features/auth/login/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () =>
@@ -12,7 +17,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./shared/components/layout/layout.component').then(m => m.LayoutComponent),
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadComponent: () =>
           import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
       { path: 'inventory', loadComponent: () =>
@@ -27,6 +31,8 @@ export const routes: Routes = [
           import('./features/transactions/transaction-list/transaction-list.component').then(m => m.TransactionListComponent) },
       { path: 'reports/z', loadComponent: () =>
           import('./features/reports/z-report.component').then(m => m.ZReportComponent) },
+      { path: 'reports/shrinkage', loadComponent: () =>
+          import('./features/reports/shrinkage.component').then(m => m.ShrinkageComponent) },
       { path: 'settings', loadComponent: () =>
           import('./features/settings/settings.component').then(m => m.SettingsComponent) },
     ]
