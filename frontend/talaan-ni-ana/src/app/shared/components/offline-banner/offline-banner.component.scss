@@ -1,0 +1,127 @@
+.banner {
+  border-bottom: var(--line-w) solid var(--line);
+
+  &--offline { background: var(--warn-soft); }
+  &--waiting { background: var(--info-soft); }
+}
+
+.banner-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 1.25rem;
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--line);
+  border-radius: 50%;
+  background: var(--warn);
+
+  .banner--waiting & {
+    background: var(--info);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  50% { opacity: 0.35; }
+}
+
+/* Honours a system setting rather than animating at someone regardless. */
+@media (prefers-reduced-motion: reduce) {
+  .dot { animation: none; }
+}
+
+.banner-text { flex: 1; }
+
+.banner-count {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.banner-chevron {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.banner-body {
+  padding: 0 1.25rem 0.9rem;
+}
+
+.banner-note {
+  margin: 0.5rem 0 0;
+  max-width: 62ch;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ---- Queued sales ---- */
+.queued {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed var(--line);
+
+  &:last-of-type { border-bottom: none; }
+}
+
+.queued-text {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.queued-total {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.queued-meta {
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.queued-error {
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: var(--danger);
+}
+
+.queued-drop,
+.banner-retry {
+  flex-shrink: 0;
+  padding: 0.3rem 0.65rem;
+  background: var(--surface);
+  border: var(--line-w) solid var(--line);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  cursor: pointer;
+
+  &:hover { background: var(--bg-sunk); }
+}
+
+.banner-retry { margin-top: 0.7rem; }
+
+.queued-drop:hover { background: var(--danger-soft); }

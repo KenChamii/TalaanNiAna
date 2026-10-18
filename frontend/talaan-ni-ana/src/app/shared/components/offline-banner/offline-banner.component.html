@@ -1,0 +1,65 @@
+<!-- Nothing to say when connected with nothing waiting. -->
+<div
+  class="banner"
+  *ngIf="!connection.isOnline() || outbox.count() > 0"
+  [class.banner--offline]="!connection.isOnline()"
+  [class.banner--waiting]="connection.isOnline() && outbox.count() > 0">
+
+  <button type="button" class="banner-bar" (click)="toggle()">
+    <span class="dot" aria-hidden="true"></span>
+
+    <span class="banner-text" *ngIf="!connection.isOnline()">
+      Walang koneksyon. Tuloy lang ang benta.
+    </span>
+    <span class="banner-text" *ngIf="connection.isOnline() && outbox.count() > 0">
+      Ipinapadala ang naunang benta…
+    </span>
+
+    <span class="banner-count" *ngIf="outbox.count() > 0">
+      {{ outbox.count() }} naghihintay
+    </span>
+
+    <span class="banner-chevron" aria-hidden="true">{{ isExpanded() ? '▴' : '▾' }}</span>
+  </button>
+
+  <div class="banner-body" *ngIf="isExpanded()">
+
+    <p class="banner-note" *ngIf="outbox.count() === 0">
+      Walang naghihintay na benta. Ang susunod ay itatago muna rito hanggang
+      bumalik ang internet.
+    </p>
+
+    <div class="queued" *ngFor="let sale of outbox.pending()">
+      <div class="queued-text">
+        <span class="queued-total">{{ sale.total | peso }}</span>
+        <span class="queued-meta">
+          {{ sale.itemCount }} piraso · {{ sale.ringUpAt | date:'h:mm a' }}
+        </span>
+        <span class="queued-error" *ngIf="sale.lastError">{{ sale.lastError }}</span>
+      </div>
+
+      <button
+        type="button"
+        class="queued-drop"
+        *ngIf="sale.attempts >= 5"
+        (click)="discard(sale.id)">
+        Burahin
+      </button>
+    </div>
+
+    <button
+      type="button"
+      class="banner-retry"
+      *ngIf="outbox.count() > 0"
+      (click)="retry()">
+      Subukan ulit ngayon
+    </button>
+
+    <p class="banner-note" *ngIf="outbox.stuck().length > 0">
+      Tinanggihan ng server ang {{ outbox.stuck().length }} benta. Karaniwang
+      ibig sabihin ay naubos na ang stock o nabago ang presyo. Basahin ang
+      dahilan, pagkatapos burahin at ulitin kung kailangan.
+    </p>
+
+  </div>
+</div>

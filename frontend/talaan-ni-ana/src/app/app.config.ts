@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, ApplicationConfig } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -6,6 +6,7 @@ import { routes } from './app.routes';
 import { AuthService } from './core/auth/auth.service';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptors';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { provideServiceWorker } from '@angular/service-worker';
 
 /** The access token lives in memory, so a reload restores it from the refresh cookie. */
 function restoreSession(auth: AuthService) {
@@ -22,6 +23,9 @@ export const appConfig: ApplicationConfig = {
       useFactory: restoreSession,
       deps: [AuthService],
       multi: true
-    }
+    }, provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          })
   ]
 };
