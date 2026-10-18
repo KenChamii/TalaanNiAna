@@ -1,7 +1,7 @@
 # Build context is this project directory.
 #   docker build -f frontend/talaan-ni-ana/Dockerfile frontend/talaan-ni-ana
 
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 WORKDIR /src
 
 # Lockfile first so npm ci is cached independently of source changes.

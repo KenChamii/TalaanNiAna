@@ -143,3 +143,76 @@
 
   .content { overflow: visible; padding: 1.25rem; }
 }
+
+/* ---- Small screens ----
+   The sidebar slides over the content rather than squeezing it: a 236px rail
+   on a 360px phone leaves nothing to work in. */
+.nav-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--surface);
+  border: var(--line-w) solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 860px) {
+  .nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .scrim { display: block; }
+
+  .topbar {
+    padding: 0.7rem 1rem;
+    gap: 0.6rem;
+
+    .brand { font-size: 1.05rem; }
+  }
+
+  .topbar-right {
+    gap: 0.4rem;
+    margin-left: auto;
+  }
+
+  .store-name {
+    max-width: 38vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    width: 230px;
+    transform: translateX(-100%);
+    transition: transform 0.18s ease;
+    box-shadow: 6px 0 0 rgba(0, 0, 0, 0.1);
+
+    &.is-open { transform: translateX(0); }
+  }
+
+  .content { padding: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar { transition: none; }
+}
+
+/* Tap targets on a phone, where this is used one-handed behind a counter. */
+@media (max-width: 860px) {
+  .nav-link { min-height: 46px; display: flex; align-items: center; }
+}
