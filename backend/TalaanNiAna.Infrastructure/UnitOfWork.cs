@@ -8,6 +8,7 @@ public class UnitOfWork : IUnitOfWork, IAsyncDisposable
     public IProductRepository Products { get; }
     public ICustomerRepository Customers { get; }
     public ITransactionRepository Transactions { get; }
+    public IStockMovementRepository StockMovements { get; }
 
     public UnitOfWork(AppDbContext context)
     {
@@ -18,6 +19,7 @@ public class UnitOfWork : IUnitOfWork, IAsyncDisposable
         Products = new ProductRepository(context);
         Customers = new CustomerRepository(context);
         Transactions = new TransactionRepository(context);
+        StockMovements = new StockMovementRepository(context);
     }
 
     public async Task BeginTransactionAsync()

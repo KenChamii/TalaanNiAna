@@ -3,6 +3,7 @@
     IProductRepository Products { get; }
     ICustomerRepository Customers { get; }
     ITransactionRepository Transactions { get; }
+    IStockMovementRepository StockMovements { get; }
 
     Task BeginTransactionAsync();
     Task CommitAsync();
