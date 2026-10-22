@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { CheckoutService } from './checkout.service';
 import { PesoPipe } from '../../shared/pipes/peso.pipes';
 import { ToastService } from '../../shared/services/toast.service';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { ReceiptModalComponent, ReceiptData } from '../../shared/components/receipt-modal/receipt-modal.component';
 
 interface QuickItem { id: number; name: string; price: number; }
@@ -12,7 +14,7 @@ interface CartLine { productId: number; name: string; price: number; qty: number
 @Component({
     selector: 'app-checkout',
     standalone: true,
-    imports: [CommonModule, FormsModule, PesoPipe, ReceiptModalComponent],
+    imports: [CommonModule, FormsModule, PesoPipe, TranslatePipe, ReceiptModalComponent],
     templateUrl: './checkout.component.html',
     styleUrl: './checkout.component.scss'
 })
@@ -29,11 +31,12 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
     /** Bound to the scan box. A USB scanner types into it and presses Enter. */
     scannedCode = '';
     isScanning = signal(false);
-    lastScanMessage = signal('');
+    lastScanned = signal('');
 
     @ViewChild('scanBox') private scanBox?: ElementRef<HTMLInputElement>;
 
     private toast = inject(ToastService);
+    private i18n = inject(I18nService);
     private checkoutService = inject(CheckoutService);
 
     /** Held across retries so a failed attempt cannot become two sales. */
@@ -75,12 +78,12 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
         this.checkoutService.findByBarcode(code).subscribe({
             next: product => {
                 this.addToCart({ id: product.id, name: product.name, price: product.price });
-                this.lastScanMessage.set(`${product.name} idinagdag.`);
+                this.lastScanned.set(product.name);
                 this.finishScan();
             },
             error: () => {
-                this.lastScanMessage.set('');
-                this.toast.warning(`Walang item na may barcode na ${code}.`);
+                this.lastScanned.set('');
+                this.toast.warning(this.i18n.translate('pos.noBarcode', { code }));
                 this.finishScan();
             }
         });
@@ -108,7 +111,7 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
 
     clearCart() {
         this.cart.set([]);
-        this.lastScanMessage.set('');
+        this.lastScanned.set('');
         this.focusScanBox();
     }
 
@@ -116,7 +119,7 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
         if (this.cart().length === 0 || this.isProcessing()) return;
 
         if (this.paymentType() === 'Credit' && !this.selectedCustomerId) {
-            this.toast.warning('Pumili ng suki para sa Utang.');
+            this.toast.warning(this.i18n.translate('pos.pickCustomerFirst'));
             return;
         }
 
@@ -162,15 +165,13 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
                 this.cart.set([]);
                 this.selectedCustomerId = null;
                 this.pendingKey = null;
-                this.lastScanMessage.set('');
+                this.lastScanned.set('');
                 this.isProcessing.set(false);
 
-                this.toast.success(
+                this.toast.success(this.i18n.translate(
                     result.isPending
-                        ? 'Nakatala muna rito. Ipapadala kapag may signal.'
-                        : result.wasReplay
-                            ? 'Naitala na ang bentang ito.'
-                            : 'Nasave na ang benta!');
+                        ? 'offline.queued'
+                        : result.wasReplay ? 'pos.replayed' : 'pos.saved'));
             },
             error: () => {
                 // The key is kept so a retry replays rather than duplicating.

@@ -7,17 +7,20 @@ import { StockMovementsComponent } from '../../stock/stock-movements/stock-movem
 import { Product } from '../../../shared/models/product.model';
 import { PesoPipe } from '../../../shared/pipes/peso.pipes';
 import { ToastService } from '../../../shared/services/toast.service';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-inventory-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, InventoryFormComponent, StockMovementsComponent, PesoPipe],
+  imports: [CommonModule, FormsModule, InventoryFormComponent, StockMovementsComponent, PesoPipe, TranslatePipe],
   templateUrl: './inventory-list.component.html',
   styleUrl: './inventory-list.component.scss'
 })
 export class InventoryListComponent implements OnInit {
   private inventoryService = inject(InventoryService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
 
   products = signal<Product[]>([]);
   categories = signal<string[]>([]);
@@ -106,15 +109,16 @@ export class InventoryListComponent implements OnInit {
 
     this.load();
     this.toast.success(
-      wasAdding ? `Nadagdag na ang "${saved.name}".` : `Na-update ang "${saved.name}".`
+      this.i18n.translate(wasAdding ? 'inventory.added' : 'inventory.updated', { name: saved.name })
     );
   }
 
+  /** Deletes a product after the owner confirms. */
   deleteProduct(product: Product) {
-    if (!confirm(`Tanggalin ang "${product.name}"?`)) return;
+    if (!confirm(this.i18n.translate('inventory.confirmDelete', { name: product.name }))) return;
 
     this.inventoryService.delete(product.id).subscribe(() => {
-      this.toast.success(`Na-tanggal ang "${product.name}".`);
+      this.toast.success(this.i18n.translate('inventory.deleted', { name: product.name }));
       this.load();
       this.loadCategories();
     });

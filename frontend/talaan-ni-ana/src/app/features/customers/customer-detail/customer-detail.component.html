@@ -1,27 +1,28 @@
-<a routerLink="/customers" class="back-link">← Bumalik sa Listahan</a>
+<a routerLink="/customers" class="back-link">{{ 'customers.back' | t }}</a>
 
-<div *ngIf="isLoading()">Loading...</div>
+<div *ngIf="isLoading()">{{ 'action.loading' | t }}</div>
 
 <ng-container *ngIf="!isLoading() && customer() as c">
   <h2>{{ c.fullName }}</h2>
   <p class="contact">{{ c.contactNumber }}</p>
 
   <div class="card debt-card" [class.has-debt]="c.totalCredit > 0">
-    <span class="label">Kasalukuyang Utang</span>
+    <span class="label">{{ 'customers.currentCredit' | t }}</span>
     <span class="value">{{ c.totalCredit | peso }}</span>
     <button
       class="pay-btn"
       *ngIf="c.totalCredit > 0 && !showPaymentForm()"
       (click)="openPaymentForm()">
-      Magbayad ng Utang
+      {{ 'customers.pay' | t }}
     </button>
   </div>
 
   <div class="card payment-form" *ngIf="showPaymentForm()">
-    <h4>Itala ang Bayad</h4>
+    <h4>{{ 'customers.paymentTitle' | t }}</h4>
     <div class="form-row">
-      <label>Halaga</label>
+      <label for="paymentAmount">{{ 'customers.amount' | t }}</label>
       <input
+        id="paymentAmount"
         type="number"
         min="0"
         [max]="c.totalCredit"
@@ -30,25 +31,27 @@
         [(ngModel)]="paymentAmount" />
     </div>
     <div class="form-row">
-      <label>Tala (opsyonal)</label>
-      <input type="text" placeholder="hal. bayad sa Lunes" [(ngModel)]="paymentNote" />
+      <label for="paymentNote">{{ 'customers.note' | t }} ({{ 'common.optional' | t }})</label>
+      <input id="paymentNote" type="text" [placeholder]="'customers.notePlaceholder' | t" [(ngModel)]="paymentNote" />
     </div>
     <div class="form-actions">
-      <button class="btn-secondary" (click)="cancelPayment()" [disabled]="isSubmittingPayment()">Kanselahin</button>
+      <button class="btn-secondary" (click)="cancelPayment()" [disabled]="isSubmittingPayment()">{{ 'action.cancel' | t }}</button>
       <button class="btn-primary" (click)="submitPayment()" [disabled]="isSubmittingPayment()">
-        {{ isSubmittingPayment() ? 'Isinusave...' : 'I-save ang Bayad' }}
+        {{ (isSubmittingPayment() ? 'action.saving' : 'customers.savePayment') | t }}
       </button>
     </div>
   </div>
 
-  <h3>Kasaysayan ng Transaksyon</h3>
-  <div class="card" *ngFor="let t of c.transactions">
+  <h3>{{ 'customers.history' | t }}</h3>
+  <div class="card" *ngFor="let txn of c.transactions">
     <div class="tx-row">
-      <span>{{ t.transactionDate | date:'MMM d, y · h:mm a' }}</span>
-      <span class="tag" [class.credit]="t.paymentType === 'Credit'">{{ t.paymentType }}</span>
-      <span class="amount">{{ t.totalAmount | peso }}</span>
+      <span>{{ txn.transactionDate | date:'MMM d, y · h:mm a' }}</span>
+      <span class="tag" [class.credit]="txn.paymentType === 'Credit'">
+        {{ (txn.paymentType === 'Credit' ? 'common.credit' : 'common.cash') | t }}
+      </span>
+      <span class="amount">{{ txn.totalAmount | peso }}</span>
     </div>
-    <p class="items">{{ t.itemSummaries.join(', ') }}</p>
+    <p class="items">{{ txn.itemSummaries.join(', ') }}</p>
   </div>
-  <p *ngIf="c.transactions.length === 0" class="empty">Walang transaksyon pa.</p>
+  <p *ngIf="c.transactions.length === 0" class="empty">{{ 'customers.noTransactions' | t }}</p>
 </ng-container>

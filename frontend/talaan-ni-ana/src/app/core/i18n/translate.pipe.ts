@@ -1,16 +1,13 @@
 import { Pipe, PipeTransform, inject } from '@angular/core';
 import { I18nService } from './i18n.service';
+import { TranslationParams } from './translation.model';
 
-/**
- * Impure on purpose: the output depends on the chosen language, which is not
- * one of the pipe's arguments, so a pure pipe would keep showing the language
- * that was active when the view was first rendered.
- */
 @Pipe({ name: 't', standalone: true, pure: false })
 export class TranslatePipe implements PipeTransform {
   private i18n = inject(I18nService);
 
-  transform(key: string): string {
-    return this.i18n.translate(key);
+  /** Impure so the text follows the language signal, which is not an argument. */
+  transform(key: string, params?: TranslationParams): string {
+    return this.i18n.translate(key, params);
   }
 }

@@ -2,83 +2,80 @@
 
   <header class="auth-top">
     <span class="brand">Talaan ni Ana</span>
-    <a routerLink="/login" class="badge">May account na</a>
+    <div class="auth-actions">
+      <button
+        type="button"
+        class="badge lang-toggle"
+        (click)="i18n.toggle()"
+        [attr.aria-label]="i18n.language() === 'tl' ? ('lang.toEnglish' | t) : ('lang.toTagalog' | t)">
+        {{ i18n.language() === 'tl' ? 'EN' : 'TL' }}
+      </button>
+      <a routerLink="/login" class="badge">{{ 'auth.haveAccountBadge' | t }}</a>
+    </div>
   </header>
 
-  <div class="banderitas" aria-hidden="true">
-    <div class="flags">
-      <i *ngFor="let f of flags"></i>
-    </div>
-  </div>
+  <app-banderitas></app-banderitas>
 
   <div class="auth-body">
 
     <section class="pitch">
-      <span class="badge">Libre, walang bayad</span>
+      <span class="badge">{{ 'auth.registerBadge' | t }}</span>
 
-      <h1 class="signwriting">Buksan<br />ang talaan</h1>
+      <h1 class="signwriting">{{ 'auth.registerTitle' | t }}</h1>
 
       <div class="pitch-stripe jeep-stripe" aria-hidden="true">
         <span></span><span></span><span></span><span></span><span></span>
       </div>
 
       <ol class="steps">
-        <li>
-          <span class="step-n">1</span>
-          <span><strong>Pangalanan ang tindahan.</strong> Ito ang lalabas sa resibo at sa dashboard.</span>
-        </li>
-        <li>
-          <span class="step-n">2</span>
-          <span><strong>Ilagay ang paninda.</strong> Pumili sa handang listahan o mag-import ng CSV.</span>
-        </li>
-        <li>
-          <span class="step-n">3</span>
-          <span><strong>Simulan ang benta.</strong> Hindi kailangan ng signal habang nagtitinda.</span>
+        <li *ngFor="let step of steps; let i = index">
+          <span class="step-n">{{ i + 1 }}</span>
+          <span><strong>{{ step + 'Title' | t }}</strong> {{ step + 'Body' | t }}</span>
         </li>
       </ol>
     </section>
 
     <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()">
-      <p class="eyebrow">Bagong tindahan</p>
-      <h2 class="auth-title">Gumawa ng account</h2>
+      <p class="eyebrow">{{ 'auth.newStore' | t }}</p>
+      <h2 class="auth-title">{{ 'auth.createAccount' | t }}</h2>
 
-      <label class="field-label" for="storeName">Pangalan ng tindahan</label>
+      <label class="field-label" for="storeName">{{ 'auth.storeName' | t }}</label>
       <input id="storeName" type="text" formControlName="storeName" placeholder="Tindahan ni Ana" />
 
       <div class="field-grid">
         <div>
-          <label class="field-label" for="displayName">Pangalan mo</label>
+          <label class="field-label" for="displayName">{{ 'auth.displayName' | t }}</label>
           <input id="displayName" type="text" formControlName="displayName" placeholder="Ana Reyes" />
         </div>
         <div>
-          <label class="field-label" for="username">Username</label>
+          <label class="field-label" for="username">{{ 'auth.usernameOnly' | t }}</label>
           <input id="username" type="text" formControlName="username" placeholder="ana_tindahan" />
         </div>
       </div>
 
       <div class="field-grid">
         <div>
-          <label class="field-label" for="password">Password</label>
+          <label class="field-label" for="password">{{ 'auth.password' | t }}</label>
           <input id="password" type="password" formControlName="password" placeholder="••••••••••"
                  autocomplete="new-password" />
         </div>
         <div>
-          <label class="field-label" for="confirmPassword">Ulitin ang password</label>
+          <label class="field-label" for="confirmPassword">{{ 'auth.confirmPassword' | t }}</label>
           <input id="confirmPassword" type="password" formControlName="confirmPassword" placeholder="••••••••••"
                  autocomplete="new-password" />
         </div>
       </div>
 
-      <p class="hint">Hindi bababa sa 6 na karakter.</p>
+      <p class="hint">{{ 'auth.passwordHint' | t }}</p>
 
-      <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+      <p class="error" *ngIf="errorKey() as key">{{ key | t }}</p>
 
       <button type="submit" class="btn-primary full-width" [disabled]="isLoading()">
-        {{ isLoading() ? 'Naglo-load…' : 'Gumawa ng account' }}
+        {{ (isLoading() ? 'action.loading' : 'auth.createAccount') | t }}
       </button>
 
       <p class="switch-link">
-        May account ka na? <a routerLink="/login">Mag-login dito</a>
+        {{ 'auth.haveAccount' | t }} <a routerLink="/login">{{ 'auth.loginHere' | t }}</a>
       </p>
     </form>
 

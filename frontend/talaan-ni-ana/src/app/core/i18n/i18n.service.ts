@@ -1,39 +1,32 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import { DICTIONARY } from './dictionary';
+import { TranslationParams } from './translation.model';
 
 export type Language = 'tl' | 'en';
 
 const STORAGE_KEY = 'talaan_lang';
 
-/**
- * Runtime translation, rather than Angular's build-time i18n.
- *
- * Build-time i18n produces one bundle per locale and needs the server to pick
- * between them, which would mean two deployments of a free-tier site. A shop
- * owner switching to English for a visitor wants it to happen on the spot, not
- * on the next page load from a different origin.
- *
- * The cost is that translation happens on every change detection pass, which
- * for an app this size is not measurable.
- */
 @Injectable({ providedIn: 'root' })
 export class I18nService {
   readonly language = signal<Language>(this.read());
 
-  /** Tagalog is the default: the people behind the counter are the users. */
+  readonly locale = computed(() => this.language() === 'en' ? 'en-PH' : 'fil-PH');
+
+  /** Reads the saved language, defaulting to Tagalog when storage is unavailable. */
   private read(): Language {
     try {
       return localStorage.getItem(STORAGE_KEY) === 'en' ? 'en' : 'tl';
     } catch {
-      // Private browsing, or storage disabled. Not worth failing over.
       return 'tl';
     }
   }
 
+  /** Switches between Tagalog and English. */
   toggle() {
     this.use(this.language() === 'tl' ? 'en' : 'tl');
   }
 
+  /** Applies a language and remembers it when storage allows. */
   use(language: Language) {
     this.language.set(language);
     document.documentElement.lang = language === 'tl' ? 'fil' : 'en';
@@ -41,18 +34,24 @@ export class I18nService {
     try {
       localStorage.setItem(STORAGE_KEY, language);
     } catch {
-      // The choice simply will not persist. The app still works.
+      return;
     }
   }
 
-  /**
-   * An unknown key returns itself rather than an empty space, so a missed
-   * string looks obviously wrong in review instead of disappearing in use.
-   */
-  translate(key: string): string {
+  /** Whether the dictionary has an entry for the key. */
+  has(key: string): boolean {
+    return key in DICTIONARY;
+  }
+
+  /** Returns the text for the key in the current language, filling in any {placeholders}. */
+  translate(key: string, params?: TranslationParams): string {
     const entry = DICTIONARY[key];
     if (!entry) return key;
 
-    return this.language() === 'en' ? entry.en : entry.tl;
+    const text = this.language() === 'en' ? entry.en : entry.tl;
+    if (!params) return text;
+
+    return text.replace(/\{(\w+)\}/g, (match, name: string) =>
+      name in params ? String(params[name] ?? '') : match);
   }
 }

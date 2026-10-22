@@ -7,14 +7,18 @@
       class="nav-toggle"
       (click)="toggleNav()"
       [attr.aria-expanded]="isNavOpen()"
-      aria-label="Menu">
+      [attr.aria-label]="'nav.menu' | t">
       <span aria-hidden="true">{{ isNavOpen() ? '✕' : '☰' }}</span>
     </button>
 
     <span class="brand">Talaan ni Ana</span>
 
     <div class="topbar-right">
-      <button type="button" class="theme-toggle" (click)="i18n.toggle()">
+      <button
+        type="button"
+        class="theme-toggle"
+        (click)="i18n.toggle()"
+        [attr.aria-label]="i18n.language() === 'tl' ? ('lang.toEnglish' | t) : ('lang.toTagalog' | t)">
         {{ i18n.language() === 'tl' ? 'EN' : 'TL' }}
       </button>
 

@@ -1,4 +1,3 @@
-<!-- Nothing to say when connected with nothing waiting. -->
 <div
   class="banner"
   *ngIf="!connection.isOnline() || outbox.count() > 0"
@@ -9,14 +8,14 @@
     <span class="dot" aria-hidden="true"></span>
 
     <span class="banner-text" *ngIf="!connection.isOnline()">
-      Walang koneksyon. Tuloy lang ang benta.
+      {{ 'offline.noConnection' | t }}
     </span>
     <span class="banner-text" *ngIf="connection.isOnline() && outbox.count() > 0">
-      Ipinapadala ang naunang benta…
+      {{ 'offline.sending' | t }}
     </span>
 
     <span class="banner-count" *ngIf="outbox.count() > 0">
-      {{ outbox.count() }} naghihintay
+      {{ 'offline.waiting' | t: { count: outbox.count() } }}
     </span>
 
     <span class="banner-chevron" aria-hidden="true">{{ isExpanded() ? '▴' : '▾' }}</span>
@@ -25,15 +24,14 @@
   <div class="banner-body" *ngIf="isExpanded()">
 
     <p class="banner-note" *ngIf="outbox.count() === 0">
-      Walang naghihintay na benta. Ang susunod ay itatago muna rito hanggang
-      bumalik ang internet.
+      {{ 'offline.nothingWaiting' | t }}
     </p>
 
     <div class="queued" *ngFor="let sale of outbox.pending()">
       <div class="queued-text">
         <span class="queued-total">{{ sale.total | peso }}</span>
         <span class="queued-meta">
-          {{ sale.itemCount }} piraso · {{ sale.ringUpAt | date:'h:mm a' }}
+          {{ sale.itemCount }} {{ 'common.pieces' | t }} · {{ sale.ringUpAt | date:'h:mm a' }}
         </span>
         <span class="queued-error" *ngIf="sale.lastError">{{ sale.lastError }}</span>
       </div>
@@ -43,7 +41,7 @@
         class="queued-drop"
         *ngIf="sale.attempts >= 5"
         (click)="discard(sale.id)">
-        Burahin
+        {{ 'offline.discard' | t }}
       </button>
     </div>
 
@@ -52,13 +50,11 @@
       class="banner-retry"
       *ngIf="outbox.count() > 0"
       (click)="retry()">
-      Subukan ulit ngayon
+      {{ 'offline.retry' | t }}
     </button>
 
     <p class="banner-note" *ngIf="outbox.stuck().length > 0">
-      Tinanggihan ng server ang {{ outbox.stuck().length }} benta. Karaniwang
-      ibig sabihin ay naubos na ang stock o nabago ang presyo. Basahin ang
-      dahilan, pagkatapos burahin at ulitin kung kailangan.
+      {{ 'offline.rejected' | t: { count: outbox.stuck().length } }}
     </p>
 
   </div>

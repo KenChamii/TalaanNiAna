@@ -2,20 +2,20 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StockService } from '../stock/stock.service';
-import { REASON_LABELS, ShrinkageReport } from '../stock/stock.model';
+import { ShrinkageReport } from '../stock/stock.model';
 import { PesoPipe } from '../../shared/pipes/peso.pipes';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-shrinkage',
   standalone: true,
-  imports: [CommonModule, FormsModule, PesoPipe],
+  imports: [CommonModule, FormsModule, PesoPipe, TranslatePipe],
   templateUrl: './shrinkage.component.html',
   styleUrl: './shrinkage.component.scss'
 })
 export class ShrinkageComponent implements OnInit {
   private stock = inject(StockService);
 
-  readonly labels = REASON_LABELS;
   readonly maxDate = new Date().toISOString().slice(0, 10);
 
   report = signal<ShrinkageReport | null>(null);

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PesoPipe } from '../../pipes/peso.pipes';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 export interface ReceiptLine {
   productName: string;
@@ -21,7 +22,7 @@ export interface ReceiptData {
 @Component({
   selector: 'app-receipt-modal',
   standalone: true,
-  imports: [CommonModule, PesoPipe],
+  imports: [CommonModule, PesoPipe, TranslatePipe],
   templateUrl: './receipt-modal.component.html',
   styleUrl: './receipt-modal.component.scss'
 })

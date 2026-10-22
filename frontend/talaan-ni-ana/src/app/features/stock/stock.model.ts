@@ -1,12 +1,7 @@
 /** Reasons the owner may record by hand. The API rejects anything else. */
-export const MANUAL_REASONS = [
-  { value: 'Restock', label: 'Delivery', hint: 'Dumating na paninda', sign: 1 },
-  { value: 'Return', label: 'Balik', hint: 'Isinauli ng suki', sign: 1 },
-  { value: 'Spoilage', label: 'Sira', hint: 'Nasira, naexpire, nabasag', sign: -1 },
-  { value: 'Adjustment', label: 'Bilang', hint: 'Hindi tugma ang bilang', sign: 0 }
-] as const;
+export const MANUAL_REASONS = ['Restock', 'Return', 'Spoilage', 'Adjustment'] as const;
 
-export type ManualReason = (typeof MANUAL_REASONS)[number]['value'];
+export type ManualReason = (typeof MANUAL_REASONS)[number];
 
 export interface StockMovement {
   id: number;
@@ -53,15 +48,3 @@ export interface ShrinkageReport {
   totalCost: number;
   lines: ShrinkageLine[];
 }
-
-/** Filipino labels for every reason the ledger can hold, including automatic ones. */
-export const REASON_LABELS: Record<string, string> = {
-  Opening: 'Simulang bilang',
-  Sale: 'Benta',
-  Restock: 'Delivery',
-  Adjustment: 'Pagbabago ng bilang',
-  Spoilage: 'Sira',
-  Return: 'Balik',
-  RepackOut: 'Binuksan para tingiin',
-  RepackIn: 'Galing sa pagtingi'
-};

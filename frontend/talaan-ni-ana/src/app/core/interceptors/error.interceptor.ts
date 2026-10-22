@@ -3,9 +3,9 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { ToastService } from '../../shared/services/toast.service';
+import { I18nService } from '../i18n/i18n.service';
 import { SILENT_404 } from './silent-404.token';
 
-/** RFC 7807 payload the API returns for every handled error. */
 interface ProblemDetails {
   title?: string;
   detail?: string;
@@ -17,50 +17,51 @@ interface ProblemDetails {
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
   const router = inject(Router);
+  const i18n = inject(I18nService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       const problem: ProblemDetails = error.error ?? {};
 
       if (error.status === 0) {
-        toast.error('Hindi maka-connect sa server. Tingnan ang internet.');
+        toast.error(i18n.translate('error.offline'));
         return throwError(() => error);
       }
 
-      // The jwt interceptor already tried to refresh, so a 401 here is terminal.
       if (error.status === 401) {
         if (!req.url.includes('/auth/')) {
-          toast.warning('Tapos na ang session. Mag-login ulit.');
+          toast.warning(i18n.translate('error.sessionEnded'));
           router.navigate(['/login']);
         }
         return throwError(() => error);
       }
 
       if (error.status === 429) {
-        toast.warning('Masyadong mabilis. Sandali lang bago subukan ulit.');
+        toast.warning(i18n.translate('error.tooFast'));
         return throwError(() => error);
       }
 
-      // A lookup that found nothing is the caller's business, not a failure.
       if (error.status === 404 && req.context.get(SILENT_404)) {
         return throwError(() => error);
       }
 
-      toast.error(messageFor(problem, error.status));
+      toast.error(messageFor(problem, error.status, i18n));
       return throwError(() => error);
     })
   );
 };
 
-function messageFor(problem: ProblemDetails, status: number): string {
-  // Field errors are more useful than the summary, so show the first one.
+/** Picks the most useful message: a translated error code, then the server's own text, then a generic one. */
+function messageFor(problem: ProblemDetails, status: number, i18n: I18nService): string {
+  const codeKey = `error.code.${problem.code}`;
+  if (problem.code && i18n.has(codeKey)) return i18n.translate(codeKey);
+
   const firstFieldError = problem.errors
     ? Object.values(problem.errors).flat().find(Boolean)
     : undefined;
 
   if (firstFieldError) return firstFieldError;
   if (problem.detail) return problem.detail;
-  if (status >= 500) return 'May naganap na error sa server. Pakisubukan ulit.';
 
-  return 'May naganap na error. Pakisubukan ulit.';
+  return i18n.translate(status >= 500 ? 'error.server' : 'error.generic');
 }

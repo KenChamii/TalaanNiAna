@@ -6,11 +6,13 @@ import { CustomerService } from '../customer.service';
 import { CustomerDetail } from '../../../shared/models/customer.model';
 import { PesoPipe } from '../../../shared/pipes/peso.pipes';
 import { ToastService } from '../../../shared/services/toast.service';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-customer-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PesoPipe],
+  imports: [CommonModule, FormsModule, RouterLink, PesoPipe, TranslatePipe],
   templateUrl: './customer-detail.component.html',
   styleUrl: './customer-detail.component.scss'
 })
@@ -18,6 +20,8 @@ export class CustomerDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private customerService = inject(CustomerService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
+  private peso = new PesoPipe();
 
   customer = signal<CustomerDetail | null>(null);
   isLoading = signal(true);
@@ -60,7 +64,7 @@ export class CustomerDetailComponent implements OnInit {
     // Only the checks the server cannot make cheaply. Overpayment is the
     // server's call, so its message is the one the user should see.
     if (!this.paymentAmount || this.paymentAmount <= 0) {
-      this.toast.warning('Maglagay ng halaga na mas mataas sa zero.');
+      this.toast.warning(this.i18n.translate('customers.amountRequired'));
       return;
     }
 
@@ -75,8 +79,8 @@ export class CustomerDetailComponent implements OnInit {
           this.load();
           this.toast.success(
             result.remainingCredit > 0
-              ? `Naitala ang bayad. Natitira: ₱${result.remainingCredit.toFixed(2)}.`
-              : 'Naitala ang bayad. Wala nang utang.'
+              ? this.i18n.translate('customers.paidRemaining', { amount: this.peso.transform(result.remainingCredit) })
+              : this.i18n.translate('customers.paidFull')
           );
         },
         error: () => this.isSubmittingPayment.set(false)

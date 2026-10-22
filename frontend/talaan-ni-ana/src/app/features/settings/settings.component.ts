@@ -4,11 +4,13 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { SettingsService, StoreSettings } from './settings.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
@@ -17,6 +19,7 @@ export class SettingsComponent implements OnInit {
   private settingsService = inject(SettingsService);
   private auth = inject(AuthService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
 
   isSaving = signal(false);
 
@@ -54,7 +57,7 @@ export class SettingsComponent implements OnInit {
         this.isSaving.set(false);
         // The topbar caches the name from login, so refresh it here too.
         this.auth.setStoreName(saved.storeName);
-        this.toast.success('Na-save ang settings.');
+        this.toast.success(this.i18n.translate('settings.saved'));
       },
       error: () => this.isSaving.set(false)
     });
