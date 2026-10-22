@@ -1,9 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { DecimalPipe, NgFor, NgIf, NgStyle } from '@angular/common';
 import { curveMonotoneX } from 'd3-shape';
 import { DashboardService } from './dashboard.service';
 import { PesoPipe } from '../../shared/pipes/peso.pipes';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 interface TopProduct {
   productId: number;
@@ -15,14 +17,19 @@ interface TopProduct {
 
 interface TopDebtor { customerId: number; fullName: string; totalCredit: number; }
 
+interface SalesPoint { date: string; cashSales: number; creditSales: number; }
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgxChartsModule, PesoPipe, DecimalPipe, NgFor, NgIf, NgStyle],
+  imports: [NgxChartsModule, PesoPipe, DecimalPipe, NgFor, NgIf, NgStyle, TranslatePipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
+  private dashboardService = inject(DashboardService);
+  private i18n = inject(I18nService);
+
   todaySales = signal(0);
   todayProfit = signal(0);
   collections = signal(0);
@@ -37,10 +44,28 @@ export class DashboardComponent implements OnInit {
   topProducts = signal<TopProduct[]>([]);
   topProfitable = signal<TopProduct[]>([]);
   topDebtors = signal<TopDebtor[]>([]);
-  chartData = signal<any[]>([]);
-  pieData = signal<any[]>([]);
+  salesHistory = signal<SalesPoint[]>([]);
 
-  today = new Date().toLocaleDateString('fil-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  today = computed(() => new Date().toLocaleDateString(this.i18n.locale(), {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  }));
+
+  chartData = computed(() => [
+    {
+      name: this.i18n.translate('dashboard.series.cash'),
+      series: this.salesHistory().map(point => ({ name: point.date, value: point.cashSales }))
+    },
+    {
+      name: this.i18n.translate('dashboard.series.credit'),
+      series: this.salesHistory().map(point => ({ name: point.date, value: point.creditSales }))
+    }
+  ]);
+
+  pieData = computed(() => [
+    { name: this.i18n.translate('dashboard.pie.sales'), value: this.todaySales() },
+    { name: this.i18n.translate('dashboard.pie.collections'), value: this.collections() },
+    { name: this.i18n.translate('dashboard.pie.credit'), value: this.totalCredit() }
+  ]);
 
   curve = curveMonotoneX;
 
@@ -48,22 +73,11 @@ export class DashboardComponent implements OnInit {
 
   pieScheme: any = { domain: ['#C8E832', '#3CBDB1', '#D95C5C'] };
 
-  getPieColor(name: string): string {
-    const map: Record<string, string> = {
-      'Benta': '#C8E832',
-      'Koleksyon': '#3CBDB1',
-      'Utang': '#D95C5C'
-    };
-    return map[name] ?? '#5C5649';
-  }
-
   /** Share of today's sales that is kita, shown under the profit card. */
   todayMarginPercent(): number {
     const sales = this.todaySales();
     return sales > 0 ? (this.todayProfit() / sales) * 100 : 0;
   }
-
-  constructor(private dashboardService: DashboardService) {}
 
   ngOnInit() {
     this.dashboardService.getSummary().subscribe(data => {
@@ -81,23 +95,7 @@ export class DashboardComponent implements OnInit {
       this.topProducts.set(data.topProducts ?? []);
       this.topProfitable.set(data.topProfitable ?? []);
       this.topDebtors.set(data.topDebtors ?? []);
-
-      this.chartData.set([
-        {
-          name: 'Cash Sales',
-          series: data.salesHistory.map((p: any) => ({ name: p.date, value: p.cashSales }))
-        },
-        {
-          name: 'Utang (Credit)',
-          series: data.salesHistory.map((p: any) => ({ name: p.date, value: p.creditSales }))
-        }
-      ]);
-
-      this.pieData.set([
-        { name: 'Benta', value: data.todaySales },
-        { name: 'Koleksyon', value: data.totalCollections },
-        { name: 'Utang', value: data.totalCredit },
-      ]);
+      this.salesHistory.set(data.salesHistory ?? []);
     });
   }
 }

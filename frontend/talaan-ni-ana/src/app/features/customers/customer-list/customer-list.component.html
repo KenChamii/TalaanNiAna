@@ -1,24 +1,24 @@
-<h2>CMS / Talaan ng mga Suki at Utang</h2>
+<h2>{{ 'customers.title' | t }}</h2>
 
 <div class="toolbar">
   <input
     type="text"
-    placeholder="Maghanap ng Suki..."
+    [placeholder]="'customers.search' | t"
     [(ngModel)]="searchTerm"
     (ngModelChange)="onSearchChange()" />
 
-  <button class="btn-primary" (click)="isModalOpen.set(true)">+ Bagong Customer</button>
+  <button class="btn-primary" (click)="isModalOpen.set(true)">{{ 'customers.add' | t }}</button>
 </div>
 
 <div class="card table-card">
   <table>
     <thead>
       <tr>
-        <th>Pangalan ng Suki</th>
-        <th>Contact No.</th>
-        <th>Total Utang</th>
-        <th>Last Active</th>
-        <th>Actions</th>
+        <th>{{ 'customers.col.name' | t }}</th>
+        <th>{{ 'customers.col.contact' | t }}</th>
+        <th>{{ 'customers.col.credit' | t }}</th>
+        <th>{{ 'customers.col.lastActive' | t }}</th>
+        <th>{{ 'common.actions' | t }}</th>
       </tr>
     </thead>
     <tbody>
@@ -28,22 +28,26 @@
         <td [class.has-debt]="c.totalCredit > 0">{{ c.totalCredit | peso }}</td>
         <td>{{ c.lastActiveAt | date:'MMM d' }}</td>
         <td class="actions">
-          <button class="link-btn" [routerLink]="['/customers', c.id]">View</button>
-          <button class="link-btn" (click)="copyReminder(c)" title="Copy reminder message">✍</button>
+          <button class="link-btn" [routerLink]="['/customers', c.id]">{{ 'customers.view' | t }}</button>
+          <button
+            class="link-btn"
+            (click)="copyReminder(c)"
+            [title]="'customers.copyReminder' | t"
+            [attr.aria-label]="'customers.copyReminder' | t">✍</button>
         </td>
       </tr>
     </tbody>
   </table>
 
   <div class="pager" *ngIf="totalPages() > 1">
-    <span>Pahina:</span>
+    <span>{{ 'common.page' | t }}</span>
     <button
       *ngFor="let p of [].constructor(totalPages()); let i = index"
       [class.active]="currentPage() === i + 1"
-      (click)="currentPage.set(i + 1); load()">
+      (click)="goToPage(i + 1)">
       {{ i + 1 }}
     </button>
-    <span class="total">Total: {{ totalCount() }} Sukis</span>
+    <span class="total">{{ 'common.total' | t: { count: totalCount() } }}</span>
   </div>
 </div>
 

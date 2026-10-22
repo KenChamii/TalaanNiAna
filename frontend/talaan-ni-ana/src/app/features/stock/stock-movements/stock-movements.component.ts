@@ -2,20 +2,23 @@ import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StockService } from '../stock.service';
-import { MANUAL_REASONS, ManualReason, REASON_LABELS, StockMovement } from '../stock.model';
+import { MANUAL_REASONS, ManualReason, StockMovement } from '../stock.model';
 import { Product } from '../../../shared/models/product.model';
 import { ToastService } from '../../../shared/services/toast.service';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-stock-movements',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './stock-movements.component.html',
   styleUrl: './stock-movements.component.scss'
 })
 export class StockMovementsComponent implements OnInit {
   private stock = inject(StockService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
 
   @Input({ required: true }) product!: Product;
 
@@ -24,7 +27,6 @@ export class StockMovementsComponent implements OnInit {
   @Output() closed = new EventEmitter<void>();
 
   readonly reasons = MANUAL_REASONS;
-  readonly labels = REASON_LABELS;
 
   movements = signal<StockMovement[]>([]);
   isLoading = signal(true);
@@ -89,9 +91,12 @@ export class StockMovementsComponent implements OnInit {
         this.isRepacking.set(false);
         this.recorded.emit();
         this.load();
-        this.toast.success(
-          `Nabuksan ang ${this.packsToOpen} ${result.parentName}. ` +
-          `+${result.tingiProduced} ${result.tingiName}.`);
+        this.toast.success(this.i18n.translate('stock.repacked', {
+          packs: this.packsToOpen,
+          parent: result.parentName,
+          pieces: result.tingiProduced,
+          tingi: result.tingiName
+        }));
       },
       error: () => this.isRepacking.set(false)
     });
@@ -101,7 +106,7 @@ export class StockMovementsComponent implements OnInit {
     const quantity = this.signedQuantity();
 
     if (this.amount === null || quantity === 0) {
-      this.toast.warning('Walang pagbabago sa stock.');
+      this.toast.warning(this.i18n.translate('stock.noChange'));
       return;
     }
 
@@ -120,7 +125,7 @@ export class StockMovementsComponent implements OnInit {
         this.isSaving.set(false);
         this.recorded.emit();
         this.load();
-        this.toast.success(`Naitala. ${movement.balanceAfter} ang natitira.`);
+        this.toast.success(this.i18n.translate('stock.recorded', { count: movement.balanceAfter }));
       },
       error: () => this.isSaving.set(false)
     });

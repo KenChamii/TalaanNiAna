@@ -3,11 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { BanderitasComponent } from '../../../shared/components/banderitas/banderitas.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe, BanderitasComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -16,12 +19,11 @@ export class LoginComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
 
-  errorMessage = signal<string | null>(null);
+  readonly i18n = inject(I18nService);
+
+  errorKey = signal<string | null>(null);
   isLoading = signal(false);
   isStartingDemo = signal(false);
-
-  /** Banderitas pennants. Colour cycles in CSS. */
-  readonly flags = Array.from({ length: 44 });
 
   form = this.fb.group({
     username: ['', Validators.required],
@@ -34,27 +36,28 @@ export class LoginComponent {
     if (this.isStartingDemo()) return;
 
     this.isStartingDemo.set(true);
-    this.errorMessage.set(null);
+    this.errorKey.set(null);
 
     this.auth.demo().subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: () => {
-        this.errorMessage.set('Hindi available ang demo sa ngayon.');
+        this.errorKey.set('auth.demoFailed');
         this.isStartingDemo.set(false);
       }
     });
   }
 
+  /** Signs in with the entered credentials and opens the dashboard. */
   submit() {
     if (this.form.invalid) return;
     this.isLoading.set(true);
-    this.errorMessage.set(null);
+    this.errorKey.set(null);
 
     const { username, password } = this.form.value;
     this.auth.login(username!, password!).subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: () => {
-        this.errorMessage.set('Mali ang pangalan/email o password.');
+        this.errorKey.set('auth.badCredentials');
         this.isLoading.set(false);
       }
     });

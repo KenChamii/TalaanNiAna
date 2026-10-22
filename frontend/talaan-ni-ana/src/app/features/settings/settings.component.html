@@ -1,37 +1,37 @@
-<p class="eyebrow">Impormasyon at configuration</p>
-<h2 class="page-title">Settings</h2>
+<p class="eyebrow">{{ 'settings.eyebrow' | t }}</p>
+<h2 class="page-title">{{ 'settings.title' | t }}</h2>
 
 <div class="card settings-card">
-  <h3 class="section-title">Pangunahing setup ng tindahan</h3>
+  <h3 class="section-title">{{ 'settings.section' | t }}</h3>
 
   <form [formGroup]="form" (ngSubmit)="submit()">
     <div class="field-row">
-      <label class="field-label" for="storeName">Pangalan ng tindahan</label>
+      <label class="field-label" for="storeName">{{ 'settings.storeName' | t }}</label>
       <input id="storeName" type="text" formControlName="storeName" />
     </div>
 
     <div class="field-row">
-      <label class="field-label" for="timeZoneId">Timezone</label>
+      <label class="field-label" for="timeZoneId">{{ 'settings.timezone' | t }}</label>
       <select id="timeZoneId" formControlName="timeZoneId">
         <option *ngFor="let zone of timeZones" [value]="zone.id">{{ zone.label }}</option>
       </select>
-      <p class="hint">Dito nagsisimula at nagtatapos ang araw ng benta.</p>
+      <p class="hint">{{ 'settings.timezoneHint' | t }}</p>
     </div>
 
     <div class="field-row">
-      <label class="field-label" for="lowStockAlertLimit">Default na low-stock limit</label>
+      <label class="field-label" for="lowStockAlertLimit">{{ 'settings.lowStock' | t }}</label>
       <input id="lowStockAlertLimit" type="number" formControlName="lowStockAlertLimit" min="0" />
-      <p class="hint">Para sa bagong paninda. Bawat item ay may sariling limit.</p>
+      <p class="hint">{{ 'settings.lowStockHint' | t }}</p>
     </div>
 
     <div class="field-row">
-      <label class="field-label" for="smsAlertTemplate">Template ng paalala sa utang</label>
+      <label class="field-label" for="smsAlertTemplate">{{ 'settings.template' | t }}</label>
       <input id="smsAlertTemplate" type="text" formControlName="smsAlertTemplate" />
-      <p class="hint">Gamitin ang {{ '{name}' }} at {{ '{amount}' }} para sa pangalan at halaga.</p>
+      <p class="hint">{{ 'settings.templateHint' | t }}</p>
     </div>
 
     <button type="submit" class="btn-primary" [disabled]="isSaving()">
-      {{ isSaving() ? 'Sine-save…' : 'I-save ang settings' }}
+      {{ (isSaving() ? 'action.saving' : 'settings.save') | t }}
     </button>
   </form>
 </div>

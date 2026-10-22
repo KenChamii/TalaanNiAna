@@ -389,6 +389,17 @@ select.ng-invalid.ng-touched {
   a { text-decoration: none; }
 }
 
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.lang-toggle {
+  cursor: pointer;
+}
+
 .auth-body {
   flex: 1;
   display: flex;

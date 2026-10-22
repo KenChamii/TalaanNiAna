@@ -2,72 +2,74 @@
 
   <header class="auth-top">
     <span class="brand">Talaan ni Ana</span>
-    <a routerLink="/register" class="badge badge--ok">Gumawa ng account</a>
+    <div class="auth-actions">
+      <button
+        type="button"
+        class="badge lang-toggle"
+        (click)="i18n.toggle()"
+        [attr.aria-label]="i18n.language() === 'tl' ? ('lang.toEnglish' | t) : ('lang.toTagalog' | t)">
+        {{ i18n.language() === 'tl' ? 'EN' : 'TL' }}
+      </button>
+      <a routerLink="/register" class="badge badge--ok">{{ 'auth.createAccount' | t }}</a>
+    </div>
   </header>
 
-  <div class="banderitas" aria-hidden="true">
-    <div class="flags">
-      <i *ngFor="let f of flags"></i>
-    </div>
-  </div>
+  <app-banderitas></app-banderitas>
 
   <div class="auth-body">
 
     <section class="pitch">
-      <span class="badge">Para sa sari-sari store</span>
+      <span class="badge">{{ 'auth.pitchBadge' | t }}</span>
 
-      <h1 class="signwriting">Alam mo<br />ang tubo mo</h1>
+      <h1 class="signwriting">{{ 'auth.pitchTitle' | t }}</h1>
 
       <div class="pitch-stripe jeep-stripe" aria-hidden="true">
         <span></span><span></span><span></span><span></span><span></span>
       </div>
 
-      <p class="pitch-copy">
-        Benta, stock at utang sa isang talaan. Gumagana kahit walang signal,
-        sumasabay kapag bumalik ang internet.
-      </p>
+      <p class="pitch-copy">{{ 'auth.pitchCopy' | t }}</p>
 
       <div class="pitch-tags">
-        <span class="badge badge--ok">Offline-ready</span>
-        <span class="badge badge--info">Utang tracker</span>
-        <span class="badge badge--warn">Tingi at repack</span>
+        <span class="badge badge--ok">{{ 'auth.tagOffline' | t }}</span>
+        <span class="badge badge--info">{{ 'auth.tagCredit' | t }}</span>
+        <span class="badge badge--warn">{{ 'auth.tagTingi' | t }}</span>
       </div>
     </section>
 
     <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()">
-      <p class="eyebrow">Maligayang pagbabalik</p>
-      <h2 class="auth-title">Mag-login</h2>
+      <p class="eyebrow">{{ 'auth.welcomeBack' | t }}</p>
+      <h2 class="auth-title">{{ 'auth.login' | t }}</h2>
 
-      <label class="field-label" for="username">Pangalan / Email</label>
+      <label class="field-label" for="username">{{ 'auth.username' | t }}</label>
       <input id="username" type="text" formControlName="username" placeholder="ana_tindahan" />
 
-      <label class="field-label" for="password">Password</label>
+      <label class="field-label" for="password">{{ 'auth.password' | t }}</label>
       <input id="password" type="password" formControlName="password" placeholder="••••••••••" />
 
       <label class="checkbox-row">
         <input type="checkbox" formControlName="rememberMe" />
-        <span>Tandaan ako</span>
+        <span>{{ 'auth.remember' | t }}</span>
       </label>
 
-      <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+      <p class="error" *ngIf="errorKey() as key">{{ key | t }}</p>
 
       <button type="submit" class="btn-primary full-width" [disabled]="isLoading()">
-        {{ isLoading() ? 'Naglo-load…' : 'Pumasok' }}
+        {{ (isLoading() ? 'action.loading' : 'auth.enter') | t }}
       </button>
 
-      <div class="demo-split" aria-hidden="true"><span>o</span></div>
+      <div class="demo-split" aria-hidden="true"><span>{{ 'auth.or' | t }}</span></div>
 
       <button
         type="button"
         class="btn-confirm full-width"
         (click)="startDemo()"
         [disabled]="isStartingDemo()">
-        {{ isStartingDemo() ? 'Binubuksan…' : 'Subukan ang demo' }}
+        {{ (isStartingDemo() ? 'auth.demoOpening' : 'auth.demo') | t }}
       </button>
-      <p class="demo-note">Totoong tindahan na may dalawang linggong benta. Walang sign-up.</p>
+      <p class="demo-note">{{ 'auth.demoNote' | t }}</p>
 
       <p class="switch-link">
-        Wala ka pang account? <a routerLink="/register">Gumawa dito</a>
+        {{ 'auth.noAccount' | t }} <a routerLink="/register">{{ 'auth.createHere' | t }}</a>
       </p>
     </form>
 

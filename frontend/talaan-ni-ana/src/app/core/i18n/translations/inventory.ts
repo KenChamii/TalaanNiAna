@@ -1,0 +1,46 @@
+import { Translations } from '../translation.model';
+
+export const INVENTORY: Translations = {
+  'inventory.title': { tl: 'Imbentaryo', en: 'Inventory' },
+  'inventory.search': { tl: 'Maghanap ng pangalan o barcode…', en: 'Search by name or barcode…' },
+  'inventory.allCategories': { tl: 'Lahat ng kategorya', en: 'All categories' },
+  'inventory.add': { tl: '+ Magdagdag ng item', en: '+ Add item' },
+  'inventory.col.name': { tl: 'Pangalan', en: 'Item' },
+  'inventory.col.category': { tl: 'Kategorya', en: 'Category' },
+  'inventory.col.cost': { tl: 'Puhunan', en: 'Cost' },
+  'inventory.col.price': { tl: 'Presyo', en: 'Price' },
+  'inventory.col.margin': { tl: 'Kita', en: 'Margin' },
+  'inventory.col.stock': { tl: 'Stock', en: 'Stock' },
+  'inventory.tingiOf': { tl: 'tingi ng {name}', en: 'by the piece from {name}' },
+  'inventory.history': { tl: 'Stock', en: 'Stock' },
+  'inventory.empty': { tl: 'Walang nahanap na paninda.', en: 'No products found.' },
+  'inventory.added': { tl: 'Nadagdag na ang "{name}".', en: 'Added "{name}".' },
+  'inventory.updated': { tl: 'Na-update ang "{name}".', en: 'Updated "{name}".' },
+  'inventory.confirmDelete': { tl: 'Tanggalin ang "{name}"?', en: 'Delete "{name}"?' },
+  'inventory.deleted': { tl: 'Natanggal ang "{name}".', en: 'Deleted "{name}".' },
+
+  'inventory.form.addTitle': { tl: 'Magdagdag ng item', en: 'Add item' },
+  'inventory.form.editTitle': { tl: 'I-edit ang item', en: 'Edit item' },
+  'inventory.form.name': { tl: 'Pangalan ng item', en: 'Item name' },
+  'inventory.form.namePlaceholder': { tl: 'hal. Lucky Me Pancit Canton', en: 'e.g. Lucky Me Pancit Canton' },
+  'inventory.form.category': { tl: 'Kategorya', en: 'Category' },
+  'inventory.form.categoryPlaceholder': { tl: 'Pumili o mag-type ng bago', en: 'Pick one or type a new one' },
+  'inventory.form.barcode': { tl: 'Barcode', en: 'Barcode' },
+  'inventory.form.barcodePlaceholder': { tl: 'I-scan o i-type ang code', en: 'Scan or type the code' },
+  'inventory.form.barcodeInvalid': { tl: 'Letra, numero, at - . _ lang ang puwede.', en: 'Only letters, numbers and - . _ are allowed.' },
+  'inventory.form.cost': { tl: 'Puhunan (₱)', en: 'Cost (₱)' },
+  'inventory.form.price': { tl: 'Presyo (₱)', en: 'Price (₱)' },
+  'inventory.form.marginPerPiece': { tl: 'Kita kada piraso', en: 'Profit per piece' },
+  'inventory.form.lossNote': { tl: 'Mas mataas ang puhunan kaysa sa presyo. Lugi ang bawat benta.', en: 'The cost is higher than the price, so every sale loses money.' },
+  'inventory.form.stock': { tl: 'Stock', en: 'Stock' },
+  'inventory.form.threshold': { tl: 'Paalala kapag bumaba sa', en: 'Alert when stock falls to' },
+  'inventory.form.tingi': { tl: 'Tingi', en: 'By the piece' },
+  'inventory.form.parent': { tl: 'Galing sa pakete', en: 'Taken from pack' },
+  'inventory.form.notTingi': { tl: 'Hindi tingi', en: 'Not sold by the piece' },
+  'inventory.form.units': { tl: 'Ilan ang laman ng isang pakete', en: 'Pieces per pack' },
+  'inventory.form.unitsPlaceholder': { tl: 'hal. 12', en: 'e.g. 12' },
+  'inventory.form.tingiNote': {
+    tl: 'Hahatiin ang puhunan ng pakete sa bilang na ito tuwing magbubukas.',
+    en: 'The pack’s cost is divided by this number every time one is opened.'
+  }
+};

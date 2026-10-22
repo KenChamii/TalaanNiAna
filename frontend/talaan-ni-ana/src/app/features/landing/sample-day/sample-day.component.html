@@ -1,0 +1,35 @@
+<figure class="sample card">
+  <figcaption class="meta sample-caption">{{ 'landing.sample.caption' | t }}</figcaption>
+
+  <table class="sample-table">
+    <thead>
+      <tr>
+        <th scope="col">{{ 'landing.sample.item' | t }}</th>
+        <th scope="col" class="num">{{ 'landing.sample.quantity' | t }}</th>
+        <th scope="col" class="num">{{ 'landing.sample.sales' | t }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let line of lines">
+        <td>{{ line.name }}</td>
+        <td class="num">{{ line.quantity }}</td>
+        <td class="num">{{ line.price * line.quantity | peso }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <dl class="sample-totals">
+    <div>
+      <dt>{{ 'landing.sample.sales' | t }}</dt>
+      <dd>{{ sales | peso }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'landing.sample.cost' | t }}</dt>
+      <dd>{{ cost | peso }}</dd>
+    </div>
+    <div class="sample-profit">
+      <dt>{{ 'landing.sample.profit' | t }}</dt>
+      <dd>{{ profit | peso }}</dd>
+    </div>
+  </dl>
+</figure>

@@ -1,85 +1,85 @@
 <div class="modal-overlay" (click)="closed.emit()">
   <form class="modal-card card" [formGroup]="form" (ngSubmit)="submit()" (click)="$event.stopPropagation()">
-    <h3>{{ product ? 'I-edit ang Item' : 'Magdagdag ng Item' }}</h3>
+    <h3>{{ (product ? 'inventory.form.editTitle' : 'inventory.form.addTitle') | t }}</h3>
 
-    <label class="field-label" for="name">Pangalan ng item</label>
-    <input id="name" type="text" formControlName="name" placeholder="hal. Lucky Me Pancit Canton" />
+    <label class="field-label" for="name">{{ 'inventory.form.name' | t }}</label>
+    <input id="name" type="text" formControlName="name" [placeholder]="'inventory.form.namePlaceholder' | t" />
 
-    <label class="field-label" for="category">Kategorya</label>
+    <label class="field-label" for="category">{{ 'inventory.form.category' | t }}</label>
     <input
       id="category"
       type="text"
       formControlName="category"
       list="product-categories"
-      placeholder="Pumili o mag-type ng bago" />
+      [placeholder]="'inventory.form.categoryPlaceholder' | t" />
     <datalist id="product-categories">
       <option *ngFor="let cat of categories" [value]="cat"></option>
     </datalist>
 
-    <label class="field-label" for="barcode">Barcode <small>(opsyonal)</small></label>
+    <label class="field-label" for="barcode">
+      {{ 'inventory.form.barcode' | t }} <small>({{ 'common.optional' | t }})</small>
+    </label>
     <input
       id="barcode"
       type="text"
       formControlName="barcode"
       autocomplete="off"
-      placeholder="I-scan o i-type ang code" />
+      [placeholder]="'inventory.form.barcodePlaceholder' | t" />
     <p class="field-hint" *ngIf="form.controls.barcode.invalid && form.controls.barcode.touched">
-      Letra, numero, at - . _ lang ang pwede.
+      {{ 'inventory.form.barcodeInvalid' | t }}
     </p>
 
     <div class="row">
       <div>
-        <label class="field-label" for="cost">Puhunan (&#8369;)</label>
+        <label class="field-label" for="cost">{{ 'inventory.form.cost' | t }}</label>
         <input id="cost" type="number" formControlName="costPrice" step="0.50" min="0" />
       </div>
       <div>
-        <label class="field-label" for="price">Presyo (&#8369;)</label>
+        <label class="field-label" for="price">{{ 'inventory.form.price' | t }}</label>
         <input id="price" type="number" formControlName="price" step="0.50" min="0" />
       </div>
     </div>
 
     <div class="margin-strip" [class.loss]="isLossLeader()">
-      <span class="margin-label">Kita kada piraso</span>
+      <span class="margin-label">{{ 'inventory.form.marginPerPiece' | t }}</span>
       <span class="margin-value">
         &#8369;{{ margin() | number:'1.2-2' }}
         <small>({{ marginPercent() | number:'1.0-1' }}%)</small>
       </span>
     </div>
-    <p class="margin-note" *ngIf="isLossLeader()">Mas mataas ang puhunan sa presyo. Lugi ang bawat benta.</p>
+    <p class="margin-note" *ngIf="isLossLeader()">{{ 'inventory.form.lossNote' | t }}</p>
 
     <div class="row">
       <div>
-        <label class="field-label" for="stock">Stock</label>
+        <label class="field-label" for="stock">{{ 'inventory.form.stock' | t }}</label>
         <input id="stock" type="number" formControlName="stockQuantity" min="0" />
       </div>
       <div>
-        <label class="field-label" for="threshold">Paalala kapag bumaba sa</label>
+        <label class="field-label" for="threshold">{{ 'inventory.form.threshold' | t }}</label>
         <input id="threshold" type="number" formControlName="lowStockThreshold" min="0" />
       </div>
     </div>
 
     <fieldset class="tingi">
-      <legend class="field-label">Tingi <small>(opsyonal)</small></legend>
+      <legend class="field-label">{{ 'inventory.form.tingi' | t }} <small>({{ 'common.optional' | t }})</small></legend>
 
-      <label class="field-label" for="parent">Galing sa paketeng</label>
+      <label class="field-label" for="parent">{{ 'inventory.form.parent' | t }}</label>
       <select id="parent" formControlName="parentProductId">
-        <option [ngValue]="null">Hindi tingi</option>
+        <option [ngValue]="null">{{ 'inventory.form.notTingi' | t }}</option>
         <option *ngFor="let parent of parentOptions" [ngValue]="parent.id">{{ parent.name }}</option>
       </select>
 
       <ng-container *ngIf="isTingi()">
-        <label class="field-label" for="units">Ilan ang lalabas sa isa</label>
-        <input id="units" type="number" formControlName="unitsPerParent" min="2" placeholder="hal. 12" />
-        <p class="tingi-note">
-          Hahatiin ang puhunan ng pakete sa bilang na ito tuwing magbubukas.
-        </p>
+        <label class="field-label" for="units">{{ 'inventory.form.units' | t }}</label>
+        <input id="units" type="number" formControlName="unitsPerParent" min="2" [placeholder]="'inventory.form.unitsPlaceholder' | t" />
+        <p class="tingi-note">{{ 'inventory.form.tingiNote' | t }}</p>
       </ng-container>
     </fieldset>
 
     <div class="modal-actions">
-      <button type="button" class="btn-secondary" (click)="closed.emit()">Kanselahin</button>
+      <button type="button" class="btn-secondary" (click)="closed.emit()">{{ 'action.cancel' | t }}</button>
       <button type="submit" class="btn-primary" [disabled]="isSaving">
-        {{ isSaving ? 'Sine-save…' : 'I-save' }}
+        {{ (isSaving ? 'action.saving' : 'action.save') | t }}
       </button>
     </div>
   </form>

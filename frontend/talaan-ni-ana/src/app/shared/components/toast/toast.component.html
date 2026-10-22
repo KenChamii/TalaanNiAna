@@ -1,18 +1,18 @@
 <div class="toast-container">
   <div
-    *ngFor="let t of toast.toasts()"
+    *ngFor="let item of toast.toasts()"
     class="toast"
-    [class]="'toast toast--' + t.type"
-    (click)="toast.dismiss(t.id)">
+    [class]="'toast toast--' + item.type"
+    (click)="toast.dismiss(item.id)">
     <span class="toast-icon">
-      <ng-container [ngSwitch]="t.type">
+      <ng-container [ngSwitch]="item.type">
         <span *ngSwitchCase="'success'">✓</span>
         <span *ngSwitchCase="'error'">✕</span>
         <span *ngSwitchCase="'warning'">!</span>
         <span *ngSwitchDefault>i</span>
       </ng-container>
     </span>
-    <span class="toast-message">{{ t.message }}</span>
-    <button class="toast-close" (click)="toast.dismiss(t.id)" aria-label="Isara">✕</button>
+    <span class="toast-message">{{ item.message }}</span>
+    <button class="toast-close" (click)="toast.dismiss(item.id)" [attr.aria-label]="'action.close' | t">✕</button>
   </div>
 </div>

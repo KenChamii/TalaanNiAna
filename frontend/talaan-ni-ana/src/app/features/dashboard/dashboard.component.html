@@ -1,10 +1,10 @@
 <!-- Page Header -->
 <div class="dash-header">
   <div>
-    <p class="eyebrow">Pangkalahatang-tanaw</p>
-    <h2 class="page-title">Dashboard</h2>
+    <p class="eyebrow">{{ 'dashboard.eyebrow' | t }}</p>
+    <h2 class="page-title">{{ 'dashboard.title' | t }}</h2>
   </div>
-  <div class="header-date">{{ today }}</div>
+  <div class="header-date">{{ today() }}</div>
 </div>
 
 <!-- KPI Cards -->
@@ -12,71 +12,73 @@
 
   <div class="stat-card">
     <div class="stat-top">
-      <span class="stat-label">Benta Ngayon</span>
+      <span class="stat-label">{{ 'dashboard.todaySales' | t }}</span>
       <span class="stat-icon-wrap sales">₱</span>
     </div>
     <span class="stat-value">{{ todaySales() | peso }}</span>
     <div class="stat-footer">
-      <span class="delta neutral">Bago bawasan ang puhunan</span>
+      <span class="delta neutral">{{ 'dashboard.beforeCost' | t }}</span>
     </div>
   </div>
 
   <div class="stat-card">
     <div class="stat-top">
-      <span class="stat-label">Kita Ngayon</span>
+      <span class="stat-label">{{ 'dashboard.todayProfit' | t }}</span>
       <span class="stat-icon-wrap success">↑</span>
     </div>
     <span class="stat-value" [class.danger]="todayProfit() < 0">{{ todayProfit() | peso }}</span>
     <div class="stat-footer">
       <span class="delta" [class.up]="todayProfit() >= 0" [class.down]="todayProfit() < 0">
-        {{ todayMarginPercent() | number:'1.0-1' }}% margin
+        {{ 'dashboard.margin' | t: { percent: (todayMarginPercent() | number:'1.0-1') } }}
       </span>
     </div>
   </div>
 
   <div class="stat-card">
     <div class="stat-top">
-      <span class="stat-label">Koleksyon (Bayad sa Utang)</span>
+      <span class="stat-label">{{ 'dashboard.collections' | t }}</span>
       <span class="stat-icon-wrap success">✓</span>
     </div>
     <span class="stat-value">{{ collections() | peso }}</span>
     <div class="stat-footer">
-      <span class="delta neutral">Binayaran ngayong araw</span>
+      <span class="delta neutral">{{ 'dashboard.paidToday' | t }}</span>
     </div>
   </div>
 
   <div class="stat-card">
     <div class="stat-top">
-      <span class="stat-label">Kabuuang Utang</span>
+      <span class="stat-label">{{ 'dashboard.totalCredit' | t }}</span>
       <span class="stat-icon-wrap danger">!</span>
     </div>
     <span class="stat-value danger">{{ totalCredit() | peso }}</span>
     <div class="stat-footer">
-      <span class="delta down">{{ creditorCount() }} customers may utang</span>
+      <span class="delta down">{{ 'dashboard.debtors' | t: { count: creditorCount() } }}</span>
     </div>
   </div>
 
   <div class="stat-card">
     <div class="stat-top">
-      <span class="stat-label">Paubos na Stock</span>
+      <span class="stat-label">{{ 'dashboard.lowStock' | t }}</span>
       <span class="stat-icon-wrap" [class.warning]="lowStockCount() > 0" [class.success]="lowStockCount() === 0">↓</span>
     </div>
-    <span class="stat-value" [class.warning]="lowStockCount() > 0">{{ lowStockCount() }} <small>items</small></span>
+    <span class="stat-value" [class.warning]="lowStockCount() > 0">
+      {{ lowStockCount() }} <small>{{ (lowStockCount() === 1 ? 'dashboard.items.one' : 'dashboard.items.other') | t }}</small>
+    </span>
     <div class="stat-footer">
       <span class="delta" [class.up]="lowStockCount() === 0" [class.down]="lowStockCount() > 0">
-        {{ lowStockCount() === 0 ? '✓ Lahat OK' : 'Kailangan ng restok' }}
+        {{ (lowStockCount() === 0 ? 'dashboard.allGood' : 'dashboard.needsRestock') | t }}
       </span>
     </div>
   </div>
 
   <div class="stat-card">
     <div class="stat-top">
-      <span class="stat-label">Average na Benta</span>
+      <span class="stat-label">{{ 'dashboard.averageSale' | t }}</span>
       <span class="stat-icon-wrap sales">⌀</span>
     </div>
     <span class="stat-value">{{ averageTransactionValue() | peso }}</span>
     <div class="stat-footer">
-      <span class="delta neutral">{{ monthlyTransactionCount() }} transaksyon ngayong buwan</span>
+      <span class="delta neutral">{{ 'dashboard.monthTransactions' | t: { count: monthlyTransactionCount() } }}</span>
     </div>
   </div>
 
@@ -89,12 +91,12 @@
   <div class="chart-card">
     <div class="chart-header">
       <div>
-        <p class="chart-eyebrow">Ngayong Buwan</p>
-        <h3 class="chart-title">Cash Sales vs Utang</h3>
+        <p class="chart-eyebrow">{{ 'dashboard.thisMonth' | t }}</p>
+        <h3 class="chart-title">{{ 'dashboard.cashVsCredit' | t }}</h3>
       </div>
       <div class="chart-legend">
-        <span class="legend-pip cash"></span><span>Cash</span>
-        <span class="legend-pip credit"></span><span>Utang</span>
+        <span class="legend-pip cash"></span><span>{{ 'common.cash' | t }}</span>
+        <span class="legend-pip credit"></span><span>{{ 'common.credit' | t }}</span>
       </div>
     </div>
     <div class="chart-wrap">
@@ -118,8 +120,8 @@
   <div class="chart-card">
     <div class="chart-header">
       <div>
-        <p class="chart-eyebrow">Breakdown</p>
-        <h3 class="chart-title">Sales Summary</h3>
+        <p class="chart-eyebrow">{{ 'dashboard.summaryEyebrow' | t }}</p>
+        <h3 class="chart-title">{{ 'dashboard.summaryTitle' | t }}</h3>
       </div>
     </div>
     <div class="chart-wrap">
@@ -133,8 +135,8 @@
       </ngx-charts-pie-chart>
     </div>
     <div class="pie-legend">
-      <div class="pie-legend-item" *ngFor="let d of pieData()">
-        <span class="pie-pip" [ngStyle]="{'background': getPieColor(d.name)}"></span>
+      <div class="pie-legend-item" *ngFor="let d of pieData(); let i = index">
+        <span class="pie-pip" [ngStyle]="{'background': pieScheme.domain[i]}"></span>
         <span class="pie-label">{{ d.name }}</span>
         <span class="pie-val">{{ d.value | peso }}</span>
       </div>
@@ -149,35 +151,35 @@
   <div class="chart-card">
     <div class="chart-header">
       <div>
-        <p class="chart-eyebrow">Ngayong Buwan</p>
-        <h3 class="chart-title">Kita vs Benta</h3>
+        <p class="chart-eyebrow">{{ 'dashboard.thisMonth' | t }}</p>
+        <h3 class="chart-title">{{ 'dashboard.profitVsSales' | t }}</h3>
       </div>
     </div>
     <div class="margin-summary">
       <div class="margin-block">
-        <span class="margin-block-label">Benta</span>
+        <span class="margin-block-label">{{ 'dashboard.sales' | t }}</span>
         <span class="margin-block-value">{{ monthRevenue() | peso }}</span>
       </div>
       <div class="margin-block">
-        <span class="margin-block-label">Puhunan</span>
+        <span class="margin-block-label">{{ 'dashboard.cost' | t }}</span>
         <span class="margin-block-value">{{ monthRevenue() - monthProfit() | peso }}</span>
       </div>
       <div class="margin-block accent">
-        <span class="margin-block-label">Kita</span>
+        <span class="margin-block-label">{{ 'dashboard.profit' | t }}</span>
         <span class="margin-block-value">{{ monthProfit() | peso }}</span>
       </div>
     </div>
     <div class="margin-bar">
       <div class="margin-bar-fill" [ngStyle]="{'width.%': monthMarginPercent()}"></div>
     </div>
-    <p class="margin-caption">{{ monthMarginPercent() | number:'1.0-1' }}% ng benta ay kita.</p>
+    <p class="margin-caption">{{ 'dashboard.marginCaption' | t: { percent: (monthMarginPercent() | number:'1.0-1') } }}</p>
   </div>
 
   <div class="chart-card">
     <div class="chart-header">
       <div>
-        <p class="chart-eyebrow">Ngayong Buwan</p>
-        <h3 class="chart-title">Pinaka-kumikita</h3>
+        <p class="chart-eyebrow">{{ 'dashboard.thisMonth' | t }}</p>
+        <h3 class="chart-title">{{ 'dashboard.topProfit' | t }}</h3>
       </div>
     </div>
     <div class="list-wrap">
@@ -187,7 +189,7 @@
         <span class="list-qty">{{ p.totalQuantitySold }}x</span>
         <span class="list-value">{{ p.totalProfit | peso }}</span>
       </div>
-      <p class="empty" *ngIf="topProfitable().length === 0">Walang naitalang kita ngayong buwan.</p>
+      <p class="empty" *ngIf="topProfitable().length === 0">{{ 'dashboard.noProfit' | t }}</p>
     </div>
   </div>
 
@@ -199,8 +201,8 @@
   <div class="chart-card">
     <div class="chart-header">
       <div>
-        <p class="chart-eyebrow">Ngayong Buwan</p>
-        <h3 class="chart-title">Top Selling Products</h3>
+        <p class="chart-eyebrow">{{ 'dashboard.thisMonth' | t }}</p>
+        <h3 class="chart-title">{{ 'dashboard.topSelling' | t }}</h3>
       </div>
     </div>
     <div class="list-wrap">
@@ -210,15 +212,15 @@
         <span class="list-qty">{{ p.totalQuantitySold }}x</span>
         <span class="list-value">{{ p.totalRevenue | peso }}</span>
       </div>
-      <p class="empty" *ngIf="topProducts().length === 0">Walang benta ngayong buwan pa.</p>
+      <p class="empty" *ngIf="topProducts().length === 0">{{ 'dashboard.noSales' | t }}</p>
     </div>
   </div>
 
   <div class="chart-card">
     <div class="chart-header">
       <div>
-        <p class="chart-eyebrow">Pagbabantay</p>
-        <h3 class="chart-title">Pinakamalaking Utang</h3>
+        <p class="chart-eyebrow">{{ 'dashboard.watchEyebrow' | t }}</p>
+        <h3 class="chart-title">{{ 'dashboard.topDebtors' | t }}</h3>
       </div>
     </div>
     <div class="list-wrap">
@@ -227,7 +229,7 @@
         <span class="list-name">{{ d.fullName }}</span>
         <span class="list-value danger">{{ d.totalCredit | peso }}</span>
       </div>
-      <p class="empty" *ngIf="topDebtors().length === 0">Walang may utang sa ngayon. ✓</p>
+      <p class="empty" *ngIf="topDebtors().length === 0">{{ 'dashboard.noDebtors' | t }}</p>
     </div>
   </div>
 

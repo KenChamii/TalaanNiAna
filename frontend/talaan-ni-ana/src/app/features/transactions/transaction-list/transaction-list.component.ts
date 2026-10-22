@@ -5,11 +5,12 @@ import { TransactionService } from '../transaction.service';
 import { TransactionView } from '../../../shared/models/transaction.model';
 import { PesoPipe } from '../../../shared/pipes/peso.pipes';
 import { ReceiptModalComponent, ReceiptData } from '../../../shared/components/receipt-modal/receipt-modal.component';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-transaction-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, PesoPipe, ReceiptModalComponent],
+  imports: [CommonModule, FormsModule, PesoPipe, TranslatePipe, ReceiptModalComponent],
   templateUrl: './transaction-list.component.html',
   styleUrl: './transaction-list.component.scss'
 })

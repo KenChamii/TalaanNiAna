@@ -56,6 +56,7 @@
   margin: 0.5rem 0 0;
   font-size: clamp(2.75rem, 9vw, 5rem);
   line-height: 0.95;
+  white-space: pre-line;
 }
 
 .hero-stripe {
@@ -99,6 +100,11 @@
 
   &--error { color: var(--danger); }
   a { color: inherit; }
+}
+
+.hero-sample {
+  display: block;
+  margin-top: 2.5rem;
 }
 
 /* ---- Bands ---- */
@@ -151,14 +157,28 @@
   color: var(--ink);
 }
 
-/* The part a reviewer reads. Quieter, because the headline comes first. */
-.feature-detail {
-  margin: 0;
+.feature-more {
+  margin-top: auto;
   padding-top: 0.55rem;
   border-top: 1px dashed var(--line);
-  font-size: 0.8rem;
-  line-height: 1.55;
-  color: var(--muted);
+
+  summary {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+
+    &:hover { color: var(--ink); }
+  }
+
+  p {
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
 }
 
 /* ---- Stack ---- */
@@ -208,40 +228,6 @@
   font-size: 0.86rem;
   line-height: 1.55;
   color: var(--body);
-}
-
-/* ---- Roadmap ---- */
-.roadmap {
-  margin: 0 0 1rem;
-  padding: 0;
-  list-style: none;
-
-  li {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.7rem;
-    padding: 0.5rem 0;
-    font-size: 0.92rem;
-    color: var(--muted);
-    border-bottom: 1px dashed var(--line);
-
-    &:last-child { border-bottom: none; }
-    &.is-done { color: var(--ink); }
-  }
-}
-
-.roadmap-mark {
-  flex-shrink: 0;
-  width: 1.1rem;
-  font-family: var(--font-mono);
-}
-
-.roadmap-note {
-  margin: 0;
-  max-width: 60ch;
-  font-size: 0.82rem;
-  line-height: 1.55;
-  color: var(--muted);
 }
 
 /* ---- Close ---- */

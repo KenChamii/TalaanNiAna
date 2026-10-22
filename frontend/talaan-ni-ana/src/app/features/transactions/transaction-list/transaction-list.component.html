@@ -1,19 +1,19 @@
-<h2>Kasaysayan ng mga Transaksyon</h2>
+<h2>{{ 'transactions.title' | t }}</h2>
 
 <div class="toolbar">
   <div class="date-field">
-    <label>Mula</label>
-    <input type="date" [(ngModel)]="dateFrom" (ngModelChange)="onFilterChange()" />
+    <label for="dateFrom">{{ 'common.from' | t }}</label>
+    <input id="dateFrom" type="date" [(ngModel)]="dateFrom" (ngModelChange)="onFilterChange()" />
   </div>
   <div class="date-field">
-    <label>Hanggang</label>
-    <input type="date" [(ngModel)]="dateTo" (ngModelChange)="onFilterChange()" />
+    <label for="dateTo">{{ 'common.to' | t }}</label>
+    <input id="dateTo" type="date" [(ngModel)]="dateTo" (ngModelChange)="onFilterChange()" />
   </div>
 
   <select [(ngModel)]="paymentType" (ngModelChange)="onFilterChange()">
-    <option value="">Lahat ng Paraan ng Bayad</option>
-    <option value="Cash">Cash</option>
-    <option value="Credit">Utang</option>
+    <option value="">{{ 'transactions.allPayments' | t }}</option>
+    <option value="Cash">{{ 'common.cash' | t }}</option>
+    <option value="Credit">{{ 'common.credit' | t }}</option>
   </select>
 </div>
 
@@ -21,10 +21,10 @@
   <table>
     <thead>
       <tr>
-        <th>Petsa</th>
-        <th>Customer</th>
-        <th>Paraan ng Bayad</th>
-        <th>Kabuuan</th>
+        <th>{{ 'transactions.col.date' | t }}</th>
+        <th>{{ 'transactions.col.customer' | t }}</th>
+        <th>{{ 'transactions.col.payment' | t }}</th>
+        <th>{{ 'transactions.col.total' | t }}</th>
         <th></th>
       </tr>
     </thead>
@@ -32,15 +32,19 @@
       <ng-container *ngFor="let txn of transactions()">
         <tr class="row" (click)="toggleExpand(txn.id)">
           <td>{{ txn.transactionDate | date:'MMM d, y · h:mm a' }}</td>
-          <td>{{ txn.customerName || 'Walk-in' }}</td>
+          <td>{{ txn.customerName || ('transactions.walkIn' | t) }}</td>
           <td>
             <span class="badge" [class.credit]="txn.paymentType === 'Credit'">
-              {{ txn.paymentType === 'Credit' ? 'Utang' : 'Cash' }}
+              {{ (txn.paymentType === 'Credit' ? 'common.credit' : 'common.cash') | t }}
             </span>
           </td>
           <td>{{ txn.totalAmount | peso }}</td>
           <td class="row-actions">
-            <button class="receipt-link-btn" (click)="viewReceipt(txn, $event)" title="Tingnan ang resibo">🧾</button>
+            <button
+              class="receipt-link-btn"
+              (click)="viewReceipt(txn, $event)"
+              [title]="'transactions.viewReceipt' | t"
+              [attr.aria-label]="'transactions.viewReceipt' | t">🧾</button>
             <span class="chevron">{{ expandedId() === txn.id ? '▲' : '▼' }}</span>
           </td>
         </tr>
@@ -54,20 +58,20 @@
         </tr>
       </ng-container>
       <tr *ngIf="transactions().length === 0">
-        <td colspan="5" class="empty">Walang transaksyon na natagpuan.</td>
+        <td colspan="5" class="empty">{{ 'transactions.empty' | t }}</td>
       </tr>
     </tbody>
   </table>
 
   <div class="pager">
-    <span>Pahina:</span>
+    <span>{{ 'common.page' | t }}</span>
     <button
       *ngFor="let p of [].constructor(totalPages()); let i = index"
       [class.active]="currentPage() === i + 1"
       (click)="goToPage(i + 1)">
       {{ i + 1 }}
     </button>
-    <span class="total">Total: {{ totalCount() }} Transaksyon</span>
+    <span class="total">{{ 'common.total' | t: { count: totalCount() } }}</span>
   </div>
 </div>
 

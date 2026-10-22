@@ -8,11 +8,13 @@ import { SettingsService } from '../../settings/settings.service';
 import { Customer } from '../../../shared/models/customer.model';
 import { PesoPipe } from '../../../shared/pipes/peso.pipes';
 import { ToastService } from '../../../shared/services/toast.service';
+import { I18nService } from '../../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-customer-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, CustomerFormComponent, PesoPipe],
+  imports: [CommonModule, FormsModule, RouterLink, CustomerFormComponent, PesoPipe, TranslatePipe],
   templateUrl: './customer-list.component.html',
   styleUrl: './customer-list.component.scss'
 })
@@ -20,6 +22,7 @@ export class CustomerListComponent implements OnInit {
   private customerService = inject(CustomerService);
   private settingsService = inject(SettingsService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
 
   customers = signal<Customer[]>([]);
   searchTerm = signal('');
@@ -65,8 +68,8 @@ export class CustomerListComponent implements OnInit {
       .replace('{amount}', `₱${customer.totalCredit.toFixed(2)}`);
 
     navigator.clipboard.writeText(message)
-      .then(() => this.toast.success('Na-copy. I-paste sa Messenger o SMS.'))
-      .catch(() => this.toast.warning('Hindi ma-access ang clipboard sa browser na ito.'));
+      .then(() => this.toast.success(this.i18n.translate('customers.copied')))
+      .catch(() => this.toast.warning(this.i18n.translate('customers.clipboardFailed')));
   }
 
   onModalSaved(name: string) {
@@ -74,6 +77,6 @@ export class CustomerListComponent implements OnInit {
     this.searchTerm.set('');
     this.currentPage.set(1);
     this.load();
-    this.toast.success(`Nadagdag na si ${name}.`);
+    this.toast.success(this.i18n.translate('customers.added', { name }));
   }
 }

@@ -4,16 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { ZReportService } from './z-report.service';
 import { ZReport } from './z-report.model';
 import { PesoPipe } from '../../shared/pipes/peso.pipes';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-z-report',
   standalone: true,
-  imports: [CommonModule, FormsModule, PesoPipe],
+  imports: [CommonModule, FormsModule, PesoPipe, TranslatePipe],
   templateUrl: './z-report.component.html',
   styleUrl: './z-report.component.scss'
 })
 export class ZReportComponent implements OnInit {
   private service = inject(ZReportService);
+  private i18n = inject(I18nService);
 
   report = signal<ZReport | null>(null);
   isLoading = signal(false);
@@ -45,9 +48,9 @@ export class ZReportComponent implements OnInit {
     window.print();
   }
 
-  /** Long-form date in Filipino, for the printed header. */
+  /** Long-form date in the current language, for the printed header. */
   formatDate(value: string): string {
-    return new Date(`${value}T00:00:00`).toLocaleDateString('fil-PH', {
+    return new Date(`${value}T00:00:00`).toLocaleDateString(this.i18n.locale(), {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
   }
