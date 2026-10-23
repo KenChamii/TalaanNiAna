@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, catchError, of, tap } from 'rxjs';
+import { Observable, catchError, of, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 /** Returned by login, register and refresh. The refresh token itself is an httpOnly cookie. */
@@ -22,6 +22,8 @@ export class AuthService {
 
   /** Kept in memory only, so an XSS payload cannot read it from storage. */
   private accessToken = signal<string | null>(null);
+
+  private restoring?: Observable<AuthResult | null>;
 
   readonly isLoggedIn = computed(() => this.accessToken() !== null);
 
@@ -47,20 +49,32 @@ export class AuthService {
 
   /** Exchanges the refresh cookie for a new access token. */
   refresh(): Observable<AuthResult | null> {
-    return this.http
-      .post<AuthResult>(`${environment.apiUrl}/auth/refresh`, {}, { withCredentials: true })
-      .pipe(
-        tap(result => this.accept(result)),
-        catchError(() => {
-          this.clear();
-          return of(null);
-        })
-      );
+    return this.requestRefresh().pipe(
+      catchError(() => {
+        this.clear();
+        return of(null);
+      })
+    );
   }
 
-  /** Called once at startup to restore a session from the cookie. */
+  /** Restores a session from the cookie once, in the background, and shares the result with the guard. */
   restoreSession(): Observable<AuthResult | null> {
-    return this.refresh();
+    return (this.restoring ??= this.requestRefresh().pipe(
+      catchError(() => of(null)),
+      shareReplay(1)
+    ));
+  }
+
+  /** Pings the API's health check so a sleeping host starts waking before the first real call. */
+  warmUp(): void {
+    const root = environment.apiUrl.replace(/\/api$/, '');
+    fetch(`${root}/health`, { mode: 'no-cors' }).catch(() => undefined);
+  }
+
+  private requestRefresh(): Observable<AuthResult> {
+    return this.http
+      .post<AuthResult>(`${environment.apiUrl}/auth/refresh`, {}, { withCredentials: true })
+      .pipe(tap(result => this.accept(result)));
   }
 
   /** Keeps the topbar current when the store is renamed in Settings. */
