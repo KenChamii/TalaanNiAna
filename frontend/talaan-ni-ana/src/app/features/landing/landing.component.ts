@@ -36,13 +36,16 @@ export class LandingComponent {
     'tingi', 'offline', 'stores'
   ];
 
-  readonly stack = [
-    { label: 'Frontend', value: 'Angular 18, standalone components, signals' },
-    { label: 'Backend', value: '.NET 10, clean architecture, EF Core 10' },
-    { label: 'Database', value: 'PostgreSQL on Neon (Singapore)' },
-    { label: 'Hosting', value: 'Cloudflare Workers, Render' },
-    { label: 'CI/CD', value: 'GitHub Actions' }
+  readonly route = ['till', 'outbox', 'api', 'app', 'db'];
+
+  readonly layers = ['domain', 'application', 'infrastructure', 'api'];
+
+  readonly spec = [
+    'backend', 'frontend', 'database', 'auth', 'tenancy',
+    'errors', 'offline', 'tests', 'ci', 'hosting', 'languages'
   ];
+
+  readonly limits = [1, 2, 3, 4];
 
   readonly decisions = ['idempotency', 'timezone', 'pricing', 'errors'];
 

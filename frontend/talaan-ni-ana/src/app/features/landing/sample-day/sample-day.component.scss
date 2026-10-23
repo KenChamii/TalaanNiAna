@@ -59,6 +59,8 @@
     padding-top: 0.45rem;
     border-top: var(--line-w) solid var(--line);
     font-weight: 700;
-    color: var(--ok);
+    padding-inline: 0.4rem;
+    background: var(--ok-soft);
+    color: var(--ink);
   }
 }

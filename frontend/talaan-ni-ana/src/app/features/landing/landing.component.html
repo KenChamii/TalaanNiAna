@@ -86,10 +86,28 @@
       <h2 class="section-title">{{ 'landing.buildTitle' | t }}</h2>
     </div>
 
+    <div class="arch">
+      <h3 class="arch-title">{{ 'landing.archTitle' | t }}</h3>
+      <p class="arch-body">{{ 'landing.archBody' | t }}</p>
+
+      <ol class="route">
+        <li class="route-step" *ngFor="let step of route">{{ 'landing.route.' + step | t }}</li>
+      </ol>
+      <p class="route-note">{{ 'landing.routeNote' | t }}</p>
+
+      <ul class="layers">
+        <li class="layer" *ngFor="let layer of layers">
+          <span class="layer-name">{{ 'landing.layer.' + layer + '.name' | t }}</span>
+          <span class="layer-text">{{ 'landing.layer.' + layer + '.text' | t }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <h3 class="spec-title">{{ 'landing.specTitle' | t }}</h3>
     <dl class="stack">
-      <div class="stack-row" *ngFor="let item of stack">
-        <dt>{{ item.label }}</dt>
-        <dd>{{ item.value }}</dd>
+      <div class="stack-row" *ngFor="let item of spec">
+        <dt>{{ 'landing.spec.' + item + '.label' | t }}</dt>
+        <dd>{{ 'landing.spec.' + item + '.value' | t }}</dd>
       </div>
     </dl>
 
@@ -98,6 +116,20 @@
         <h3 class="decision-title">{{ 'landing.decision.' + decision + '.title' | t }}</h3>
         <p class="decision-body">{{ 'landing.decision.' + decision + '.body' | t }}</p>
       </article>
+    </div>
+  </section>
+
+  <!-- Limits -->
+  <section class="band">
+    <div class="limits">
+      <div>
+        <p class="eyebrow">{{ 'landing.limitsEyebrow' | t }}</p>
+        <h2 class="section-title">{{ 'landing.limitsTitle' | t }}</h2>
+        <p class="limits-body">{{ 'landing.limitsBody' | t }}</p>
+      </div>
+      <ul class="limits-list">
+        <li *ngFor="let n of limits">{{ 'landing.limit.' + n | t }}</li>
+      </ul>
     </div>
   </section>
 

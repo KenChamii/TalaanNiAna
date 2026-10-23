@@ -31,14 +31,14 @@
     <tbody>
       <ng-container *ngFor="let txn of transactions()">
         <tr class="row" (click)="toggleExpand(txn.id)">
-          <td>{{ txn.transactionDate | date:'MMM d, y · h:mm a' }}</td>
-          <td>{{ txn.customerName || ('transactions.walkIn' | t) }}</td>
-          <td>
+          <td [attr.data-label]="'transactions.col.date' | t">{{ txn.transactionDate | date:'MMM d, y · h:mm a' }}</td>
+          <td [attr.data-label]="'transactions.col.customer' | t">{{ txn.customerName || ('transactions.walkIn' | t) }}</td>
+          <td [attr.data-label]="'transactions.col.payment' | t">
             <span class="badge" [class.credit]="txn.paymentType === 'Credit'">
               {{ (txn.paymentType === 'Credit' ? 'common.credit' : 'common.cash') | t }}
             </span>
           </td>
-          <td>{{ txn.totalAmount | peso }}</td>
+          <td [attr.data-label]="'transactions.col.total' | t">{{ txn.totalAmount | peso }}</td>
           <td class="row-actions">
             <button
               class="receipt-link-btn"

@@ -7,6 +7,7 @@ import { AuthService } from './core/auth/auth.service';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptors';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { provideServiceWorker } from '@angular/service-worker';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 /** The access token lives in memory, so a reload restores it from the refresh cookie. */
 function restoreSession(auth: AuthService) {
@@ -16,6 +17,8 @@ function restoreSession(auth: AuthService) {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
+    // ngx-charts animates with @angular/animations; loaded lazily so the landing page doesn't pay for it.
+    provideAnimationsAsync(),
     // jwt runs first so it can retry a 401; error runs outside it and only sees failures.
     provideHttpClient(withInterceptors([errorInterceptor, jwtInterceptor])),
     {

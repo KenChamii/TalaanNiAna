@@ -23,14 +23,14 @@ table {
   th, td {
     text-align: left;
     padding: 0.85rem 1.25rem;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--line);
     font-size: 0.9rem;
   }
 
   th { color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
 
   .row { cursor: pointer; }
-  .row:hover { background: rgba(255,255,255,0.03); }
+  .row:hover { background: var(--bg-sunk); }
   .chevron { color: var(--text-muted); }
 
   .row-actions {
@@ -50,20 +50,20 @@ table {
     line-height: 1;
     transition: background 0.15s ease;
 
-    &:hover { background: rgba(255,255,255,0.06); }
+    &:hover { background: var(--bg-sunk); }
   }
 
   .badge {
-    background: rgba(46, 204, 113, 0.15);
-    color: var(--success);
+    background: var(--ok-soft);
+    color: var(--ink);
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
     font-size: 0.8rem;
-    &.credit { background: rgba(206, 17, 38, 0.15); color: var(--crimson-red); }
+    &.credit { background: var(--danger-soft); color: var(--ink); }
   }
 
   .detail-row td {
-    background: rgba(255,255,255,0.02);
+    background: var(--bg-sunk);
     padding: 0.75rem 1.25rem 0.75rem 2.5rem;
   }
 
@@ -89,14 +89,70 @@ table {
 
   button {
     background: none;
-    border: 1px solid var(--border-subtle);
-    color: var(--text-primary);
+    border: 1px solid var(--line);
+    color: var(--ink);
     width: 28px;
     height: 28px;
     border-radius: 4px;
     cursor: pointer;
-    &.active { background: var(--sun-yellow); color: #1A1A1A; border-color: var(--sun-yellow); }
+    &.active { background: var(--ok); color: #1A1A1A; border-color: var(--ok); }
   }
 
   .total { margin-left: auto; }
+}
+
+/* ---- Small screens ----
+   Five columns do not fit a phone, so each row becomes a card; labels come from data-label. */
+@media (max-width: 780px) {
+  .toolbar {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+
+    .date-field { flex: 1 1 140px; min-width: 0; }
+    .date-field input, select { width: 100%; }
+    select { flex: 1 1 100%; }
+  }
+
+  .table-card { padding: 0.5rem; }
+
+  table, tbody, tr, td { display: block; width: 100%; }
+
+  thead { display: none; }
+
+  tr.row {
+    margin-bottom: 0.7rem;
+    padding: 0.7rem 0.8rem;
+    border: var(--line-w) solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+  }
+
+  tr.detail-row { margin: -0.4rem 0 0.7rem; padding: 0 0.8rem; }
+
+  table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.28rem 0;
+    border: none;
+    text-align: right;
+
+    &::before {
+      content: attr(data-label);
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+    }
+  }
+
+  table .row-actions { padding-top: 0.5rem; &::before { content: none; } }
+  table .detail-row td { display: block; padding: 0.5rem 0; &::before { content: none; } }
+  table .empty { display: block; &::before { content: none; } }
+  table .line-item { max-width: none; }
+
+  .pager { flex-wrap: wrap; }
 }
