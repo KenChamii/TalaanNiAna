@@ -152,6 +152,66 @@ export const LANDING: Translations = {
     en: 'Errors follow RFC 7807 with a stable error code, so the cashier sees a specific message like "kulang ang stock ng Coke" instead of a generic server error.'
   },
 
+  'landing.archEyebrow': { tl: 'Arkitektura', en: 'Architecture' },
+  'landing.archTitle': { tl: 'Ganito dumadaloy ang isang benta', en: 'How a sale travels' },
+  'landing.archBody': {
+    tl: 'Apat na proyekto sa backend, at laging papasok ang mga dependency. Walang alam ang Application layer sa EF Core, kaya ang API middleware ang nagiging 409 sa concurrency error.',
+    en: 'Four backend projects, with dependencies always pointing inward. The Application layer knows nothing about EF Core, so the API middleware is what turns a concurrency error into a 409.'
+  },
+  'landing.route.till': { tl: 'Register (Angular PWA)', en: 'Till (Angular PWA)' },
+  'landing.route.outbox': { tl: 'Outbox (IndexedDB)', en: 'Outbox (IndexedDB)' },
+  'landing.route.api': { tl: 'ASP.NET Core API', en: 'ASP.NET Core API' },
+  'landing.route.app': { tl: 'Application services', en: 'Application services' },
+  'landing.route.db': { tl: 'EF Core → PostgreSQL', en: 'EF Core → PostgreSQL' },
+  'landing.routeNote': {
+    tl: 'Kapag walang signal, sa Outbox muna papasok ang benta at ipapadala kapag may koneksyon na. Sa ilalim, may global query filter ang bawat tindahan, kaya hindi makikita ng isa ang data ng iba.',
+    en: 'With no signal, a sale waits in the outbox and is sent when the connection returns. At the bottom, a global query filter scopes every query to the store, so one store never sees another’s data.'
+  },
+
+  'landing.layer.domain.name': { tl: 'Domain', en: 'Domain' },
+  'landing.layer.domain.text': { tl: 'Mga entity at interface. Walang dependency.', en: 'Entities and interfaces. No dependencies.' },
+  'landing.layer.application.name': { tl: 'Application', en: 'Application' },
+  'landing.layer.application.text': { tl: 'Mga service, DTO at validator (FluentValidation).', en: 'Services, DTOs and validators (FluentValidation).' },
+  'landing.layer.infrastructure.name': { tl: 'Infrastructure', en: 'Infrastructure' },
+  'landing.layer.infrastructure.text': { tl: 'EF Core, mga repository, Identity at migration.', en: 'EF Core, repositories, Identity and migrations.' },
+  'landing.layer.api.name': { tl: 'API', en: 'API' },
+  'landing.layer.api.text': { tl: 'Mga controller, middleware, rate limit at composition.', en: 'Controllers, middleware, rate limits and composition.' },
+
+  'landing.specTitle': { tl: 'Spec sheet', en: 'Spec sheet' },
+  'landing.spec.backend.label': { tl: 'Backend', en: 'Backend' },
+  'landing.spec.backend.value': { tl: '.NET 10, ASP.NET Core, clean architecture, EF Core 10', en: '.NET 10, ASP.NET Core, clean architecture, EF Core 10' },
+  'landing.spec.frontend.label': { tl: 'Frontend', en: 'Frontend' },
+  'landing.spec.frontend.value': { tl: 'Angular 18, standalone components, signals, installable PWA', en: 'Angular 18, standalone components, signals, installable PWA' },
+  'landing.spec.database.label': { tl: 'Database', en: 'Database' },
+  'landing.spec.database.value': { tl: 'PostgreSQL sa Neon (Singapore); xmin bilang concurrency token', en: 'PostgreSQL on Neon (Singapore); xmin as the concurrency token' },
+  'landing.spec.auth.label': { tl: 'Auth', en: 'Auth' },
+  'landing.spec.auth.value': { tl: 'JWT na maikli ang buhay, umiikot na refresh token (SHA-256 hash, httpOnly cookie)', en: 'Short-lived JWT, rotating refresh tokens (SHA-256 hashed, httpOnly cookie)' },
+  'landing.spec.tenancy.label': { tl: 'Tenancy', en: 'Tenancy' },
+  'landing.spec.tenancy.value': { tl: 'StoreId sa bawat entity, ipinapatupad ng global query filter', en: 'StoreId on every entity, enforced by a global query filter' },
+  'landing.spec.errors.label': { tl: 'Errors', en: 'Errors' },
+  'landing.spec.errors.value': { tl: 'RFC 7807 problem details na may stable code', en: 'RFC 7807 problem details with stable codes' },
+  'landing.spec.offline.label': { tl: 'Offline', en: 'Offline' },
+  'landing.spec.offline.value': { tl: 'IndexedDB outbox, ligtas i-replay dahil sa idempotency key', en: 'IndexedDB outbox, safe to replay thanks to idempotency keys' },
+  'landing.spec.tests.label': { tl: 'Tests', en: 'Tests' },
+  'landing.spec.tests.value': { tl: 'xUnit + FluentAssertions, hand-written na fakes sa halip na mocking library', en: 'xUnit + FluentAssertions, hand-written fakes instead of a mocking library' },
+  'landing.spec.ci.label': { tl: 'CI/CD', en: 'CI/CD' },
+  'landing.spec.ci.value': { tl: 'GitHub Actions: build, test, mga Docker image, deploy sa Cloudflare', en: 'GitHub Actions: build, test, Docker images, deploy to Cloudflare' },
+  'landing.spec.hosting.label': { tl: 'Hosting', en: 'Hosting' },
+  'landing.spec.hosting.value': { tl: 'Cloudflare Workers (frontend), Render (API), Neon (database)', en: 'Cloudflare Workers (frontend), Render (API), Neon (database)' },
+  'landing.spec.languages.label': { tl: 'Wika', en: 'Languages' },
+  'landing.spec.languages.value': { tl: 'Tagalog at English, may test na pumapalya kapag may kulang na salin', en: 'Tagalog and English, with a test that fails when a translation is missing' },
+
+  'landing.limitsEyebrow': { tl: 'Mga limitasyon', en: 'Known limits' },
+  'landing.limitsTitle': { tl: 'Ang hindi pa kaya nito', en: 'What it doesn’t do yet' },
+  'landing.limitsBody': {
+    tl: 'Itinatala ang mga ito nang hayag, hindi hinahayaang matuklasan na lang.',
+    en: 'Recorded openly rather than left to be discovered.'
+  },
+  'landing.limit.1': { tl: 'Isang direksyon lang ang offline: nagpapadala ng benta, pero luma ang catalogue hangga’t hindi online.', en: 'Offline is one-way: sales queue and send, but the catalogue is only as fresh as the last time the app was online.' },
+  'landing.limit.2': { tl: 'Isang antas lang ang repack: puwedeng buksan ang kahon, pero hindi na ang piraso.', en: 'Repacking is one level deep: a pack can be opened, a piece cannot be broken again.' },
+  'landing.limit.3': { tl: 'Walang integration test sa totoong database. Mga fake ang gamit ng lahat ng test.', en: 'No integration tests against a real database. Every test runs against in-memory fakes.' },
+  'landing.limit.4': { tl: 'Puwedeng baguhin ng kahit sino ang demo, kaya lumalayo ito sa orihinal na data.', en: 'The demo is writable by anyone, so it drifts from the seeded data.' },
+
   'landing.closeTitle': { tl: 'Tingnan mo na', en: 'Take a look' },
   'landing.madeBy': { tl: 'Gawa ni', en: 'Made by' }
 };

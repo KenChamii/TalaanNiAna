@@ -238,3 +238,8 @@
   font-size: 0.75rem;
   color: var(--muted);
 }
+
+@media (max-width: 520px) {
+  .margin-summary { flex-wrap: wrap; }
+  .margin-block { flex: 1 1 130px; min-width: 0; overflow-wrap: anywhere; }
+}

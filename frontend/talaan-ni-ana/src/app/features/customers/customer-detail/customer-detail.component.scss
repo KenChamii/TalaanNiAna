@@ -1,7 +1,7 @@
 .back-link {
     display: inline-block;
     margin-bottom: 1rem;
-    color: var(--flag-blue);
+    color: var(--action);
     text-decoration: none;
 }
 
@@ -23,12 +23,12 @@
     }
 
     &.has-debt .value {
-        color: var(--crimson-red);
+        color: var(--danger);
     }
 }
 
 .pay-btn {
-    background: var(--flag-blue);
+    background: var(--action);
     color: #fff;
     border: none;
     padding: 0.5rem 1rem;
@@ -79,12 +79,12 @@
     .tag {
         padding: 0.15rem 0.5rem;
         border-radius: 4px;
-        background: var(--flag-blue);
+        background: var(--action);
         font-size: 0.75rem;
     }
 
     .tag.credit {
-        background: var(--crimson-red);
+        background: var(--danger);
     }
 
     .amount {
@@ -101,4 +101,10 @@
 
 .empty {
     color: var(--text-muted);
+}
+
+@media (max-width: 520px) {
+    .debt-card { flex-wrap: wrap; }
+    .tx-row { flex-wrap: wrap; gap: 0.4rem 0.8rem; }
+    .form-actions { flex-direction: column-reverse; button { width: 100%; } }
 }

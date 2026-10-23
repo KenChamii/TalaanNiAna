@@ -14,6 +14,12 @@ period takes up to a minute while the API and the database wake. It is seeded wi
 store that has eighteen products, five customers carrying utang, and a fortnight of sales,
 so the screens have something in them.
 
+![The landing page](docs/screenshots/landing-desktop.png)
+
+| The till | On a phone | Transactions on a phone |
+|---|---|---|
+| ![The till](docs/screenshots/checkout-desktop.png) | ![The dashboard on a phone](docs/screenshots/dashboard-mobile.png) | ![Transactions on a phone](docs/screenshots/transactions-mobile.png) |
+
 ## Why profit, and not just sales
 
 A sari-sari store's notebook records what was sold. It does not record what the stock cost,
@@ -97,13 +103,43 @@ level only — a sack to a cup is repacking, a sack to a cup to a spoonful is a 
 
 ## Architecture
 
+![Architecture and spec sheet from the landing page](docs/screenshots/architecture-desktop.png)
+
+```mermaid
+flowchart LR
+  subgraph Browser
+    Till["Angular 18 PWA<br/>signals, standalone components"]
+    Outbox[("Outbox<br/>IndexedDB")]
+  end
+  Till -->|"online"| API
+  Till -.->|"no signal"| Outbox
+  Outbox -.->|"replayed on reconnect"| API
+  API["ASP.NET Core API<br/>JWT, rate limits, RFC 7807"] --> App["Application services<br/>FluentValidation"]
+  App --> Infra["EF Core 10<br/>query filter per store"]
+  Infra --> DB[("PostgreSQL")]
+```
+
+| | |
+| --- | --- |
+| Backend | .NET 10, ASP.NET Core, EF Core 10, FluentValidation, Identity |
+| Frontend | Angular 18, standalone components, signals, service worker, ngx-charts |
+| Database | PostgreSQL 17 (Neon in production), `xmin` as the concurrency token |
+| Auth | Short-lived JWT, rotating refresh tokens in an httpOnly cookie |
+| Tests | xUnit and FluentAssertions on the backend, Karma and Jasmine on the frontend |
+| CI/CD | GitHub Actions: build, test, Docker images, deploy to Cloudflare Workers |
+| Hosting | Cloudflare Workers (web), Render (API), Neon (database) |
+| Languages | Tagalog and English, with a test that fails when a text is missing in one |
+
 Four projects, dependencies pointing inward:
 
 ```
-TalaanNiAna.Domain          entities, interfaces, no dependencies
-TalaanNiAna.Application     services, DTOs, validators
-TalaanNiAna.Infrastructure  EF Core, repositories, Identity
-TalaanNiAna.API             controllers, middleware, composition
+backend/TalaanNiAna.Domain          entities, interfaces, no dependencies
+backend/TalaanNiAna.Application     services, DTOs, validators
+backend/TalaanNiAna.Infrastructure  EF Core, repositories, Identity
+backend/TalaanNiAna.API             controllers, middleware, composition
+backend/TalaanNiAna.Tests           xUnit, against hand-written fakes
+frontend/talaan-ni-ana              Angular app: features/, core/ (auth, i18n, offline), shared/
+docs/                               CI, database, deployment, demo, offline, testing
 ```
 
 The Application layer deliberately knows nothing about EF Core. `CheckoutService` does not
@@ -161,6 +197,17 @@ Short-lived access tokens, with rotating refresh tokens stored as SHA-256 hashes
 httpOnly cookie. Presenting a refresh token that has already been used revokes the whole
 family, on the assumption that it leaked. The access token is held in memory only, so an
 XSS payload cannot read it from storage.
+
+## Things worth knowing
+
+**The phone is the main screen.** A till is used one-handed behind a counter, so below 860px
+the sidebar becomes a drawer, and the wide tables (inventory, customers, transactions)
+become stacked cards whose labels come from `data-label`, keeping each one a single table in
+the markup. Nothing scrolls sideways at 360px; that was checked in a real browser at 360,
+768 and 1280px rather than assumed.
+
+**Charts load lazily.** `provideAnimationsAsync()` keeps `@angular/animations` out of the
+landing page's initial bundle, which is about 110 kB over the wire.
 
 ## Running it locally
 
@@ -229,7 +276,10 @@ PostgreSQL specifics, and `docs/DEMO.md` for what the demo seeds.
 
 ```bash
 cd backend
-dotnet test
+dotnet test            # 50 tests
+
+cd frontend/talaan-ni-ana
+npm test               # includes the translation completeness check
 ```
 
 The suite covers the pieces that hold real logic:
@@ -263,15 +313,18 @@ Recorded deliberately rather than left to be discovered.
   as the last time the app was online, and a price changed on another device will not be
   known. Two tills selling the same last piece offline both succeed locally and one fails
   on sync, which is correct but unhelpful.
-- **Only part of the UI is translated.** The dictionary covers the navigation, the landing
-  page, sign-in, the till and the offline banner. The dashboard, inventory, customers,
-  transactions, settings and the two reports still carry Tagalog literals.
 - **Repacking is one level deep.** A pack can be broken into pieces, but a piece cannot be
   broken again. That is deliberate rather than pending, but it is a limit.
 - **Migrations applied at startup.** Fine for a single free instance, wrong the moment there
   are two: both would try to migrate on boot.
 - **The demo is writable by anyone.** Visitors can add products and ring up sales, and
   nothing resets it, so it drifts from the seeded state.
+
+## Roadmap
+
+- Integration tests against a throwaway PostgreSQL container.
+- Offline catalogue refresh, so a price changed on another device reaches a till that was offline.
+- A reset for the shared demo store.
 
 ## Licence
 
